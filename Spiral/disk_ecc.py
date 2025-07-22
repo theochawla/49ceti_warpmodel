@@ -579,6 +579,11 @@ class Disk:
         plt.colorbar()
         plt.savefig("tvel.png")
         print("tvel.shape " + str(tvel.shape))
+
+        plt.imshow(tvel[:,:,10])
+        plt.colorbar()
+        plt.savefig("tvel_10.png")
+        #print("tvel.shape " + str(tvel.shape))
         
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)

@@ -390,7 +390,7 @@ class Disk:
 
 
         #self.vel = np.sqrt(self.vel_phi**2 + self.vel_rad **2)
-        self.vel = self.vel_phi
+        #self.vel = self.vel_phi
 
         #fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
         #scatter = ax.scatter(pcf[:,:,0], acf[:,:,0], c=self.vel_phi, label="phi velocity, face on")
@@ -562,6 +562,7 @@ class Disk:
         '''this is where I need to make sure velocity map is being used correctly'''
 
         plt.imshow(self.vel_phi[:,:,0])
+        plt.colorbar()
         plt.savefig('vel_phi_beforecoord.png', dpi = 300)
         plt.show()
 
@@ -659,18 +660,22 @@ class Disk:
         print("vel_phi shape " + str(self.vel_rad.shape))
 
         plt.imshow(self.vel_rad[:,:,0])
+        plt.colorbar()
         plt.savefig('pvel_rad_z=0.png', dpi = 300)
         plt.show()
         
         plt.imshow(self.vel_rad[:,:,10])
+        plt.colorbar()
         plt.savefig('pvel_rad_z=10.png', dpi = 300)
         plt.show()
 
         plt.imshow(self.vel_phi[:,:,0])
+        plt.colorbar()
         plt.savefig('pvel_phi_z=0.png', dpi = 300)
         plt.show()
          
         plt.imshow(self.vel_phi[:,:,10])
+        plt.colorbar()
         plt.savefig('pvel_phi_z=10.png', dpi = 300)
         plt.show()
         

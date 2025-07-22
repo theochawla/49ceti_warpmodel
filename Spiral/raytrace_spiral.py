@@ -48,7 +48,7 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     nu0 = obs[1]*GHz
     Zmax = obs[5]*AU
     veloc = obs[6]*kms
-    print("veloc shape " + str(veloc.shape))
+    #print("veloc shape " + str(veloc.shape))
 
 
     # - disk parameters
@@ -88,7 +88,7 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         '''My version'''
         dV = veloc + handed*np.sin(thet)*(los_vel)
 
-    print("dV " + str(dV))
+    #print("dV " + str(dV))
 
 
     if wind:
@@ -122,6 +122,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     #tau = arg.cumsum(axis=2)
     tau = cumtrapz(Knu,S,axis=2,initial=0)
     arg = Knu*Snu*np.exp(-tau)
+
+    #print("tau shape " + str(tau.shape))
+    print("tau first z slice" + str(tau[:,:,0]))
+    #print("arg shape " + str(arg.shape))
+    print("arg first z slice " + str(arg[:,:,0]))
 
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 
@@ -317,10 +322,17 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
 
     # extract disk structure from Disk object
     cube=np.zeros((disk.nphi,disk.nr,nchans))
+    print("cube.shape " + str(cube.shape))
     cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
+
     cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
+
     X = disk.X
+    print("disk.X shape " + str(X.shape))
+    #print("X " + str(X))
     Y = disk.Y
+    print("disk.Y shape " + str(Y.shape))
+    print("disk.X shape " + str(X.shape))
 
     if isgas:
     # approximation for partition function
@@ -364,7 +376,10 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         parZ = np.sqrt(1.+(2./Te)**2*disk.T**2)
 
     # calculate level population
+        print("rhoG " + str(disk.rhoG))
+        print("rhoG shape " + str(disk.rhoG.shape))
         tnl = gl*abund*disk.rhoG*np.exp(-(El/kB)/disk.T)/parZ
+        print("tnl " + str(tnl))
         w = tnl<0
         if w.sum()>0:
             tnl[w] = 0
@@ -384,6 +399,8 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         if isgas:
             Inu,Inuz,tau_dust = gasmodel(disk,params,obs,moldat,tnl,wind,includeDust=includeDust)
         #Inu_dust,tau_dust = dustmodel(disk,freq0)
+            print("Inu shape " + str(Inu.shape))
+            print("Inu max " + str(np.max(Inu)))
             cube[:,:,i] = Inu
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
@@ -418,6 +435,7 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         imt = xy_interpol(ztau1tot,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
         imt[np.isnan(imt)]=-170*disk.AU
         velo = chans+vsys
+        print("velo " + str(velo))
         if obsv is not None:
             imt2 = np.zeros((xnpix,xnpix,len(obsv)))
             for ix in range(xnpix):
@@ -440,9 +458,18 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         #hdut=fits.PrimaryHDU((imt_s).T,hdrt)
         hdut.writeto(modfile+'p_tau1.fits',overwrite=True,output_verify='fix')
 
+    print("cube max" + str(np.max(cube)))
+    print("cube shape " + str(cube.shape))
+
+    print("X max" + str(np.max(X)))
+    print("Y max " + str(np.max(Y)))
+    print("X shape " + str(X.shape))
 
     # - interpolate onto a square grid
     im = xy_interpol(cube,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
+    #print("im " + str(im))
+    print("im max" + str(np.max(im)))
+    print("im shape " + str(im.shape))
 
     if isgas:
     # - interpolate onto velocity grid of observed star
@@ -504,6 +531,10 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         chanstep*=bin
         chans = chanmin+np.arange(nchans)*chanstep
 
+    #print("im2 " + str(im2))
+    print("im2 max "+ str(np.max(im2)))
+    #print("im2 shape " + str(im2))
+
     # - make header
     if isgas:
         if obsv is not None:
@@ -514,10 +545,16 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         im2=im
         hdr = write_h_cont(dd=distance,xnpix=xnpix,xpixscale=xpixscale)
     # - shift and rotate model
+    '''hdr  is header (simple, T)'''
+    #print("hdr " + str(hdr))
+    #print("hdr shape "+ str(hdr.shape))
     im_s = ndimage.rotate(im2,90.+PA,reshape=False) #***#
 
     pixshift = np.array([-1.,1.])*offs/(3600.*np.abs([hdr['cdelt1'],hdr['cdelt2']]))
     im_s = ndimage.shift(im_s,(pixshift[0],pixshift[1],0),mode='nearest')*Jy*(xpixscale/rad)**2
+    #print("im_s " + str(im_s))
+    print("im_s max "+ str(np.max(im_s)))
+    #print("im_s shape " + str(im_s.shape))
 
 
     # write processed model
