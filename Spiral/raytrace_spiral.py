@@ -59,6 +59,7 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     nphi = disk.nphi
     nr = disk.nr
     nz = disk.nz
+    '''what is this S...? part of grid'''
     S = disk.S
 
     # - conversions and derivative data
@@ -74,6 +75,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
     '''adding this velocity definition for a spiral'''
     los_vel = (disk.vel_rad*np.cos(disk.p_grid) +disk.vel_phi*np.sin(disk.p_grid))
+    print("los_vel shape " + str(los_vel.shape))
+    print("los_vel min "+ str(np.min(los_vel)))
+    print("los_vel max "+ str(np.max(los_vel)))
 
     # - Calculate source function and absorbing coefficient
     try:
@@ -88,7 +92,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         '''My version'''
         dV = veloc + handed*np.sin(thet)*(los_vel)
 
-    #print("dV " + str(dV))
+    print("dV max" + str(np.max(dV)))
+    print("dV min" + str(np.min(dV)))
+
 
 
     if wind:
@@ -99,9 +105,10 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #print(height.shape,disk.cs.shape,disk.Z.shape)
 
     Signu = SignuF1*np.exp(-dV**2/disk.dBV**2)/disk.dBV*(1.-np.exp(-(BBF2*nu)/disk.T))   # - absorbing cross section
-    print('disk.vel shape ' + str(disk.vel.shape))
+    #print('disk.vel shape ' + str(disk.vel.shape))
     
-
+    print("Signu shape " + str(Signu.shape))
+    print("Signu max " + str(np.max(Signu)))
 
     Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
     if includeDust and disk.rhoD is not None:
@@ -116,6 +123,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
 
+    print("Snu shape " + str(Snu.shape))
+    print("Snu mas " + str(np.max(Snu)))
+    print("Knu shape " + str(Knu.shape))
+    print("Knu mas " + str(np.max(Knu)))
+
+
     #ds = (S-np.roll(S,1,axis=2))/2.
     #arg = ds*(Knu + np.roll(Knu,1,axis=2))
     #arg[:,:,0]=0.
@@ -124,10 +137,16 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     arg = Knu*Snu*np.exp(-tau)
 
     #print("tau shape " + str(tau.shape))
-    print("tau first z slice" + str(tau[:,:,0]))
+    print("tau first z slice max" + str(np.max(tau[:,:,0])))
     #print("arg shape " + str(arg.shape))
-    print("arg first z slice " + str(arg[:,:,0]))
+    print("arg first z slice max " + str(np.max(arg[:,:,0])))
 
+
+    print("gas model output 1 max " + str(np.max(trapz(arg,S,axis=2))))
+    print("gas model output 2 =tau ")
+    print("gas model output 3 max " + str(np.max(cumtrapz(arg,S,axis=2,initial=0.))))
+
+    #integratng
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 
 def dustmodel(disk,nu):
@@ -376,7 +395,8 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         parZ = np.sqrt(1.+(2./Te)**2*disk.T**2)
 
     # calculate level population
-        print("rhoG " + str(disk.rhoG))
+        #print("rhoG " + str(disk.rhoG))
+        print("rhoG max " + str(np.max(disk.rhoG)))
         print("rhoG shape " + str(disk.rhoG.shape))
         tnl = gl*abund*disk.rhoG*np.exp(-(El/kB)/disk.T)/parZ
         print("tnl " + str(tnl))

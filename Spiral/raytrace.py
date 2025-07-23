@@ -82,6 +82,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
 
+    print("disk.vel max " + str(np.max(disk.vel)))
+    print("disk.vel min " + str(np.min(disk.vel)))
+
+    print("dV max" + str(np.max(dV)))
+    print("dV min" + str(np.min(dV)))
+
     #print("dV " + str(dV))
 
     if wind:
@@ -93,6 +99,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
     Signu = SignuF1*np.exp(-dV**2/disk.dBV**2)/disk.dBV*(1.-np.exp(-(BBF2*nu)/disk.T))   # - absorbing cross section
     #print('disk.vel shape ' + str(disk.vel.shape))
+
+    print("Signu shape " + str(Signu.shape))
+    print("Signu max " + str(np.max(Signu)))
     
 
 
@@ -109,6 +118,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
 
+    print("Snu shape " + str(Snu.shape))
+    print("Snu mas " + str(np.max(Snu)))
+    print("Knu shape " + str(Knu.shape))
+    print("Knu mas " + str(np.max(Knu)))
+
     #ds = (S-np.roll(S,1,axis=2))/2.
     #arg = ds*(Knu + np.roll(Knu,1,axis=2))
     #arg[:,:,0]=0.
@@ -120,6 +134,10 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     print("tau first z slice" + str(tau[:,:,0]))
     #print("arg shape " + str(arg.shape))
     print("arg first z slice " + str(arg[:,:,0]))
+
+    print("gas model output 1 max " + str(np.max(trapz(arg,S,axis=2))))
+    print("gas model output 2 =tau ")
+    print("gas model output 3 max " + str(np.max(cumtrapz(arg,S,axis=2,initial=0.))))
 
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 
@@ -363,6 +381,8 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
 
     # calculate level population
         tnl = gl*abund*disk.rhoG*np.exp(-(El/kB)/disk.T)/parZ
+        print("rhoG max " + str(np.max(disk.rhoG)))
+        print("rhoG shape " + str(disk.rhoG.shape))
         w = tnl<0
         if w.sum()>0:
             tnl[w] = 0

@@ -569,7 +569,7 @@ class Disk:
         #modified to use phi and r velocities
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
-        tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
         plt.imshow(tvelphi[:,:,0])
         plt.colorbar()
@@ -655,7 +655,7 @@ class Disk:
         '''changed these to include r and phi velocity values'''
         self.vel_rad = tvelr
         self.vel_phi = tvelphi
-        self.vel = tvel
+        #self.vel = tvel
         print("vel_rad shape " + str(self.vel_rad.shape))
         print("vel_phi shape " + str(self.vel_rad.shape))
 
