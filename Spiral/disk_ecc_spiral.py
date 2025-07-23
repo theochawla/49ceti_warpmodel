@@ -295,17 +295,26 @@ class Disk:
         plt.savefig("spiral_b4_interp_surf.png")
         plt.show()
         
+        '''tiling surface density grid'''
+        g_r_flat = np.ravel(g_r)
+        g_r_tiled = np.append(g_r_flat, [[g_r_flat], [g_r_flat]])
 
+        g_phi_flat = np.ravel(g_phi)
+        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi)]])
 
-        interp_test = interpnd((np.ravel(g_r), np.ravel(g_phi)), np.ravel(spir0))
-        print("g_r " + str(g_r))
-        print("g_phi " + str(g_phi))
-        plt.scatter(np.ravel(g_r), np.ravel(g_phi), c=spir0)
+        spir_flat = np.ravel(spir0)
+        spir_tiled = np.append(spir_flat, [[spir_flat],[spir_flat]])
+
+        '''interpolating tiled grid'''
+        interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
+        #print("g_r " + str(g_r))
+        #print("g_phi " + str(g_phi))
+        plt.scatter(g_r_tiled, g_phi_tiled, c=spir_tiled)
         plt.colorbar()
-        plt.savefig("density_plotted1darray.png")
+        plt.savefig("density_plotted1darray_tiled.png")
         plt.show()
-        print("acf [:,:,0] " + str(acf[:,:,0]))
-        print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
+        #print("acf [:,:,0] " + str(acf[:,:,0]))
+        #print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
 
         siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + 5
 
@@ -359,7 +368,7 @@ class Disk:
         pos = 90 # rotation of spiral (degrees), starting north, cw
 
         #self.vel = giggle.momentone(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0, 0)
-
+        '''defining spiral velocity fields'''
         
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
         phi_vel = giggle.uphC(gx, gy, ms, md, p, m, 1, beta, amin, amax, ap, 0)
@@ -367,16 +376,37 @@ class Disk:
         rad_vel = giggle.urC(gx, gy, ms, md, p, 2, 1, beta, amin, amax, ap, 0) 
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
-        plt.scatter(g_r, g_phi, c=phi_vel)
+        '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
+        of the interpolated grid (due to the fact that it doesn't know 0=2pi), I am tiling the grid, 
+        interpolating, then selecting relevant chunk.'''
+
+        '''tiling phi and rad vel'''
+
+        phi_flat_vel = np.ravel(phi_vel)
+        phi_tiled_vel = np.append(phi_flat_vel, [[phi_flat_vel],[phi_flat_vel]])
+
+        rad_flat_vel = np.ravel(rad_vel)
+        rad_tiled_vel = np.append(rad_flat_vel, [[rad_flat_vel],[rad_flat_vel]])
+
+        '''interpolating tiled grid'''
+        interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)      
+
+        plt.scatter(g_r_tiled, g_phi_tiled, c=phi_tiled_vel)
         plt.colorbar()
-        plt.savefig("vel_phi_polarscatter.png")
+        plt.savefig("vel_phi_polarscatter_tiled.png")
         plt.show()
 
-        interp_test_phi = interpnd((np.ravel(g_r), np.ravel(g_phi)), np.ravel(phi_vel))
-        interp_test_rad = interpnd((np.ravel(g_r), np.ravel(g_phi)), np.ravel(rad_vel))
+        interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
+        interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
+
+        phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
+        rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
 
         self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
         self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+
+        self.vel_phi[np.isnan(self.vel_phi)] = 0
+        self.vel_rad[np.isnan(self.vel_rad)] = 0
 
         plt.imshow(self.vel_phi[:,:,0])
         plt.colorbar()

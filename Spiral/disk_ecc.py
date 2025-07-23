@@ -565,7 +565,7 @@ class Disk:
 
 
         '''I need to figure out what whape self.vel is to make sure self.phi and self.rad are the same shape'''
-        print("self.vel.shape " + str(self.vel.shape))
+        #print("self.vel.shape " + str(self.vel.shape))
 
 
         #print("index interp {t}".format(t=time.clock()-tst))
@@ -575,10 +575,13 @@ class Disk:
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         
+        
+        
         plt.imshow(tvel[:,:,0])
         plt.colorbar()
         plt.savefig("tvel.png")
         print("tvel.shape " + str(tvel.shape))
+        print("tvel min " + str(np.min(tvel)))
 
         plt.imshow(tvel[:,:,10])
         plt.colorbar()
