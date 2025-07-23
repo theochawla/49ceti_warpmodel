@@ -1,0 +1,48 @@
+2025-07-23 21:25:38	INFO	::casa	
+2025-07-23 21:25:39	INFO	::casa	data_update using version casarundata-2025.07.17-1.tar.gz, acquiring the lock ... 
+2025-07-23 21:25:39	INFO	::casa	Removing files using manifest from previous install of casarundata-2025.05.15-1.tar.gz on 2025-06-04
+2025-07-23 21:25:39	SEVERE	::casa	ERROR! : Unexpected exception while populating casarundata version casarundata-2025.07.17-1.tar.gz to /Users/tchawla/.casa/data
+2025-07-23 21:25:39	SEVERE	::casa	ERROR! : [Errno 13] Permission denied: '/Users/tchawla/.casa/data/catalogs/lines/Lovas_NIST.csv.gz'
+2025-07-23 21:25:39	SEVERE	::casa	
+2025-07-23 21:25:39	SEVERE	::casa	ERROR! Unexpected exception while doing auto updates or checking on the status of the data at measurespath
+2025-07-23 21:25:39	SEVERE	::casa	The casa data found at measurespath is not being maintained by casaconfig.
+2025-07-23 21:25:39	SEVERE	::casa	visit https://casadocs.readthedocs.io/en/stable/notebooks/external-data.html for more information
+2025-07-23 21:25:39	SEVERE	::casa	
+2025-07-23 21:25:39	INFO	::casa	
+2025-07-23 21:25:39	INFO	::casa	
+2025-07-23 21:25:39	INFO	::casa	
+2025-07-23 21:25:39	INFO	::casa	
+2025-07-23 21:25:41	INFO	::casa	Python version 3.10.12
+2025-07-23 21:25:41	INFO	::casa	CASA Version CASALITH 6.6.5.31
+2025-07-23 21:25:41	INFO	::casa	
+2025-07-23 21:25:41	INFO	::casa	optional configuration file not found, continuing CASA startup without it
+2025-07-23 21:25:41	INFO	::casa	loaded config file : /soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaconfig/config.py
+2025-07-23 21:25:41	INFO	::casa	
+2025-07-23 21:25:41	INFO	::casa	config values
+2025-07-23 21:25:41	INFO	::casa	    agg = False
+2025-07-23 21:25:41	INFO	::casa	    cachedir = '/Users/tchawla/.casa'
+2025-07-23 21:25:41	INFO	::casa	    casaconfig_verbose = 1
+2025-07-23 21:25:41	INFO	::casa	    colors = 'Neutral'
+2025-07-23 21:25:41	INFO	::casa	    data_auto_update = True
+2025-07-23 21:25:41	INFO	::casa	    datapath = ['/Users/tchawla/.casa/data']
+2025-07-23 21:25:41	INFO	::casa	    iplog = False
+2025-07-23 21:25:41	INFO	::casa	    iplogfile = '/Volumes/disks/theo/49ceti_warpmodel/ipython-20250723-212534.log'
+2025-07-23 21:25:41	INFO	::casa	    log2term = False
+2025-07-23 21:25:41	INFO	::casa	    logfile = '/Volumes/disks/theo/49ceti_warpmodel/casa-20250723-212534.log'
+2025-07-23 21:25:41	INFO	::casa	    measures_auto_update = True
+2025-07-23 21:25:41	INFO	::casa	    measurespath = '/Users/tchawla/.casa/data'
+2025-07-23 21:25:41	INFO	::casa	    nogui = False
+2025-07-23 21:25:41	INFO	::casa	    nologfile = False
+2025-07-23 21:25:41	INFO	::casa	    nologger = False
+2025-07-23 21:25:41	INFO	::casa	    pipeline = False
+2025-07-23 21:25:41	INFO	::casa	    startupfile = '/Users/tchawla/.casa/startup.py'
+2025-07-23 21:25:41	INFO	::casa	    user_site = False
+2025-07-23 21:25:41	INFO	::casa	
+2025-07-23 21:25:41	INFO	::casa	casarundata version is unknown, this is probably a legacy version not installed by casaconfig
+2025-07-23 21:25:41	INFO	::casa	measures version : WSRT_Measures_20250604-160001.ztar
+2025-07-23 21:25:41	INFO	::casa	
+2025-07-23 21:25:41	INFO	::casa	Checking Measures tables in data repository sub-directory /Users/tchawla/.casa/data/geodetic
+2025-07-23 21:25:41	INFO	::casa	  IERSeop2000 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-07-23 21:25:41	INFO	::casa	  IERSeop97 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-07-23 21:25:41	INFO	::casa	  IERSpredict (version date, last date in table (UTC)): 2025/06/04/15:15, 2025/09/02/00:00:00
+2025-07-23 21:25:41	INFO	::casa	  TAI_UTC (version date, last date in table (UTC)): 2025/05/11/15:15, 2017/01/01/00:00:00

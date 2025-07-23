@@ -146,6 +146,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     print("gas model output 2 =tau ")
     print("gas model output 3 max " + str(np.max(cumtrapz(arg,S,axis=2,initial=0.))))
 
+    print("S Shape " + str(S.shape))
+    print("S min " + str(np.min(S)))
+
     #integratng
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 

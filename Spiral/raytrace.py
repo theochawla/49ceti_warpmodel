@@ -131,13 +131,17 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     arg = Knu*Snu*np.exp(-tau)
 
     #print("tau shape " + str(tau.shape))
-    print("tau first z slice" + str(tau[:,:,0]))
+    print("tau first z slice max" + str(np.max(tau[:,:,0])))
     #print("arg shape " + str(arg.shape))
-    print("arg first z slice " + str(arg[:,:,0]))
+    print("arg first z slice max " + str(np.max(arg[:,:,0])))
+
 
     print("gas model output 1 max " + str(np.max(trapz(arg,S,axis=2))))
     print("gas model output 2 =tau ")
     print("gas model output 3 max " + str(np.max(cumtrapz(arg,S,axis=2,initial=0.))))
+
+    print("S Shape " + str(S.shape))
+    print("S min " + str(np.min(S)))
 
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 

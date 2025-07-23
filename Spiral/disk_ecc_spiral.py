@@ -316,7 +316,7 @@ class Disk:
         #print("acf [:,:,0] " + str(acf[:,:,0]))
         #print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
 
-        siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + 5
+        siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + 1
 
         print("siggas " + str(siggas))
 
