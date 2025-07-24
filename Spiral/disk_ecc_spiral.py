@@ -237,12 +237,12 @@ class Disk:
         siggas_r = Sc*(acf[:,:,0]/self.Rc)**(-1*self.pp)*np.exp(-1*(acf[:,:,0]/self.Rc)**(2-self.pp))
 
         dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
-        '''commenting this out to use my surface density profile for now'''
-        #siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
+        '''profile of unperturbed disk'''
+        siggas_unpert = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
 
         '''adding spiral feature
-        feature is a perturbation of dsigma/sigma, so I think needs to be multiplied by and added to
-        original surface denncity profile
+        feature is a perturbation of dsigma, so I think it needs to be added to unperturbed disk, with
+        amplitude as tunable parameter
         
         The feaure should be very subtle...'''
 
@@ -253,7 +253,8 @@ class Disk:
         p = -.5 #surface density
         ap = 60*np.pi/180 #pitch angle
         m = 2 #azimuthal wavenumber
-        beta = 5 #cool
+        '''I think beta can be used to control amplitude...?'''
+        beta = 1000 #cool
         incl = np.pi/2.1 #inclination of the disc towards the line of sight
         pos = 90 # rotation of spiral (degrees), starting north, cw
 
@@ -316,7 +317,7 @@ class Disk:
         #print("acf [:,:,0] " + str(acf[:,:,0]))
         #print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
 
-        siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + 1
+        siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + siggas_unpert
 
         print("siggas " + str(siggas))
 
