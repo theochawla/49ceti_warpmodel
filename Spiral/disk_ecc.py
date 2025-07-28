@@ -317,6 +317,10 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
+        print("self.vel min " + str(np.min(self.vel)))
+        print("self.vel max" + str(np.max(self.vel)))
+        print("self.vel mean " + str(np.mean(self.vel)))
+
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))

@@ -84,9 +84,21 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
     print("disk.vel max " + str(np.max(disk.vel)))
     print("disk.vel min " + str(np.min(disk.vel)))
+    print("disk.vel mean" + str(np.mean(disk.vel)))
+
+
+    plt.imshow(disk.vel[:,:,0])
+    plt.colorbar()
+    plt.savefig("diskdotvel.jpg")
+    plt.show()
 
     print("dV max" + str(np.max(dV)))
     print("dV min" + str(np.min(dV)))
+
+    plt.imshow(dV[:,:,0])
+    plt.colorbar()
+    plt.savefig("dV_unspiral.jpg")
+    plt.show()
 
     #print("dV " + str(dV))
 

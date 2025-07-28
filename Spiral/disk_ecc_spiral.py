@@ -248,7 +248,7 @@ class Disk:
 
         #understanding structure of perturbed_sigma and how to use it
         #Parameters
-        ms = 1 #star mass
+        ms = self.Mstar/Disk.Msun #star mass
         md = 0.35 #disc mass
         p = -.5 #surface density
         ap = 60*np.pi/180 #pitch angle
@@ -273,8 +273,9 @@ class Disk:
         #x_grid, y_grid = pol2cart(acf[:,:,0], pcf[:,:,0])
         #r_cart = 
 
-
-        gx, gy = np.mgrid[-1000:1000:100j,-1000:1000:100j]
+        '''change grid resolution here.
+        x:y:res'''
+        gx, gy = np.mgrid[-1000:1000:1000j,-1000:1000:1000j]
         g_r, g_phi = cart2pol(gx, gy)
         car = np.linspace(-100,100,400)
         grid_angle = 0*gx
@@ -358,7 +359,8 @@ class Disk:
 
         '''for spiral model, we want to make copies of the spiral extending in the z direction. Right now should
         just be above the midplane I think. '''
-
+        '''
+        removing this so velocity and surface density spiral have same parameters
         ms = 1 #star mass
         md = 0.35 #disc mass
         p = -.5 #surface density
@@ -367,14 +369,23 @@ class Disk:
         beta = 5 #cool
         incl = np.pi/2.1 #inclination of the disc towards the line of sight
         pos = 90 # rotation of spiral (degrees), starting north, cw
+        '''
 
         #self.vel = giggle.momentone(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0, 0)
         '''defining spiral velocity fields'''
         
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
+        '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
+        
         phi_vel = giggle.uphC(gx, gy, ms, md, p, m, 1, beta, amin, amax, ap, 0)
+        '''trying shifting center of line to middle of data...? I think there is a better
+        way to do this, but just to try...'''
+        #phi_vel = phi_vel-np.mean(phi_vel)
         #print("self.vel_phi shape " + str(self.vel_phi.shape))
-        rad_vel = giggle.urC(gx, gy, ms, md, p, 2, 1, beta, amin, amax, ap, 0) 
+
+        '''I think rad_vel does not be to changed; it has positive and negative components, and is
+        less concerned with rotation and more concerned with movement towards/away from center'''
+        rad_vel = giggle.urC(gx, gy, ms, md, p, 2, 1, beta, amin, amax, ap, 0)
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
@@ -397,17 +408,27 @@ class Disk:
         plt.savefig("vel_phi_polarscatter_tiled.png")
         plt.show()
 
+        print("phi_vel min " + str(np.min(phi_flat_vel)))
+        print("phi_vel max " + str(np.max(phi_flat_vel)))
+        print("phi_vel mean " + str(np.mean(phi_flat_vel)))
+
         interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
         interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
 
         phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
         rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
 
+        '''storing in self.vel, converting to cm/s'''
+
         self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
         self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
+
+        print("self.vel_phi min " + str(np.min(self.vel_phi)))
+        print("self.vel_phi max " + str(np.max(self.vel_phi)))
+        print("self.vel_phi mean " + str(np.mean(self.vel_phi)))
 
         plt.imshow(self.vel_phi[:,:,0])
         plt.colorbar()

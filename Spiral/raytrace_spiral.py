@@ -75,9 +75,28 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
     '''adding this velocity definition for a spiral'''
     los_vel = (disk.vel_rad*np.cos(disk.p_grid) +disk.vel_phi*np.sin(disk.p_grid))
+    print("disk.vel_phi shape " + str(disk.vel_phi.shape))
+    print("disk.vel_phi min "+ str(np.min(disk.vel_phi)))
+    print("disk.vel_phi max "+ str(np.max(disk.vel_phi)))
+    print("disk.vel_phi med "+ str(np.med(disk.vel_phi)))
+
     print("los_vel shape " + str(los_vel.shape))
     print("los_vel min "+ str(np.min(los_vel)))
     print("los_vel max "+ str(np.max(los_vel)))
+    print("los_vel med "+ str(np.med(los_vel)))
+
+    '''
+    plt.imshow(los_vel[:,:,0])
+    plt.colorbar()
+    plt.savefig("los_vel.jpg")
+    plt.show()
+
+    plt.imshow(disk.vel_phi[:,:,0])
+    plt.colorbar()
+    plt.savefig("diskdotvel_phi.jpg")
+    plt.show()
+    '''
+
 
     # - Calculate source function and absorbing coefficient
     try:
@@ -90,7 +109,19 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         '''Kevin's version'''
         #dV = veloc + handed*np.sin(thet)*(disk.vel)
         '''My version'''
-        dV = veloc + handed*np.sin(thet)*(los_vel)
+
+        #dV = veloc + handed*np.sin(thet)*(los_vel)
+        '''trying without handed....???'''
+        dV = veloc + np.sin(thet)*los_vel
+
+
+    '''
+    can't get this to stop plotting over itself
+    plt.imshow(dV[:,:,0])
+    plt.colorbar()
+    plt.savefig("dV_spiral.jpg")
+    plt.show()
+    '''
 
     print("dV max" + str(np.max(dV)))
     print("dV min" + str(np.min(dV)))
