@@ -206,19 +206,22 @@ class Disk:
         # use Dartois (03) type II temperature structure
         ###### expanding to 3D should not affect this ######
         delta = 1.                # shape parameter
-        rcf150=rcf/(150.*Disk.AU)
+
+        '''changing this to T at 100 instead of 150 AU'''
+        rcf100=rcf/(100.*Disk.AU)
 
         #qq is "temperature index....???"
-        rcf150q=rcf150**self.qq
+        rcf100q=rcf100**self.qq
         
-        '''# zq0 = Zq, in AU, at 150 AU (????)'''
-        '''zq should be 3d and scalled by 150 AU...???'''
-        '''z has default shape of 500, 131, 1250 (so yes, 3d grid, but no negative values)'''
-        zq = self.zq0*Disk.AU*rcf150**1.3
+        '''zq is used for temp structure, but we won't need it'''
+        zq = self.zq0*Disk.AU*rcf100**1.3
         
         #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
-        tmid = self.tmid0*rcf150q
-        tatm = self.tatm0*rcf150q
+        tmid = self.tmid0*rcf100q
+
+        '''setting tmid=tatm for debris disk optically thin assumption'''
+        tatm=tmid
+        #tatm = self.tatm0*rcf100q
         tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
 
         '''ii is 3d boolean grid of z values above some critical value'''
