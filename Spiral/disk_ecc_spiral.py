@@ -65,6 +65,11 @@ class Disk:
     sigphot = 0.79*sc   # - photo-dissociation column
 
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):
+    '''edited some initial parameters: increased res a bit, and set Tmid = Tatm. Also expanded sigbound to very low to very high
+    to avoid clipping CO emission, playing with inclination
+    
+    trying mstar=1'''
+    
     def __init__(self,q=-0.5,McoG=0.09,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
@@ -88,14 +93,15 @@ class Disk:
         'Set the disk structure parameters'
 
         '''I will add these as real parameters at some point but just adding default values to test here'''
-        ms = 1 #star mass
-        md = 0.35 #disc mass
-        p = -.5 #surface density
-        ap = 60*np.pi/180 #pitch angle
-        m = 2 #azimuthal wavenumber
-        beta = 5 #cool
-        incl = np.pi/2.1 #inclination of the disc towards the line of sight
-        pos = 90 # rotation of spiral (degrees), starting north, cw
+        
+        self.ms = params[7] #star mass
+        self.md = 0.35 #disc mass
+        self.p = -.5 #surface density
+        self.ap = 10*np.pi/180 #pitch angle
+        self.m = 2 #azimuthal wavenumber
+        self.beta = 1000 #cool
+        self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
+        self.pos = 90 # rotation of spiral (degrees), starting north, cw
 
 
         self.qq = params[0]                 # - temperature index
@@ -248,15 +254,21 @@ class Disk:
 
         #understanding structure of perturbed_sigma and how to use it
         #Parameters
+        '''
         ms = self.Mstar/Disk.Msun #star mass
         md = 0.35 #disc mass
         p = -.5 #surface density
-        ap = 60*np.pi/180 #pitch angle
-        m = 2 #azimuthal wavenumber
+        ap = 10*np.pi/180 #pitch angle
+        m = 1 #azimuthal wavenumber
+        '''
         '''I think beta can be used to control amplitude...?'''
+        '''
         beta = 1000 #cool
         incl = np.pi/2.1 #inclination of the disc towards the line of sight
         pos = 90 # rotation of spiral (degrees), starting north, cw
+        '''
+        #md = 0.35 #disc mass
+        #beta = 1000 #cool
 
         #1d r array
         #r = np.linspace(1,100,500)
@@ -275,7 +287,7 @@ class Disk:
 
         '''change grid resolution here.
         x:y:res'''
-        gx, gy = np.mgrid[-1000:1000:1000j,-1000:1000:1000j]
+        gx, gy = np.mgrid[-1000:1000:200j,-1000:1000:200j]
         g_r, g_phi = cart2pol(gx, gy)
         car = np.linspace(-100,100,400)
         grid_angle = 0*gx
@@ -284,7 +296,7 @@ class Disk:
 
         #print(str(grid_angle.shape)+"grid_angle shape")
         #print(str(gr.shape)+"gr shape")
-        spir0 = giggle.perturbed_sigma(g_r, g_phi, p, self.Ain, self.Aout, md, beta, m, ap,0)
+        spir0 = giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
 
         plt.imshow(spir0)
         plt.colorbar()
@@ -370,6 +382,9 @@ class Disk:
         incl = np.pi/2.1 #inclination of the disc towards the line of sight
         pos = 90 # rotation of spiral (degrees), starting north, cw
         '''
+        '''the amplitude of the surface density perturbation needs to be very small to avoid negative
+        surface density values... but the velocity one needs to be larger to be visible. Arbitratily leaving beta=5 for now'''
+        beta = 5 #cool
 
         #self.vel = giggle.momentone(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0, 0)
         '''defining spiral velocity fields'''
@@ -377,7 +392,7 @@ class Disk:
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
         '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
         
-        phi_vel = giggle.uphC(gx, gy, ms, md, p, m, 1, beta, amin, amax, ap, 0)
+        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0)
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
         #phi_vel = phi_vel-np.mean(phi_vel)
@@ -385,7 +400,7 @@ class Disk:
 
         '''I think rad_vel does not be to changed; it has positive and negative components, and is
         less concerned with rotation and more concerned with movement towards/away from center'''
-        rad_vel = giggle.urC(gx, gy, ms, md, p, 2, 1, beta, amin, amax, ap, 0)
+        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, 2, 1, self.beta, amin, amax, self.ap, 0)
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners

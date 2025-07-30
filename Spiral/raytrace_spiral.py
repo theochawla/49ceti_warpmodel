@@ -78,12 +78,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     print("disk.vel_phi shape " + str(disk.vel_phi.shape))
     print("disk.vel_phi min "+ str(np.min(disk.vel_phi)))
     print("disk.vel_phi max "+ str(np.max(disk.vel_phi)))
-    print("disk.vel_phi med "+ str(np.med(disk.vel_phi)))
+    print("disk.vel_phi med "+ str(np.median(disk.vel_phi)))
 
     print("los_vel shape " + str(los_vel.shape))
     print("los_vel min "+ str(np.min(los_vel)))
     print("los_vel max "+ str(np.max(los_vel)))
-    print("los_vel med "+ str(np.med(los_vel)))
+    print("los_vel med "+ str(np.median(los_vel)))
 
     '''
     plt.imshow(los_vel[:,:,0])
@@ -110,9 +110,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #dV = veloc + handed*np.sin(thet)*(disk.vel)
         '''My version'''
 
-        #dV = veloc + handed*np.sin(thet)*(los_vel)
+        dV = veloc + handed*np.sin(thet)*(los_vel)
         '''trying without handed....???'''
-        dV = veloc + np.sin(thet)*los_vel
+        #dV = veloc + np.sin(thet)*los_vel
 
 
     '''
