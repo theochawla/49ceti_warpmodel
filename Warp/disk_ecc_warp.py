@@ -22,7 +22,57 @@ from scipy.integrate import trapz
 #testing time
 import time
 
-'''this is where I'm putting functions I am addng or modifying'''
+'''method from Andres Zuleta et al. 2024
+paper: ui.adsabs.harvard.edu/abs/2024A%26A...692A..56Z/abstract
+github repo: https://github.com/andres-zuleta/eddy/tree/warp_rf'''
+
+'''My attempt at defining an axis rotation (spatial) with warp
+I think the best thing would be to integrate this into the set_structure function
+goal is to define initial grid, warp it, make it 3d in a way that works with the rest of the code'''
+
+'''straightforward coordinate switching but i did steal it from here;
+https://stackoverflow.com/questions/20924085/python-conversion-between-coordinates'''
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return(rho, phi)
+
+def pol2cart(rho, phi):
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return(x, y)
+
+'''
+
+def define_warp(self):
+    
+    inc=0
+    pa=0
+
+    r_grid = self.acf
+    f_grid = self.pcf
+    z_grid = self.zcf
+
+    r_i = r_grid[:,0,0]  #1d array of radius values
+'''
+
+
+'''
+def w_func(self, r, type):
+    r0 = self.w_r0
+    dr = self.w_dr
+
+    if type == "w":
+        a = self.w_i
+
+    elif type == "pa":
+        a = self.pa
+
+    r0 = 1.0 if r0 is None else r0
+    dr = 1.0 if dr is None else dr
+    return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
+'''
+
 def w_func(self, r, type):
     r0 = self.w_r0
     dr = self.w_dr
@@ -37,6 +87,75 @@ def w_func(self, r, type):
     r0 = 1.0 if r0 is None else r0
     dr = 1.0 if dr is None else dr
     return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
+
+'''
+warp_i  = w_func(r_i, "w")
+#print(warp_i.shape)
+twist_i = w_func(r_i, "pa")
+
+inc_obs = np.deg2rad(inc)
+PA_obs = np.deg2rad(pa)
+
+xi = r_grid[:,:,0] * np.cos(f_grid[:,:,0])
+#print(xi.shape)
+yi = r_grid[:,:,0] * np.sin(f_grid[:,:,0])
+
+#needed to reshape to play nice with rotational matrix
+points_i = np.moveaxis([xi, yi, z_grid[:,:,0]], 0, 2)
+print(points_i.shape)
+'''
+
+
+def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
+    x = p0[:, :, 0]
+    y = p0[:, :, 1]
+    z = p0[:, :, 2]
+
+    warp = warp[:, None]
+    print(warp.shape)
+    twist = twist[:, None]
+    print(twist.shape)
+
+    cosw = np.cos(warp)
+    sinw = np.sin(warp)
+
+    cost = np.cos(twist)
+    sint = np.sin(twist)
+
+    cosPA = np.cos(PA_)
+    sinPA = np.sin(PA_)
+
+    cosi = np.cos(inc_)
+    sini = np.sin(inc_)
+
+    xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
+    yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
+    zp = x*sini*sint + y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
+
+    return np.moveaxis([xp, yp, zp], 0, 2)
+#rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
+#velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
+
+'''rotation'''
+#return rotation
+
+'''this is where I'm putting functions I am addng or modifying'''
+'''
+def w_func(self, r, type):
+    r0 = self.w_r0
+    dr = self.w_dr
+
+
+    if type == "w":
+        a = self.w_i
+
+    elif type == "pa":
+        a = self.pa
+
+    r0 = 1.0 if r0 is None else r0
+    dr = 1.0 if dr is None else dr
+    return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
+    '''
 
 class Disk:
     'Common class for circumstellar disk structure'
@@ -95,33 +214,7 @@ class Disk:
 
     
     
-    def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
-        x = p0[:, :, 0]
-        y = p0[:, :, 1]
-        z = p0[:, :, 2]
-
-        warp = warp[:, None]
-        print(warp.shape)
-        twist = twist[:, None]
-        print(twist.shape)
-
-        cosw = np.cos(warp)
-        sinw = np.sin(warp)
-
-        cost = np.cos(twist)
-        sint = np.sin(twist)
-
-        cosPA = np.cos(PA_)
-        sinPA = np.sin(PA_)
-
-        cosi = np.cos(inc_)
-        sini = np.sin(inc_)
-
-        xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
-        yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
-        zp = x*sini*sint + y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
-
-        return np.moveaxis([xp, yp, zp], 0, 2)
+    
     
     '''I think I don't need this one, can use built-in grid'''
     '''
@@ -166,100 +259,7 @@ class Disk:
         return pcf, acf, zcf
 '''
 
-    '''method from Andres Zuleta et al. 2024
-    paper: ui.adsabs.harvard.edu/abs/2024A%26A...692A..56Z/abstract
-    github repo: https://github.com/andres-zuleta/eddy/tree/warp_rf'''
-
-    '''My attempt at defining an axis rotation (spatial) with warp
-    I think the best thing would be to integrate this into the set_structure function
-    goal is to define initial grid, warp it, make it 3d in a way that works with the rest of the code'''
-    
-    '''straightforward coordinate switching but i did steal it from here;
-    https://stackoverflow.com/questions/20924085/python-conversion-between-coordinates'''
-    def cart2pol(x, y):
-        rho = np.sqrt(x**2 + y**2)
-        phi = np.arctan2(y, x)
-        return(rho, phi)
-
-    def pol2cart(rho, phi):
-        x = rho * np.cos(phi)
-        y = rho * np.sin(phi)
-        return(x, y)
-
-    def define_warp(self):
-        
-        inc=0
-        pa=0
-
-        r_grid = self.acf
-        f_grid = self.pcf
-        z_grid = self.zcf
-
-        r_i = r_grid[:,0,0]  #1d array of radius values
-
-        def w_func(self, r, type):
-            r0 = self.w_r0
-            dr = self.w_dr
-
-            '''same general function for warp & twist, just need to specify which param to use'''
-            if type == "w":
-                a = self.w_i
-
-            elif type == "pa":
-                a = self.pa
-
-            r0 = 1.0 if r0 is None else r0
-            dr = 1.0 if dr is None else dr
-            return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
-        
-        warp_i  = w_func(r_i, "w")
-        #print(warp_i.shape)
-        twist_i = w_func(r_i, "pa")
-
-        inc_obs = np.deg2rad(inc)
-        PA_obs = np.deg2rad(pa)
-
-        xi = r_grid[:,:,0] * np.cos(f_grid[:,:,0])
-        #print(xi.shape)
-        yi = r_grid[:,:,0] * np.sin(f_grid[:,:,0])
-
-        #needed to reshape to play nice with rotational matrix
-        points_i = np.moveaxis([xi, yi, z_grid[:,:,0]], 0, 2)
-        print(points_i.shape)
-
-
-        def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
-            x = p0[:, :, 0]
-            y = p0[:, :, 1]
-            z = p0[:, :, 2]
-
-            warp = warp[:, None]
-            print(warp.shape)
-            twist = twist[:, None]
-            print(twist.shape)
-
-            cosw = np.cos(warp)
-            sinw = np.sin(warp)
-
-            cost = np.cos(twist)
-            sint = np.sin(twist)
-
-            cosPA = np.cos(PA_)
-            sinPA = np.sin(PA_)
-
-            cosi = np.cos(inc_)
-            sini = np.sin(inc_)
-
-            xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
-            yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
-            zp = x*sini*sint + y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
-
-            return np.moveaxis([xp, yp, zp], 0, 2)
-        rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
-        #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
-
-        '''rotation'''
-        return rotation   
+       
 
     def set_structure(self):
         #tst=time.clock()
@@ -314,25 +314,12 @@ class Disk:
         r_i = acf[:,0,0]  #1d array of radius values
 
 
-        def w_func(r, type):
-            r0 = self.w_r0
-            dr = self.w_dr
-
-            '''same general function for warp & twist, just need to specify which param to use'''
-            if type == "w":
-                a = self.w_i
-
-            elif type == "pa":
-                a = self.pa
-
-            r0 = 1.0 if r0 is None else r0
-            dr = 1.0 if dr is None else dr
-            return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
+        
         
 
-        warp_i  = w_func(r_i, type="w")
+        warp_i  = w_func(self, r_i, type="w")
         #print(warp_i.shape)
-        twist_i = w_func(r_i, type="pa")
+        twist_i = w_func(self, r_i, type="pa")
 
         inc_obs = np.deg2rad(inc)
         PA_obs = np.deg2rad(pa)
@@ -345,34 +332,7 @@ class Disk:
         points_i = np.moveaxis([xi, yi, zcf[:,:,0]], 0, 2)
         print(points_i.shape)
 
-
-        def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
-            x = p0[:, :, 0]
-            y = p0[:, :, 1]
-            z = p0[:, :, 2]
-
-            warp = warp[:, None]
-            print(warp.shape)
-            twist = twist[:, None]
-            print(twist.shape)
-
-            cosw = np.cos(warp)
-            sinw = np.sin(warp)
-
-            cost = np.cos(twist)
-            sint = np.sin(twist)
-
-            cosPA = np.cos(PA_)
-            sinPA = np.sin(PA_)
-
-            cosi = np.cos(inc_)
-            sini = np.sin(inc_)
-
-            xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
-            yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
-            zp = x*sini*sint + y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
-
-            return np.moveaxis([xp, yp, zp], 0, 2)
+        '''applying warp via rotational matrix'''
         rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         self.rotation = rotation
@@ -384,10 +344,7 @@ class Disk:
         z_full_grid = z_grid[:,:,np.newaxis] + zf
         '''translating x &y grids back to polar coordinates'''
 
-        def cart2pol(x, y):
-            rho = np.sqrt(x**2 + y**2)
-            phi = np.arctan2(y, x)
-            return(rho, phi)
+        
 
         r_grid, f_grid = cart2pol(rotation[:,:,0], rotation[:,:,1])
         self.r_grid = r_grid
