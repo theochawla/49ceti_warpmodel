@@ -32,6 +32,7 @@ goal is to define initial grid, warp it, make it 3d in a way that works with the
 
 '''straightforward coordinate switching but i did steal it from here;
 https://stackoverflow.com/questions/20924085/python-conversion-between-coordinates'''
+
 def cart2pol(x, y):
     rho = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
@@ -41,37 +42,6 @@ def pol2cart(rho, phi):
     x = rho * np.cos(phi)
     y = rho * np.sin(phi)
     return(x, y)
-
-'''
-
-def define_warp(self):
-    
-    inc=0
-    pa=0
-
-    r_grid = self.acf
-    f_grid = self.pcf
-    z_grid = self.zcf
-
-    r_i = r_grid[:,0,0]  #1d array of radius values
-'''
-
-
-'''
-def w_func(self, r, type):
-    r0 = self.w_r0
-    dr = self.w_dr
-
-    if type == "w":
-        a = self.w_i
-
-    elif type == "pa":
-        a = self.pa
-
-    r0 = 1.0 if r0 is None else r0
-    dr = 1.0 if dr is None else dr
-    return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
-'''
 
 def w_func(self, r, type):
     r0 = self.w_r0
@@ -87,23 +57,6 @@ def w_func(self, r, type):
     r0 = 1.0 if r0 is None else r0
     dr = 1.0 if dr is None else dr
     return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
-
-'''
-warp_i  = w_func(r_i, "w")
-#print(warp_i.shape)
-twist_i = w_func(r_i, "pa")
-
-inc_obs = np.deg2rad(inc)
-PA_obs = np.deg2rad(pa)
-
-xi = r_grid[:,:,0] * np.cos(f_grid[:,:,0])
-#print(xi.shape)
-yi = r_grid[:,:,0] * np.sin(f_grid[:,:,0])
-
-#needed to reshape to play nice with rotational matrix
-points_i = np.moveaxis([xi, yi, z_grid[:,:,0]], 0, 2)
-print(points_i.shape)
-'''
 
 
 def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
@@ -133,29 +86,6 @@ def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
     zp = x*sini*sint + y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
 
     return np.moveaxis([xp, yp, zp], 0, 2)
-#rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
-#velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
-
-'''rotation'''
-#return rotation
-
-'''this is where I'm putting functions I am addng or modifying'''
-'''
-def w_func(self, r, type):
-    r0 = self.w_r0
-    dr = self.w_dr
-
-
-    if type == "w":
-        a = self.w_i
-
-    elif type == "pa":
-        a = self.pa
-
-    r0 = 1.0 if r0 is None else r0
-    dr = 1.0 if dr is None else dr
-    return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
-    '''
 
 class Disk:
     'Common class for circumstellar disk structure'
@@ -206,59 +136,6 @@ class Disk:
         #tf = time.clock()
         #print("disk init took {t} seconds".format(t=(tf-tb)))
 
-
-
-
-
-
-
-    
-    
-    
-    
-    '''I think I don't need this one, can use built-in grid'''
-    '''
-    def get_grid(r_min, r_max, e, aop):
-    #def get_grid(w_i, w_r0, w_pa, w_dr, r_min, r_max, inc, pa, e, aop):
-    #def get_velocity(r_min, r_max, e, aop):
-        nac = 100#256             # - number of unique a rings
-        nzc = int(2.5*nac)#nac*5           # - number of unique z points
-        zmin = .1   #in AU
-        zmax = 10  #in AU
-            #nfc = self.nphi
-        nfc = 180
-            # - number of unique f points
-        af = np.logspace(np.log10(r_min),np.log10(r_max),nac)
-        print(af.shape)
-        zf = np.logspace(np.log10(zmin),np.log10(zmax),nzc)
-        pf = np.linspace(0,2*np.pi,nfc) #f is with refrence to semi major axis, array of phi values
-        ff = (pf - aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
-        rf = np.zeros((nac,nfc))
-        for i in range(nac):
-            for j in range(nfc):
-                rf[i,j] = (af[i]*(1.-e*e))/(1.+e*np.cos(ff[j]))
-
-        idz = np.ones(nzc)
-        idf = np.ones(nfc)
-        ida = np.ones(nac)
-        pcf,acf,zcf = np.meshgrid(pf,af,zf)
-        fcf = (pcf - aop) % (2*np.pi)
-            #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
-        rcf=rf[:,:,np.newaxis]*idz
-            #print("coords init {t}".format(t=time.clock()-tst))
-
-        #return acf
-
-        # Define the warp and twist for each ring
-        #warp_i  = w_func(acf[:,:,0], w_i, w_r0, w_dr)
-        #twist_i = w_func(acf[:,:,0], w_pa, w_r0, w_dr)
-
-        #inc_obs = np.deg2rad(inc)
-        #PA_obs = np.deg2rad(pa)
-
-        return pcf, acf, zcf
-'''
-
        
 
     def set_structure(self):
@@ -304,31 +181,30 @@ class Disk:
         
 
         '''warp code'''
-        inc=0
-        pa=0
+        #inc=0
+        #pa=0
 
         #r_grid = self.acf
         #f_grid = self.pcf
         #z_grid = self.zcf
 
-        r_i = acf[:,0,0]  #1d array of radius values
+        #r_i = acf[:,0,0]  #1d array of radius values
 
-
-        
-        
-
-        warp_i  = w_func(self, r_i, type="w")
-        #print(warp_i.shape)
-        twist_i = w_func(self, r_i, type="pa")
+        '''defining warp, taking parmas from input into Disk'''
+        '''defines change in inclination'''
+        warp_i  = w_func(self, af, type="w")
+        '''defines twist'''
+        twist_i = w_func(self, af, type="pa")
 
         inc_obs = np.deg2rad(inc)
         PA_obs = np.deg2rad(pa)
 
+        '''need cartesian system for warp rotation'''
         xi = acf[:,:,0] * np.cos(pcf[:,:,0])
         #print(xi.shape)
         yi = acf[:,:,0] * np.sin(pcf[:,:,0])
 
-        #needed to reshape to play nice with rotational matrix
+        '''reshaping to play nice with rotational matrix'''
         points_i = np.moveaxis([xi, yi, zcf[:,:,0]], 0, 2)
         print(points_i.shape)
 
@@ -336,20 +212,25 @@ class Disk:
         rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         self.rotation = rotation
-        '''now we have warped disk, rotation is a 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
+        '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
         
         '''now to make 3d grid:'''
 
+        '''keeping z grid, adding each point in zf to each slice
+        this doesn't perfectly replicate geoemetry of warp: 
+        I think we would need to apply a rotational matrix to each z slice'''
         z_grid = rotation[:,:,2]
         z_full_grid = z_grid[:,:,np.newaxis] + zf
         '''translating x &y grids back to polar coordinates'''
 
         
-
+        '''converting back to polar coordinates'''
         r_grid, f_grid = cart2pol(rotation[:,:,0], rotation[:,:,1])
         self.r_grid = r_grid
         self.f_grid = f_grid
 
+
+        '''making r & phi grid 3d along z axis'''
         r_full_grid = r_grid[:,:, np.newaxis]+np.ones(len(zf))
         f_full_grid = f_grid[:,:, np.newaxis]+np.ones(len(zf))
 
