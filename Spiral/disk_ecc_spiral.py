@@ -100,9 +100,10 @@ class Disk:
         self.p = -.5 #surface density
         self.ap = 10*np.pi/180 #pitch angle
         self.m = 2 #azimuthal wavenumber
-        self.beta = 1000 #cool
+        self.beta = 5 #cool
         self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
         self.pos = 90 # rotation of spiral (degrees), starting north, cw
+        self.surf_amp = .001
 
 
         self.qq = params[0]                 # - temperature index
@@ -300,7 +301,7 @@ class Disk:
 
         #print(str(grid_angle.shape)+"grid_angle shape")
         #print(str(gr.shape)+"gr shape")
-        spir0 = giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
+        spir0 = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
 
         plt.imshow(spir0)
         plt.colorbar()
