@@ -61,7 +61,8 @@ class Disk:
     Hnuctog = 0.706*mu   # - H nuclei abundance fraction (H nuclei:gas)
     sc = 1.59e21   # - Av --> H column density (C. Qi 08,11)
     H2tog = 0.8    # - H2 abundance fraction (H2:gas)
-    Tco = 19.    # - freeze out
+    '''set Tco from 19. to 0'''
+    Tco = 0    # - freeze out
     sigphot = 0.79*sc   # - photo-dissociation column
 
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):

@@ -52,7 +52,9 @@ class Disk:
     sigphot = 0.79*sc   # - photo-dissociation column
 
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):
-    def __init__(self,q=-0.5,McoG=0.09,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
+    '''testing with debris disk parameters (temp, co freeze out, radius, and disk mass)'''
+    
+    def __init__(self,q=-0.5,McoG=1e-4,pp=1.,Ain=10.,Aout=50.,Rc=50.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None):
@@ -189,16 +191,22 @@ class Disk:
         #define temperature structure
         # use Dartois (03) type II temperature structure
         ###### expanding to 3D should not affect this ######
+
+        '''modifying for debris disk temp structure'''
         delta = 1.                # shape parameter
-        rcf150=rcf/(150.*Disk.AU)
-        rcf150q=rcf150**self.qq
+        rcf100=rcf/(100.*Disk.AU)
+        rcf100q=rcf100**self.qq
         
         '''# zq0 = Zq, in AU, at 150 AU (????)'''
         '''zq should be 3d and scalled by 150 AU...???'''
-        zq = self.zq0*Disk.AU*rcf150**1.3
+        zq = self.zq0*Disk.AU*rcf100**1.3
         #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
-        tmid = self.tmid0*rcf150q
-        tatm = self.tatm0*rcf150q
+        tmid = self.tmid0*rcf100q
+
+        tatm  = tmid
+        #tatm = self.tatm0*rcf100q
+
+
         tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
 
         '''ii is 3d boolean grid of z values above some critical value'''
