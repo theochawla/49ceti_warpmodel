@@ -1,0 +1,10 @@
+fitsimage         = 'direct_vel_ampadj.fits'
+imagename         = 'spiral_test2.image'
+whichrep          = 0
+whichhdu          = -1
+zeroblanks        = True
+overwrite         = False
+defaultaxes       = False
+defaultaxesvalues = []
+beam              = []
+#importfits( fitsimage='direct_vel_ampadj.fits',imagename='spiral_test2.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
