@@ -103,7 +103,7 @@ class Disk:
         self.beta = 5 #cool
         self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
         self.pos = 90 # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = .001
+        self.surf_amp = .00001
 
 
         self.qq = params[0]                 # - temperature index
