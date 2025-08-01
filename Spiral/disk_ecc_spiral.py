@@ -99,11 +99,12 @@ class Disk:
         self.md = 0.35 #disc mass
         self.p = -.5 #surface density
         self.ap = 10*np.pi/180 #pitch angle
-        self.m = 2 #azimuthal wavenumber
+        self.m = 1 #azimuthal wavenumber
         self.beta = 5 #cool
         self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
         self.pos = 90 # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = .00001
+        self.surf_amp = .0000001
+        self.vel_amp = 8
 
 
         self.qq = params[0]                 # - temperature index
@@ -397,7 +398,7 @@ class Disk:
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
         '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
         
-        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0)
+        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
         #phi_vel = phi_vel-np.mean(phi_vel)
@@ -405,7 +406,7 @@ class Disk:
 
         '''I think rad_vel does not be to changed; it has positive and negative components, and is
         less concerned with rotation and more concerned with movement towards/away from center'''
-        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, 2, 1, self.beta, amin, amax, self.ap, 0)
+        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
