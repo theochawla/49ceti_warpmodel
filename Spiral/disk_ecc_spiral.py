@@ -102,7 +102,7 @@ class Disk:
         self.m = 1 #azimuthal wavenumber
         self.beta = 5 #cool
         self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
-        self.pos = 90 # rotation of spiral (degrees), starting north, cw
+        self.pos = 0 # rotation of spiral (degrees), starting north, cw
         self.surf_amp = .0000001
         self.vel_amp = 8
 
