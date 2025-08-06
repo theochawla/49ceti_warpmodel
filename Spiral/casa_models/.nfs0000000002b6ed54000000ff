@@ -1,0 +1,166 @@
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	Some or all of the expected auto updates did not happen.
+2025-08-01 16:53:57	INFO	::casa	This indicates that measurespath is not empty and does not contain data maintained by casaconfig.
+2025-08-01 16:53:57	INFO	::casa	If the IERSeop2000 table is found in datapth then casatools will import.
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	The casa data found at measurespath is not being maintained by casaconfig.
+2025-08-01 16:53:57	INFO	::casa	visit https://casadocs.readthedocs.io/en/stable/notebooks/external-data.html for more information
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:57	INFO	::casa	
+2025-08-01 16:53:58	INFO	::casa	Python version 3.10.12
+2025-08-01 16:53:58	INFO	::casa	CASA Version CASALITH 6.6.5.31
+2025-08-01 16:53:58	INFO	::casa	
+2025-08-01 16:53:58	INFO	::casa	optional configuration file not found, continuing CASA startup without it
+2025-08-01 16:53:58	INFO	::casa	loaded config file : /soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaconfig/config.py
+2025-08-01 16:53:58	INFO	::casa	
+2025-08-01 16:53:58	INFO	::casa	config values
+2025-08-01 16:53:58	INFO	::casa	    agg = False
+2025-08-01 16:53:58	INFO	::casa	    cachedir = '/Users/tchawla/.casa'
+2025-08-01 16:53:58	INFO	::casa	    casaconfig_verbose = 1
+2025-08-01 16:53:58	INFO	::casa	    colors = 'Neutral'
+2025-08-01 16:53:58	INFO	::casa	    data_auto_update = True
+2025-08-01 16:53:58	INFO	::casa	    datapath = ['/Users/tchawla/.casa/data']
+2025-08-01 16:53:58	INFO	::casa	    iplog = False
+2025-08-01 16:53:58	INFO	::casa	    iplogfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/ipython-20250801-165354.log'
+2025-08-01 16:53:58	INFO	::casa	    log2term = False
+2025-08-01 16:53:58	INFO	::casa	    logfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/casa-20250801-165354.log'
+2025-08-01 16:53:58	INFO	::casa	    measures_auto_update = True
+2025-08-01 16:53:58	INFO	::casa	    measurespath = '/Users/tchawla/.casa/data'
+2025-08-01 16:53:58	INFO	::casa	    nogui = False
+2025-08-01 16:53:58	INFO	::casa	    nologfile = False
+2025-08-01 16:53:58	INFO	::casa	    nologger = False
+2025-08-01 16:53:58	INFO	::casa	    pipeline = False
+2025-08-01 16:53:58	INFO	::casa	    startupfile = '/Users/tchawla/.casa/startup.py'
+2025-08-01 16:53:58	INFO	::casa	    user_site = False
+2025-08-01 16:53:58	INFO	::casa	
+2025-08-01 16:53:58	INFO	::casa	casarundata version is unknown, this is probably a legacy version not installed by casaconfig
+2025-08-01 16:53:58	INFO	::casa	measures version : WSRT_Measures_20250604-160001.ztar
+2025-08-01 16:53:58	INFO	::casa	
+2025-08-01 16:53:58	INFO	::casa	Checking Measures tables in data repository sub-directory /Users/tchawla/.casa/data/geodetic
+2025-08-01 16:53:58	INFO	::casa	  IERSeop2000 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-01 16:53:58	INFO	::casa	  IERSeop97 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-01 16:53:58	INFO	::casa	  IERSpredict (version date, last date in table (UTC)): 2025/06/04/15:15, 2025/09/02/00:00:00
+2025-08-01 16:53:58	INFO	::casa	  TAI_UTC (version date, last date in table (UTC)): 2025/05/11/15:15, 2017/01/01/00:00:00
+2025-08-01 16:56:39	INFO	immoments::::casa	##########################################
+2025-08-01 16:56:39	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-01 16:56:39	INFO	immoments::::casa	immoments( imagename='direct_vel_ampadj.fits', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='spiral_moment0_test.fits', stretch=False )
+2025-08-01 16:56:39	INFO	immoments::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 16:56:39	INFO	immoments::::	Keyword value has wrong data type.
+2025-08-01 16:56:39	INFO	immoments::::	... converted to type double.
+2025-08-01 16:56:39	INFO	immoments::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 16:56:39	INFO	immoments::::	Keyword value has wrong data type.
+2025-08-01 16:56:39	INFO	immoments::::	... converted to type double.
+2025-08-01 16:56:39	WARN	immoments::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
+2025-08-01 16:56:39	SEVERE	immoments::image::open (file src/tools/image/image_cmpt.cc, line 4208)	Exception Reported: TabularCoordinate - start and end values in table must differ
+2025-08-01 16:56:39	SEVERE	immoments::::casa	Exception Reported: Error in immoments: TabularCoordinate - start and end values in table must differ
+2025-08-01 16:56:39	INFO	immoments::::casa	Traceback (most recent call last):
+2025-08-01 16:56:39	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/immoments.py", line 585, in __call__
+2025-08-01 16:56:39	INFO	immoments::::casa+	    task_result = _immoments_t( _pc.document['imagename'],_pc.document['moments'],_pc.document['axis'],_pc.document['region'],_pc.document['box'],_pc.document['chans'],_pc.document['stokes'],_pc.document['mask'],_pc.document['includepix'],_pc.document['excludepix'],_pc.document['outfile'],_pc.document['stretch'] )
+2025-08-01 16:56:39	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_immoments.py", line 119, in immoments
+2025-08-01 16:56:39	INFO	immoments::::casa+	    _myia.open(imagename)
+2025-08-01 16:56:39	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/image.py", line 2640, in open
+2025-08-01 16:56:39	INFO	immoments::::casa+	    return self._swigobj.open(infile, cache)
+2025-08-01 16:56:39	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/__casac__/image.py", line 5462, in open
+2025-08-01 16:56:39	INFO	immoments::::casa+	    return _image.image_open(self, *args, **kwargs)
+2025-08-01 16:56:39	INFO	immoments::::casa+	RuntimeError: TabularCoordinate - start and end values in table must differ
+2025-08-01 16:56:39	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-01 12:56:39.170364 End time: 2025-08-01 12:56:39.192095
+2025-08-01 16:56:39	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-01 16:56:39	INFO	immoments::::casa	##########################################
+2025-08-01 16:58:55	INFO	importfits::::casa	##########################################
+2025-08-01 16:58:55	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-01 16:58:55	INFO	importfits::::casa	importfits( fitsimage='direct_vel_ampadj.fits', imagename='spiral_test1.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-01 16:58:55	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 16:58:55	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-01 16:58:55	INFO	importfits::::	... converted to type double.
+2025-08-01 16:58:55	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-01 16:58:55	WARN	importfits::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
+2025-08-01 16:58:55	WARN	importfits::::ImageFITSConverter	This HDU (0) did not contain a legible image.
+2025-08-01 16:58:55	WARN	importfits::::ImageFITSConverter	Next candidate image HDU is #1
+2025-08-01 16:58:55	WARN	importfits::::ImageFITSConverter+	 (note: use the whichhdu parameter to address HDUs directly)
+2025-08-01 16:58:55	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)	Exception Reported: Exception: There are 1 HDUs in FITS file direct_vel_ampadj.fits . None of them is a legible image..
+2025-08-01 16:58:55	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 16:58:55	SEVERE	importfits::::casa	Exception Reported: Error in importfits: Exception: There are 1 HDUs in FITS file direct_vel_ampadj.fits . None of them is a legible image..
+2025-08-01 16:58:55	SEVERE	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 16:58:55	INFO	importfits::::casa	Traceback (most recent call last):
+2025-08-01 16:58:55	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/importfits.py", line 469, in __call__
+2025-08-01 16:58:55	INFO	importfits::::casa+	    task_result = _importfits_t( _pc.document['fitsimage'],_pc.document['imagename'],_pc.document['whichrep'],_pc.document['whichhdu'],_pc.document['zeroblanks'],_pc.document['overwrite'],_pc.document['defaultaxes'],_pc.document['defaultaxesvalues'],_pc.document['beam'] )
+2025-08-01 16:58:55	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_importfits.py", line 111, in importfits
+2025-08-01 16:58:55	INFO	importfits::::casa+	    _myia.fromfits(tmpname,fitsimage,whichrep,whichhdu,zeroblanks)
+2025-08-01 16:58:55	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/image.py", line 471, in fromfits
+2025-08-01 16:58:55	INFO	importfits::::casa+	    return self._swigobj.fromfits(outfile, infile, whichrep, whichhdu, zeroblanks, overwrite)
+2025-08-01 16:58:55	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/__casac__/image.py", line 1032, in fromfits
+2025-08-01 16:58:55	INFO	importfits::::casa+	    return _image.image_fromfits(self, *args, **kwargs)
+2025-08-01 16:58:55	INFO	importfits::::casa+	RuntimeError: Exception: There are 1 HDUs in FITS file direct_vel_ampadj.fits . None of them is a legible image..
+2025-08-01 16:58:55	INFO	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 16:58:55	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-01 12:58:54.791046 End time: 2025-08-01 12:58:54.799280
+2025-08-01 16:58:55	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-01 16:58:55	INFO	importfits::::casa	##########################################
+2025-08-01 17:00:42	INFO	importfits::::casa	##########################################
+2025-08-01 17:00:42	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-01 17:00:42	INFO	importfits::::casa	importfits( fitsimage='40degincl.fits', imagename='spiral_test1.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-01 17:00:42	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 17:00:42	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-01 17:00:42	INFO	importfits::::	... converted to type double.
+2025-08-01 17:00:42	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-01 17:00:42	WARN	importfits::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
+2025-08-01 17:00:42	WARN	importfits::::ImageFITSConverter	This HDU (0) did not contain a legible image.
+2025-08-01 17:00:42	WARN	importfits::::ImageFITSConverter	Next candidate image HDU is #1
+2025-08-01 17:00:42	WARN	importfits::::ImageFITSConverter+	 (note: use the whichhdu parameter to address HDUs directly)
+2025-08-01 17:00:42	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)	Exception Reported: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:00:42	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:00:42	SEVERE	importfits::::casa	Exception Reported: Error in importfits: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:00:42	SEVERE	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:00:42	INFO	importfits::::casa	Traceback (most recent call last):
+2025-08-01 17:00:42	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/importfits.py", line 469, in __call__
+2025-08-01 17:00:42	INFO	importfits::::casa+	    task_result = _importfits_t( _pc.document['fitsimage'],_pc.document['imagename'],_pc.document['whichrep'],_pc.document['whichhdu'],_pc.document['zeroblanks'],_pc.document['overwrite'],_pc.document['defaultaxes'],_pc.document['defaultaxesvalues'],_pc.document['beam'] )
+2025-08-01 17:00:42	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_importfits.py", line 111, in importfits
+2025-08-01 17:00:42	INFO	importfits::::casa+	    _myia.fromfits(tmpname,fitsimage,whichrep,whichhdu,zeroblanks)
+2025-08-01 17:00:42	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/image.py", line 471, in fromfits
+2025-08-01 17:00:42	INFO	importfits::::casa+	    return self._swigobj.fromfits(outfile, infile, whichrep, whichhdu, zeroblanks, overwrite)
+2025-08-01 17:00:42	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/__casac__/image.py", line 1032, in fromfits
+2025-08-01 17:00:42	INFO	importfits::::casa+	    return _image.image_fromfits(self, *args, **kwargs)
+2025-08-01 17:00:42	INFO	importfits::::casa+	RuntimeError: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:00:42	INFO	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:00:42	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-01 13:00:42.394811 End time: 2025-08-01 13:00:42.399141
+2025-08-01 17:00:42	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-01 17:00:42	INFO	importfits::::casa	##########################################
+2025-08-01 17:06:51	INFO	importfits::::casa	##########################################
+2025-08-01 17:06:51	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-01 17:06:51	INFO	importfits::::casa	importfits( fitsimage='40degincl.fits', imagename='spiral_test1.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-01 17:06:51	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 17:06:51	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-01 17:06:51	INFO	importfits::::	... converted to type double.
+2025-08-01 17:06:51	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-01 17:06:51	WARN	importfits::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
+2025-08-01 17:06:51	WARN	importfits::::ImageFITSConverter	This HDU (0) did not contain a legible image.
+2025-08-01 17:06:51	WARN	importfits::::ImageFITSConverter	Next candidate image HDU is #1
+2025-08-01 17:06:51	WARN	importfits::::ImageFITSConverter+	 (note: use the whichhdu parameter to address HDUs directly)
+2025-08-01 17:06:51	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)	Exception Reported: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:06:51	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:06:51	SEVERE	importfits::::casa	Exception Reported: Error in importfits: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:06:51	SEVERE	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:06:51	INFO	importfits::::casa	Traceback (most recent call last):
+2025-08-01 17:06:51	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/importfits.py", line 469, in __call__
+2025-08-01 17:06:51	INFO	importfits::::casa+	    task_result = _importfits_t( _pc.document['fitsimage'],_pc.document['imagename'],_pc.document['whichrep'],_pc.document['whichhdu'],_pc.document['zeroblanks'],_pc.document['overwrite'],_pc.document['defaultaxes'],_pc.document['defaultaxesvalues'],_pc.document['beam'] )
+2025-08-01 17:06:51	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_importfits.py", line 111, in importfits
+2025-08-01 17:06:51	INFO	importfits::::casa+	    _myia.fromfits(tmpname,fitsimage,whichrep,whichhdu,zeroblanks)
+2025-08-01 17:06:51	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/image.py", line 471, in fromfits
+2025-08-01 17:06:51	INFO	importfits::::casa+	    return self._swigobj.fromfits(outfile, infile, whichrep, whichhdu, zeroblanks, overwrite)
+2025-08-01 17:06:51	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/__casac__/image.py", line 1032, in fromfits
+2025-08-01 17:06:51	INFO	importfits::::casa+	    return _image.image_fromfits(self, *args, **kwargs)
+2025-08-01 17:06:51	INFO	importfits::::casa+	RuntimeError: Exception: There are 1 HDUs in FITS file 40degincl.fits . None of them is a legible image..
+2025-08-01 17:06:51	INFO	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-01 17:06:51	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-01 13:06:50.980011 End time: 2025-08-01 13:06:50.983108
+2025-08-01 17:06:51	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-01 17:06:51	INFO	importfits::::casa	##########################################
+2025-08-01 17:07:10	INFO	importfits::::casa	##########################################
+2025-08-01 17:07:10	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-01 17:07:10	INFO	importfits::::casa	importfits( fitsimage='40degincl.fits', imagename='spiral_test1.image', whichrep=0, whichhdu=0, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-01 17:07:10	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-01 17:07:10	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-01 17:07:10	INFO	importfits::::	... converted to type double.
+2025-08-01 17:07:10	WARN	importfits::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
