@@ -21,7 +21,7 @@ from scipy.integrate import trapz
 import giggle_my_version as giggle
 
 from scipy.interpolate import LinearNDInterpolator as interpnd
-
+from PIL import Image
 #testing time
 import time
 
@@ -442,6 +442,7 @@ class Disk:
         '''storing in self.vel, converting to cm/s'''
 
         self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        #self.vel_phi = (vel_phi  - np.max(vel_phi)/2) * Disk.kms   # convert to cm/s
         self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
@@ -451,14 +452,21 @@ class Disk:
         print("self.vel_phi max " + str(np.max(self.vel_phi)))
         print("self.vel_phi mean " + str(np.mean(self.vel_phi)))
 
+        plt.pcolor(pcf[:,:,0], acf[:,:,0], self.vel_phi[:,:,0], cmap='viridis')
+        plt.colorbar()
+        plt.xlabel("phi (radians)")
+        plt.ylabel("a (AU)")
+        plt.savefig("phivel_with_acf_pcf.jpg")
+        plt.show()
+
         plt.imshow(self.vel_phi[:,:,0])
         plt.colorbar()
-        plt.savefig("phi_vel_afterinterp.png")
+        plt.savefig("phi_vel_afterinterp.jpg")
         plt.show()
 
         plt.imshow(self.vel_rad[:,:,0])
         plt.colorbar()
-        plt.savefig("rad_vel_afterinterp.png")
+        plt.savefig("rad_vel_afterinterp.jpg")
         plt.show()
 
 
@@ -563,6 +571,18 @@ class Disk:
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
 
+        plt.imshow(X)
+        plt.title("X_skygrid")
+        plt.colorbar()
+        plt.savefig("X_skygrid.jpg")
+        plt.show()
+
+        plt.imshow(Y)
+        plt.title("Y_skygrid")
+        plt.colorbar() 
+        plt.savefig("Y_skygrid.jpg")
+        plt.show()
+
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
@@ -577,6 +597,8 @@ class Disk:
         '''are these x & y projected onto sky plane..?'''
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
+        
+        
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''
@@ -598,6 +620,9 @@ class Disk:
         #    tdiskZ -=(Y*self.sinthet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
+
+
+        #tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi) + np.pi/2
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
         notdisk = (tr > self.Aout*(1.+self.ecc)) | (tr < self.Ain*(1-self.ecc))  # - individual grid elements not in disk
@@ -622,10 +647,21 @@ class Disk:
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+
+        '''maybe adding pi/2 here..?'''
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
 
+        print("phiind shape " + str(phiind.shape))
+        print("aind shape " + str(aind.shape))
+        print("phiind.min " + str(np.min(phiind)))
+        print("phiind.max " + str(np.max(phiind)))
 
+        plt.scatter(aind, phiind)
+        plt.xlabel("aind")
+        plt.ylabel("phiind")
+        plt.savefig("aind_phiind_scatter.png")
+        plt.show()
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
@@ -640,6 +676,8 @@ class Disk:
         plt.show()
 
         #modified to use phi and r velocities
+
+
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)

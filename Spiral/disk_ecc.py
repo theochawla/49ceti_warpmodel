@@ -325,6 +325,14 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
+        
+        plt.pcolor(pcf[:,:,0], acf[:,:,0], self.vel[:,:,0], cmap='viridis')
+        plt.colorbar()
+        plt.xlabel("phi (radians)")
+        plt.ylabel("a (AU)")
+        plt.savefig("vel_with_acf_pcf.png")
+        plt.show()
+        
         print("self.vel min " + str(np.min(self.vel)))
         print("self.vel max" + str(np.max(self.vel)))
         print("self.vel mean " + str(np.mean(self.vel)))
@@ -580,6 +588,14 @@ class Disk:
         #print("self.vel.shape " + str(self.vel.shape))
 
 
+        plt.imshow(self.vel[:,:,0])
+        plt.colorbar()
+        plt.savefig("selfvel.jpg")
+        plt.show()
+
+        print('self.vel min ' + str(np.min(self.vel)))
+        print('self.vel max ' + str(np.max(self.vel)))
+
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
@@ -592,12 +608,14 @@ class Disk:
         plt.imshow(tvel[:,:,0])
         plt.colorbar()
         plt.savefig("tvel.png")
+        plt.show()
         print("tvel.shape " + str(tvel.shape))
         print("tvel min " + str(np.min(tvel)))
 
         plt.imshow(tvel[:,:,10])
         plt.colorbar()
         plt.savefig("tvel_10.png")
+        plt.show()
         #print("tvel.shape " + str(tvel.shape))
         
         #Omgz = np.zeros(np.shape(Omgy))
