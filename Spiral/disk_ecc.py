@@ -332,6 +332,13 @@ class Disk:
         plt.ylabel("a (AU)")
         plt.savefig("vel_with_acf_pcf.png")
         plt.show()
+
+        plt.pcolor(pcf[:,:,0], acf[:,:,0], self.vel[:,:,60], cmap='viridis')
+        plt.colorbar()
+        plt.xlabel("phi (radians)")
+        plt.ylabel("a (AU)")
+        plt.savefig("vel_with_acf_pcf_zslice.jpg")
+        plt.show()
         
         print("self.vel min " + str(np.min(self.vel)))
         print("self.vel max" + str(np.max(self.vel)))
@@ -506,6 +513,13 @@ class Disk:
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
         phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+
+        print('R min' + str(np.min(R)))
+        print('R max' + str(np.max(R)))
+
+        print('phi min' + str(np.min(phi)))
+        print('phi max' + str(np.max(phi)))
+
         #foo = np.floor(self.nz/2)
 
         #S_old = np.concatenate([Smid+Smin-10**(np.log10(Smid)+np.log10(Smin/Smid)*np.arange(foo)/(foo)),Smid-Smin+10**(np.log10(Smin)+np.log10(Smid/Smin)*np.arange(foo)/(foo))])
@@ -520,7 +534,18 @@ class Disk:
         # arrays in [phi,r,s] on sky coordinates
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
+       
+        plt.imshow(X)
+        plt.title("X_skygrid")
+        plt.colorbar()
+        #plt.savefig("X_skygrid.jpg")
+        plt.show()
 
+        plt.imshow(Y)
+        plt.title("Y_skygrid")
+        plt.colorbar() 
+        #plt.savefig("Y_skygrid.jpg")
+        plt.show()
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
@@ -535,6 +560,19 @@ class Disk:
         '''are these x & y projected onto sky plane..?'''
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
+        
+        plt.imshow(tdiskZ[:,:,0])
+        plt.title("tdiskZ")
+        plt.colorbar()
+        #plt.savefig("tdiskZ.jpg")
+        plt.show()
+
+        plt.imshow(tdiskY[:,:,0])
+        plt.title("tdiskY")
+        plt.colorbar()
+        #plt.savefig("tdiskY.jpg")
+        plt.show()
+        
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''
@@ -557,6 +595,19 @@ class Disk:
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
+
+        plt.imshow(tphi[:,:,0])
+        plt.title("tphi")
+        plt.colorbar()
+        #plt.savefig("tphi.jpg")
+        plt.show()
+
+        plt.imshow(tr[:,:,0])
+        plt.title("tr")
+        plt.colorbar()
+        #plt.savefig("tr.jpg")
+        plt.show()
+
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
         notdisk = (tr > self.Aout*(1.+self.ecc)) | (tr < self.Ain*(1-self.ecc))  # - individual grid elements not in disk
         isdisk = (tr>self.Ain*(1-self.ecc)) & (tr<self.Aout*(1+self.ecc)) & (np.abs(tdiskZ)<self.zmax)
@@ -583,14 +634,26 @@ class Disk:
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
 
+        print("zind min " + str(np.min(zind)))
+        print("zind max " + str(np.max(zind)))
+        print("zind mean " + str(np.mean(zind)))
+
+        print("phiind min " + str(np.min(phiind)))
+        print("phiind max " + str(np.max(phiind)))
+        print("phiind mean " + str(np.mean(phiind)))
+
+        print("aind min " + str(np.min(aind)))
+        print("aind max " + str(np.max(aind))) 
+        print("aind mean " + str(np.mean(aind))) 
 
         '''I need to figure out what whape self.vel is to make sure self.phi and self.rad are the same shape'''
         #print("self.vel.shape " + str(self.vel.shape))
 
 
         plt.imshow(self.vel[:,:,0])
+        plt.title("self.vel")
         plt.colorbar()
-        plt.savefig("selfvel.jpg")
+        #plt.savefig("selfvel.jpg")
         plt.show()
 
         print('self.vel min ' + str(np.min(self.vel)))
@@ -601,29 +664,61 @@ class Disk:
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
+        tvel1 = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1) #interpolate onto coordinates xind,yind #vel
+        tvel2  = tvel1.reshape(self.nphi,self.nr,self.nz)
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         
+        '''
+        plt.imshow(tvel1[:,:,0])
+        plt.title("tvel1")
+        plt.colorbar()
+        plt.savefig("tvel1.png")
+        plt.show()
+        '''
+
+        plt.imshow(self.tempg[:,:,0])
+        plt.title("self.tempg")
+        plt.colorbar()
+        #plt.savefig("selftempg.jpg")
+        plt.show()
         
+        plt.imshow(tT[:,:,0])
+        plt.title("tT")
+        plt.colorbar()
+        #plt.savefig("tT.png")
+        plt.show()
         
         plt.imshow(tvel[:,:,0])
+        plt.title("tvel")
         plt.colorbar()
         plt.savefig("tvel.png")
         plt.show()
         print("tvel.shape " + str(tvel.shape))
         print("tvel min " + str(np.min(tvel)))
 
+        '''
         plt.imshow(tvel[:,:,10])
         plt.colorbar()
         plt.savefig("tvel_10.png")
         plt.show()
         #print("tvel.shape " + str(tvel.shape))
+        '''
         
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
         #zpht = np.interp(tr.flatten(),self.rf,self.zpht).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+
+        plt.imshow(tsig_col[:,:,0])
+        plt.title("tsig_col")
+        plt.colorbar()
+        plt.savefig("tsig_col.png")
+        plt.show()
+
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+
+        print("zpht_up shape " + str(zpht_up.shape))
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
         self.sig_col = tsig_col

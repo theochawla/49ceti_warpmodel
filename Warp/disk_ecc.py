@@ -126,14 +126,17 @@ class Disk:
         # of annuli'''
         zmin = .1*Disk.AU      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
-        af = np.logspace(np.log10(amin),np.log10(amax),nac)
-        zf = np.logspace(np.log10(zmin),np.log10(self.zmax),nzc)
+        '''putting into linspace for now to compare to warp model'''
+        af = np.linspace(amin,amax,nac)
+        zf = np.linspace(zmin,self.zmax,nzc)
+        #zf = np.logspace(np.log10(zmin),np.log10(self.zmax),nzc)
 
         #adding this to triple check z-dimension is doing what I think it is
-        print("1d z-array " + str(zf))
+        #print("1d z-array " + str(zf))
 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
+        #print("ff" + str(ff))
         rf = np.zeros((nac,nfc))
         for i in range(nac):
             for j in range(nfc):
@@ -152,14 +155,33 @@ class Disk:
         #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
         #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
         fcf = (pcf - self.aop) % (2*np.pi)
+
+        plt.imshow(fcf[:,:,0])
+        plt.title("fcf")
+        plt.colorbar()
+        plt.savefig("warp_fcf.jpg")
+        plt.show()
+
         #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
+
+        plt.imshow(zcf[0,:,:])
+        plt.title("zcf")
+        plt.colorbar()
+        plt.savefig("original_zcf.jpg")
+        plt.show()
+
+        plt.imshow(zcf[10,:,:])
+        plt.title("zcf p=10 index slice")
+        plt.colorbar()
+        plt.savefig("original_zcf.jpg")
+        plt.show()
         
         '''should be 0 grid in shape of radius, phi, z above midplane'''
         rcf=rf[:,:,np.newaxis]*idz
         print(str(rcf.shape))
         #print("coords init {t}".format(t=time.clock()-tst))
 
-        if 0:
+        if 1:
             print('plotting')
             plt.plot((rcf*np.cos(fcf)).flatten(),(rcf*np.sin(fcf)).flatten())
             plt.show()
@@ -225,25 +247,21 @@ class Disk:
         dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
         siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
 
+        print("siggas shape: "+ str(siggas.shape))
+
+        plt.imshow(siggas)
+        plt.title("siggas")
+        plt.colorbar()
+        plt.savefig("nowarp_siggas.jpg")
+        plt.show()
+
+
         ## Add an extra ring
         if self.ring is not None:
             w = np.abs(rcf-self.Rring)<self.Wring/2.
             if w.sum()>0:
                 tempg[w] = tempg[w]*(rcdf[w]/(150*Disk.AU))**(self.sig_enhance-self.qq)/((rcf[w].max())/(150.*Disk.AU))**(-self.qq+self.sig_enhance)
 
-
-        #print("surface density {t}".format(t=time.clock()-tst))
-        if 0:
-            print('plotting')
-            #plt.pcolor(rcf[:,:,0]*np.cos(fcf[:,:,0]),rcf[:,:,0]*np.sin(fcf[:,:,0]),(siggas[:,:]))
-            plt.loglog(rcf[:,0,0]/self.AU,siggas[:,0],color='k',lw=2)
-            plt.loglog(rcf[:,nfc/2,0]/self.AU,siggas[:,nfc/2],color='r',lw=2)
-            plt.loglog(rcf[:,0,0]/self.AU,linrho[:,0],ls='--',lw=2,color='k')
-#            plt.loglog(rcf[:,0,0]/self.AU,siggas_r[:,0],ls=':',lw=2,color='k')
-            plt.loglog(rcf[:,nfc/2,0]/self.AU,linrho[:,nfc/2],ls='--',lw=2,color='r')
-#            plt.loglog(rcf[:,nfc/2,0]/self.AU,siggas_r[:,nfc/2],ls=':',lw=2,color='r')
-#            plt.colorbar()
-            plt.show()
 
         if 0:
             # check that siggas adds up to Mdisk #
@@ -268,25 +286,6 @@ class Disk:
 
         self.calc_hydrostatic(tempg,siggas,grid)
 
-        if 0:
-            #check if rho0 adds up to Mdisk
-            df=2*np.pi/self.nphi
-            #dz=0.5*(np.roll(zcf,-1,axis=2)-np.roll(zcf,1,axis=2))
-            #dz[:,:,0]=zcf[:,:,1]-zcf[:,:,0]
-            #dz[:,:,nzc-1]=zcf[:,:,nzc-1]-zcf[:,:,nzc-2]
-            #dr=0.5*(np.roll(rcf,-1,axis=0)-np.roll(rcf,1,axis=0))
-            #dr[0]=rcf[1]-rcf[0]
-            #dr[nac-1]=rcf[nac-1]-rcf[nac-2]
-            dz = zcf-np.roll(zcf,1,axis=2)
-            dz[:,:,0] = 0#zcf[:,:,1]
-            dr = acf-np.roll(acf,1,axis=0)
-            dr[0] = 0#rcf[1]
-            dV=acf*df*dr*dz
-            mcheck=self.rho0*dV
-            mcheck=mcheck.sum()
-            print("rho mass check (should be 1/2 as z is only one half of disk)")
-            print(mcheck/self.McoG)
-
         #print("hydro done {t}".format(t=time.clock()-tst))
         #Calculate radial pressure differential
         ### nolonger use pressure term ###
@@ -306,6 +305,12 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
+
+        plt.imshow(self.vel[:,:,0])
+        plt.title("vel")
+        plt.colorbar()
+        plt.savefig("nowarp_vel.jpg")
+        plt.show()
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))
@@ -315,52 +320,6 @@ class Disk:
         #x,y velocities with refrence to sky (phi) only care about Vy on sky
         #velrot[0] = self.cosaop*vel[0] - self.sinaop*vel[1]
         #velrot = self.sinaop*velx + self.cosaop*vely
-
-        #velrot = np.sqrt((Disk.G*self.Mstar)/(acf*(1.-self.ecc**2)))*(self.sinaop*(-1.*np.sin(fcf)) + self.cosaop*(self.ecc+np.cos(fcf)))
-        #velrot2 = np.sqrt((Disk.G*self.Mstar)*(2/rcf-1/acf))
-
-        if 0:
-            plt.subplot(211)
-            #plt.plot(ff/np.pi,velrot[nac/2,:,0]/1e5,'.',color='k',lw=2)
-            plt.plot(pf/np.pi,(Omg*rcf)[nac/2,:,0]/1e5,'.',lw=2)
-            #plt.plot(ff/np.pi,velrot2[nac/2,:,0]/1e5,'.',color='r')
-            plt.subplot(212)
-            #plt.plot(af/Disk.AU,velrot[:,0,0]/1e5,color='k',lw=2)
-            plt.plot(af/Disk.AU,(Omg*rcf)[:,0,0]/1e5,lw=2)
-            #plt.plot(af/Disk.AU,velrot2[:,0,0]/1e5,color='r')
-            #plt.plot(af/Disk.AU,velrot[:,nfc/2,0]/1e5,color='k',ls='--')
-            plt.plot(af/Disk.AU,(Omg*rcf)[:,nfc/2,0]/1e5,ls='--',lw=2)
-            #plt.plot(af/Disk.AU,velrot2[:,nfc/2,0]/1e5,color='r',ls='--')
-
-
-        #print("Vel {t}".format(t=time.clock()-tst))
-        if 0:
-            print('plotting velocity')
-            plt.clf()
-            '''
-            plt.plot(fcf[0,:,0],velrot[0,0,:,0],label='Vx')
-            plt.plot(fcf[0,:,0],velrot[1,0,:,0],label='Vy')
-            plt.plot(fcf[0,:,0],np.sqrt(Disk.G*self.Mstar*((2./rcf[0,:,0])-(1./acf[0,:,0]))),"o",color="c",label="Vis Viva")
-            plt.plot(fcf[0,:,0],np.sqrt(velrot[0,0,:,0]**2+velrot[1,0,:,0]**2),"x",color="k",label='V')
-            plt.legend(loc = "lower right")
-            plt.show()
-            '''
-            plt.subplot(131,aspect="equal")
-            #plt.axes().set_aspect("equal")
-            plt.title("Vx/V")
-            plt.pcolor(rcf[:,:,0]*np.cos(pcf[:,:,0]),rcf[:,:,0]*np.sin(pcf[:,:,0]),velrot[0,:,:,0])#/np.sqrt(velrot[0,:,:,0]**2+velrot[1,:,:,0]**2))
-            plt.colorbar()
-            plt.subplot(132,aspect="equal")
-            #plt.axes().set_aspect("equal")
-            plt.title("Vy/V")
-            plt.pcolor(rcf[:,:,0]*np.cos(pcf[:,:,0]),rcf[:,:,0]*np.sin(pcf[:,:,0]),velrot[1,:,:,0])#/np.sqrt(velrot[0,:,:,0]**2+velrot[1,:,:,0]**2))
-            plt.colorbar()
-            plt.subplot(133,aspect="equal")
-            #plt.axes().set_aspect("equal")
-            plt.title("Log V")
-            plt.pcolor(rcf[:,:,0]*np.cos(pcf[:,:,0]),rcf[:,:,0]*np.sin(pcf[:,:,0]),np.log10(np.sqrt(velrot[0,:,:,0]**2+velrot[1,:,:,0]**2)))
-            plt.colorbar()
-            plt.show()
 
         # Check for NANs
         ### nolonger use Omg ###
@@ -441,25 +400,6 @@ class Disk:
         self.rcf = rcf  #only used for plotting can remove after testing
 
 
-
-
-        if 0:
-            plt.figure()
-            cs = plt.contour(rcf/Disk.AU,zcf/Disk.AU,np.log10(self.rho0/(Disk.mu*Disk.mh)),np.arange(0,10,1))
-            #cs2 = plt.contour(tr[0,:,:]/Disk.AU,tdiskZ[0,:,:]/Disk.AU,np.log10(self.rhoG[0,:,:])+4,np.arange(0,11,1))
-            cs2 = plt.contour(rcf/Disk.AU,zcf/Disk.AU,tempg,(30,50,70,100,120,150),colors='k')
-            #cs3 = plt.contour(tr[0,:,:]/Disk.AU,tdiskZ[0,:,:]/Disk.AU,tT[0,:,:],(20,40,60,80,100,120),colors='k',ls='--')
-            #plt.plot(tr[0,:,:]/Disk.AU,zpht[0,:,:]/Disk.AU,color='k',lw=8,ls='--')
-            plt.plot(rf/Disk.AU,zice/Disk.AU,color='b',lw=6,ls='--')
-            plt.plot(rf/Disk.AU,szpht/Disk.AU,color='k',lw=6,ls='--')
-            plt.colorbar(cs,label='log n')
-            plt.clabel(cs2,fmt='%1i')
-            #plt.clabel(cs3,fmt='%3i')
-            plt.xlim(0,500)
-            plt.xlabel('R (AU)',fontsize=20)
-            plt.ylabel('Z (AU)',fontsize=20)
-            plt.show()
-
     def set_rt_grid(self):
         #tst=time.clock()
         ### Start of Radiative Transfer portion of the code...
@@ -526,6 +466,12 @@ class Disk:
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
+
+        plt.imshow(tphi[:,:,0])
+        plt.title("tphi")
+        plt.colorbar()
+        plt.savefig("nowarp_tphi.jpg")
+        plt.show()
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
         notdisk = (tr > self.Aout*(1.+self.ecc)) | (tr < self.Ain*(1-self.ecc))  # - individual grid elements not in disk
         isdisk = (tr>self.Ain*(1-self.ecc)) & (tr<self.Aout*(1+self.ecc)) & (np.abs(tdiskZ)<self.zmax)
@@ -559,6 +505,19 @@ class Disk:
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+
+
+        plt.imshow(tT[:,:,0])
+        plt.title("tT")
+        plt.colorbar()
+        plt.savefig("nowarp_tT.jpg")
+        plt.show()
+
+        plt.imshow(tvel[:,:,0])
+        plt.title("tvel")
+        plt.colorbar()
+        plt.savefig("nowarp_tvel.jpg")
+        plt.show()
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
@@ -567,6 +526,13 @@ class Disk:
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
+
+        plt.imshow(tsig_col[:,:,0])
+        plt.title("tsig_col")
+        plt.colorbar()
+        plt.savefig("nowarp_tsig_col.jpg")
+        plt.show()
+        
         self.sig_col = tsig_col
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)

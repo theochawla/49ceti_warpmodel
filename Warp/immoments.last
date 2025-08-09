@@ -1,0 +1,13 @@
+imagename  = 'warp_unwarped.image'
+moments    = [9]
+axis       = 'spec'
+region     = ''
+box        = ''
+chans      = ''
+stokes     = ''
+mask       = ''
+includepix = -1
+excludepix = -1
+outfile    = 'unwarped_protodisk_m9.im'
+stretch    = False
+#immoments( imagename='warp_unwarped.image',moments=[9],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=-1,excludepix=-1,outfile='unwarped_protodisk_m9.im',stretch=False )

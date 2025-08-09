@@ -422,9 +422,10 @@ class Disk:
         rad_tiled_vel = np.append(rad_flat_vel, [[rad_flat_vel],[rad_flat_vel]])
 
         '''interpolating tiled grid'''
-        interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)      
+        '''trying phi & r inputs'''
+        interp_test = interpnd((g_phi_tiled, g_r_tiled), spir_tiled)      
 
-        plt.scatter(g_r_tiled, g_phi_tiled, c=phi_tiled_vel)
+        plt.scatter(g_phi_tiled, g_r_tiled, c=phi_tiled_vel)
         plt.colorbar()
         plt.savefig("vel_phi_polarscatter_tiled.png")
         plt.show()
@@ -433,17 +434,25 @@ class Disk:
         print("phi_vel max " + str(np.max(phi_flat_vel)))
         print("phi_vel mean " + str(np.mean(phi_flat_vel)))
 
-        interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
-        interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
+        #interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
+        interp_test_phi = interpnd((g_phi_tiled, g_r_tiled), phi_tiled_vel)
+        ##interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
+        interp_test_rad = interpnd((g_phi_tiled, g_r_tiled), rad_tiled_vel)
 
-        phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
-        rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
+        '''switching acf & pcf'''
+
+        #phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
+        #rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
+
+        phi_2d = interp_test_phi(pcf[:,:,0]-np.pi, acf[:,:,0]/Disk.AU)
+        rad_2d = interp_test_rad(pcf[:,:,0]-np.pi, acf[:,:,0]/Disk.AU)
 
         '''storing in self.vel, converting to cm/s'''
-
-        self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        #self.vel_phi = interp_test_phi(acf[:,:,0]-np.pi, pcf[:,:,0]/Disk.AU)[:,:,np.newaxis]*idz
+        self.vel_phi = interp_test_phi(pcf[:,:,0]-np.pi, acf[:,:,0]/Disk.AU)[:,:,np.newaxis]*idz
         #self.vel_phi = (vel_phi  - np.max(vel_phi)/2) * Disk.kms   # convert to cm/s
-        self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        self.vel_rad = interp_test_rad(pcf[:,:,0]/Disk.AU, acf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        #self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
@@ -452,7 +461,7 @@ class Disk:
         print("self.vel_phi max " + str(np.max(self.vel_phi)))
         print("self.vel_phi mean " + str(np.mean(self.vel_phi)))
 
-        plt.pcolor(pcf[:,:,0], acf[:,:,0], self.vel_phi[:,:,0], cmap='viridis')
+        plt.pcolor(acf[:,:,0], pcf[:,:,0], self.vel_phi[:,:,0], cmap='viridis')
         plt.colorbar()
         plt.xlabel("phi (radians)")
         plt.ylabel("a (AU)")
@@ -556,7 +565,13 @@ class Disk:
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
         phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
-        #foo = np.floor(self.nz/2)
+
+        print('R min' + str(np.min(R)))
+        print('R max' + str(np.max(R)))
+
+        print('phi min' + str(np.min(phi)))
+        print('phi max' + str(np.max(phi)))
+
 
         #S_old = np.concatenate([Smid+Smin-10**(np.log10(Smid)+np.log10(Smin/Smid)*np.arange(foo)/(foo)),Smid-Smin+10**(np.log10(Smin)+np.log10(Smid/Smin)*np.arange(foo)/(foo))])
         #S_old = np.arange(2*foo)/(2*foo)*(Smax-Smin)+Smin #*** not on cluster**
@@ -631,6 +646,17 @@ class Disk:
         #xydisk =  tr[:,:,0] <= self.Aout*(1.+self.ecc)+Smax*self.sinthet  # - tracing outline of disk on observer xy plane
         self.r = tr
 
+        plt.imshow(tphi[:,:,0])
+        plt.title("tphi")
+        plt.colorbar()
+        #plt.savefig("tphi.jpg")
+        plt.show()
+
+        plt.imshow(tr[:,:,0])
+        plt.title("tr")
+        plt.colorbar()
+        #plt.savefig("tr.jpg")
+        plt.show()
 
 
 
@@ -652,10 +678,17 @@ class Disk:
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
 
-        print("phiind shape " + str(phiind.shape))
-        print("aind shape " + str(aind.shape))
-        print("phiind.min " + str(np.min(phiind)))
-        print("phiind.max " + str(np.max(phiind)))
+        print("zind min " + str(np.min(zind)))
+        print("zind max " + str(np.max(zind)))
+        print("zind mean " + str(np.mean(zind)))
+
+        print("phiind min " + str(np.min(phiind)))
+        print("phiind max " + str(np.max(phiind)))
+        print("phiind mean " + str(np.mean(phiind)))
+
+        print("aind min " + str(np.min(aind)))
+        print("aind max " + str(np.max(aind))) 
+        print("aind mean " + str(np.mean(aind))) 
 
         plt.scatter(aind, phiind)
         plt.xlabel("aind")
@@ -670,31 +703,70 @@ class Disk:
         
         '''this is where I need to make sure velocity map is being used correctly'''
 
-        plt.imshow(self.vel_phi[:,:,0])
+        plt.imshow(self.tempg[:,:,0])
+        plt.title("self.tempg")
         plt.colorbar()
-        plt.savefig('vel_phi_beforecoord.png', dpi = 300)
+        #plt.savefig("selftempg.jpg")
         plt.show()
+
+        plt.imshow(tT[:,:,0])
+        plt.title("tT")
+        plt.colorbar()
+        #plt.savefig("tT.png")
+        plt.show()
+
+        plt.imshow(self.vel_phi[:,:,0])
+        plt.title("vel_phi before coord")
+        plt.colorbar()
+        #plt.savefig('vel_phi_beforecoord.jpg', dpi = 300)
+        plt.show()
+
+        '''
+        plt.imshow(self.vel_phi[:,:,60])
+        plt.colorbar()
+        plt.savefig('vel_phi_beforecoord_zslice.jpg', dpi = 300)
+        plt.show()
+        '''
+
+
 
         #modified to use phi and r velocities
 
+        '''maybe re-ordering aind and phiind?'''
+
+        #tvelphi = ndimage.map_coordinates(self.vel_phi,[[phiind],[aind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
+        #tvelphi1 = ndimage.map_coordinates(self.vel_phi,[[phiind],[aind],[zind]],order=1)
+        #tvelphi2 = tvelphi1.reshape(self.nphi,self.nr,self.nz)*Disk.kms
+        #print("tvelphi1 shape " + str(tvelphi1.shape))
+        
+        '''
+        plt.imshow(tvelphi1[:,:,0])
+        plt.title("tvelphi1")
+        plt.colorbar()
+        plt.savefig("tvelphi1.png")
+        plt.show()
+        '''
 
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
-        plt.imshow(tvelphi[:,:,0])
+        plt.imshow(tvelphi2[:,:,0])
+        plt.title("tvelphi")
         plt.colorbar()
-        plt.savefig("tvelphi.png")
+        #plt.savefig("tvelphi.png")
         plt.show()
+
         plt.imshow(tvelr[:,:,0])
+        plt.title("tvelr")
         plt.colorbar()
-        plt.savefig("tvelr.png")
+        #plt.savefig("tvelr.png")
         plt.show()
 
         self.p_grid = ndimage.map_coordinates(self.pcf,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         plt.imshow(self.p_grid[:,:,0])
         plt.colorbar()
-        plt.savefig("p_grid.png")
+        #plt.savefig("p_grid.png")
         plt.show()
         
         #Omgz = np.zeros(np.shape(Omgy))
@@ -702,7 +774,15 @@ class Disk:
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
         #zpht = np.interp(tr.flatten(),self.rf,self.zpht).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+
+        plt.imshow(tsig_col[:,:,0])
+        plt.title("tsig_col")
+        plt.colorbar()
+        plt.savefig("tsig_col.png")
+        plt.show()
+
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+        print("zpht_up shape " + str(zpht_up.shape))
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
         self.sig_col = tsig_col
@@ -770,6 +850,7 @@ class Disk:
         print("vel_rad shape " + str(self.vel_rad.shape))
         print("vel_phi shape " + str(self.vel_rad.shape))
 
+        '''
         plt.imshow(self.vel_rad[:,:,0])
         plt.colorbar()
         plt.savefig('pvel_rad_z=0.png', dpi = 300)
@@ -789,6 +870,7 @@ class Disk:
         plt.colorbar()
         plt.savefig('pvel_phi_z=10.png', dpi = 300)
         plt.show()
+        '''
         
 
         self.i_notdisk = notdisk
