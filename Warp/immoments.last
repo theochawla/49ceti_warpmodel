@@ -1,4 +1,4 @@
-imagename  = 'warp_unwarped.image'
+imagename  = 'unedited_disk.image'
 moments    = [9]
 axis       = 'spec'
 region     = ''
@@ -8,6 +8,6 @@ stokes     = ''
 mask       = ''
 includepix = -1
 excludepix = -1
-outfile    = 'unwarped_protodisk_m9.im'
+outfile    = 'unedited_protodisk_m9.im'
 stretch    = False
-#immoments( imagename='warp_unwarped.image',moments=[9],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=-1,excludepix=-1,outfile='unwarped_protodisk_m9.im',stretch=False )
+#immoments( imagename='unedited_disk.image',moments=[9],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=-1,excludepix=-1,outfile='unedited_protodisk_m9.im',stretch=False )

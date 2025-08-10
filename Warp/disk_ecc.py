@@ -48,7 +48,10 @@ class Disk:
     Hnuctog = 0.706*mu   # - H nuclei abundance fraction (H nuclei:gas)
     sc = 1.59e21   # - Av --> H column density (C. Qi 08,11)
     H2tog = 0.8    # - H2 abundance fraction (H2:gas)
-    Tco = 19.    # - freeze out
+
+    '''freeze out = 0 for dd parameters'''
+    Tco = 0.
+    #Tco = 19.    # - freeze out
     sigphot = 0.79*sc   # - photo-dissociation column
 
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):
@@ -207,16 +210,19 @@ class Disk:
         #define temperature structure
         # use Dartois (03) type II temperature structure
         ###### expanding to 3D should not affect this ######
+        '''using debris disk parameters, setting tmid = tatm, and using 100 AU instead of 150 AU'''
+
         delta = 1.                # shape parameter
-        rcf150=rcf/(150.*Disk.AU)
-        rcf150q=rcf150**self.qq
+        rcf100=rcf/(100.*Disk.AU)
+        rcf100q=rcf100**self.qq
         
         '''# zq0 = Zq, in AU, at 150 AU (????)'''
         '''zq should be 3d and scalled by 150 AU...???'''
-        zq = self.zq0*Disk.AU*rcf150**1.3
+        zq = self.zq0*Disk.AU*rcf100**1.3
         #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
-        tmid = self.tmid0*rcf150q
-        tatm = self.tatm0*rcf150q
+        tmid = self.tmid0*rcf100q
+        tatm = tmid
+        #tatm = self.tatm0*rcf100q
         tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
 
         '''ii is 3d boolean grid of z values above some critical value'''

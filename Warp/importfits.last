@@ -1,5 +1,5 @@
-fitsimage         = 'warp_unwarped.fits'
-imagename         = 'warp_unwarped.image'
+fitsimage         = 'unedited_disk.fits'
+imagename         = 'unedited_disk.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
@@ -7,4 +7,4 @@ overwrite         = False
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='warp_unwarped.fits',imagename='warp_unwarped.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='unedited_disk.fits',imagename='unedited_disk.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
