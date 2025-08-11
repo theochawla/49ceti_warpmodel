@@ -547,7 +547,10 @@ class Disk:
         #sky coordinates
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
-        phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+        #phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+
+        '''adjusting phi... more intentionally?'''
+        phi = np.arange(self.nphi)*(2*np.pi)/(self.nphi-1)
         #foo = np.floor(self.nz/2)
 
         #S_old = np.concatenate([Smid+Smin-10**(np.log10(Smid)+np.log10(Smin/Smid)*np.arange(foo)/(foo)),Smid-Smin+10**(np.log10(Smin)+np.log10(Smid/Smin)*np.arange(foo)/(foo))])
@@ -560,8 +563,13 @@ class Disk:
         '''my guess is that z reflection happen here'''
 
         # arrays in [phi,r,s] on sky coordinates
+
+        '''this isn't going to work.. but what if I switch x & y'''
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
+
+        #Y = (np.outer(R,np.cos(phi))).transpose()
+        #X = (np.outer(R,np.sin(phi))).transpose()
 
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
@@ -643,6 +651,12 @@ class Disk:
         plt.colorbar()
         plt.savefig('vel_phi_beforecoord.png', dpi = 300)
         plt.show()
+
+
+        #'''trying modifying tphi for just velocity field...'''
+        tphi = np.arctan2(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz), tdiskY)%(2*np.pi)
+        #tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
+        phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
 
         #modified to use phi and r velocities
         #this is where we convert from km/s to cm/s
