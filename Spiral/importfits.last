@@ -1,5 +1,5 @@
-fitsimage         = 'unedited_dd_disk.fits'
-imagename         = 'unedited_dd.image'
+fitsimage         = '85_incl_nospiral.fits'
+imagename         = 'high_inc_nospiral.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
@@ -7,4 +7,4 @@ overwrite         = True
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='unedited_dd_disk.fits',imagename='unedited_dd.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='85_incl_nospiral.fits',imagename='high_inc_nospiral.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )

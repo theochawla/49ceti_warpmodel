@@ -1,10 +1,10 @@
-fitsimage         = 'direct_vel_ampadj.fits'
-imagename         = 'spiral_test2.image'
+fitsimage         = '85_incl_spiral.fits'
+imagename         = 'high_inc_spiral.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
-overwrite         = False
+overwrite         = True
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='direct_vel_ampadj.fits',imagename='spiral_test2.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='85_incl_spiral.fits',imagename='high_inc_spiral.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )

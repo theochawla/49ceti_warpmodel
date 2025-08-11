@@ -1,6 +1,6 @@
-raster  = 'spiral_test2.image'
+raster  = 'unedited_dd_m9_3sigma.im'
 contour = {}
 zoom    = 1
 axes    = {}
 out     = ''
-#imview( raster='spiral_test2.image',contour={},zoom=1,axes={},out='' )
+#imview( raster='unedited_dd_m9_3sigma.im',contour={},zoom=1,axes={},out='' )
