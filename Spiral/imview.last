@@ -1,6 +1,6 @@
-raster  = 'spiral_protodisk_m9.im'
+raster  = 'unedited_dd_m0_real2.im'
 contour = {}
 zoom    = 1
 axes    = {}
 out     = ''
-#imview( raster='spiral_protodisk_m9.im',contour={},zoom=1,axes={},out='' )
+#imview( raster='unedited_dd_m0_real2.im',contour={},zoom=1,axes={},out='' )

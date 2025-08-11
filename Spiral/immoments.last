@@ -1,5 +1,5 @@
-imagename  = 'unediteddisk.image'
-moments    = [9]
+imagename  = 'unedited_dd.image'
+moments    = [0]
 axis       = 'spec'
 region     = ''
 box        = ''
@@ -8,6 +8,6 @@ stokes     = ''
 mask       = ''
 includepix = -1
 excludepix = -1
-outfile    = 'unedit_protodisk_m9.im'
+outfile    = 'unedited_dd_m0_real2.im'
 stretch    = False
-#immoments( imagename='unediteddisk.image',moments=[9],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=-1,excludepix=-1,outfile='unedit_protodisk_m9.im',stretch=False )
+#immoments( imagename='unedited_dd.image',moments=[0],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=-1,excludepix=-1,outfile='unedited_dd_m0_real2.im',stretch=False )

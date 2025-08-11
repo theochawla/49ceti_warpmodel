@@ -55,7 +55,7 @@ class Disk:
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):
     '''testing with debris disk parameters (temp, co freeze out, radius, and disk mass)'''
     
-    def __init__(self,q=-0.5,McoG=1e-4,pp=1.,Ain=10.,Aout=50.,Rc=50.,incl=51.5,
+    def __init__(self,q=-0.5,McoG=1e-4,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None):
@@ -129,8 +129,10 @@ class Disk:
         # of annuli'''
         zmin = .1*Disk.AU      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
-        af = np.logspace(np.log10(amin),np.log10(amax),nac)
-        zf = np.logspace(np.log10(zmin),np.log10(self.zmax),nzc)
+
+        '''linspacing this for now'''
+        af = np.linspace(amin,amax,nac)
+        zf = np.linspace(zmin,self.zmax,nzc)
 
         #adding this to triple check z-dimension is doing what I think it is
         print("1d z-array " + str(zf))

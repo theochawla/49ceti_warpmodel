@@ -1,10 +1,10 @@
-fitsimage         = 'kevincodetest.fits'
-imagename         = 'unediteddisk.image'
+fitsimage         = 'unedited_dd_disk.fits'
+imagename         = 'unedited_dd.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
-overwrite         = False
+overwrite         = True
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='kevincodetest.fits',imagename='unediteddisk.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='unedited_dd_disk.fits',imagename='unedited_dd.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )

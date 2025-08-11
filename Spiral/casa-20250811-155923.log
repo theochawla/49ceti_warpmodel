@@ -1,0 +1,361 @@
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	Some or all of the expected auto updates did not happen.
+2025-08-11 15:59:25	INFO	::casa	This indicates that measurespath is not empty and does not contain data maintained by casaconfig.
+2025-08-11 15:59:25	INFO	::casa	If the IERSeop2000 table is found in datapth then casatools will import.
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	The casa data found at measurespath is not being maintained by casaconfig.
+2025-08-11 15:59:25	INFO	::casa	visit https://casadocs.readthedocs.io/en/stable/notebooks/external-data.html for more information
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:25	INFO	::casa	
+2025-08-11 15:59:26	INFO	::casa	Python version 3.10.12
+2025-08-11 15:59:26	INFO	::casa	CASA Version CASALITH 6.6.5.31
+2025-08-11 15:59:26	INFO	::casa	
+2025-08-11 15:59:26	INFO	::casa	optional configuration file not found, continuing CASA startup without it
+2025-08-11 15:59:26	INFO	::casa	loaded config file : /soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaconfig/config.py
+2025-08-11 15:59:26	INFO	::casa	
+2025-08-11 15:59:26	INFO	::casa	config values
+2025-08-11 15:59:26	INFO	::casa	    agg = False
+2025-08-11 15:59:26	INFO	::casa	    cachedir = '/Users/tchawla/.casa'
+2025-08-11 15:59:26	INFO	::casa	    casaconfig_verbose = 1
+2025-08-11 15:59:26	INFO	::casa	    colors = 'Neutral'
+2025-08-11 15:59:26	INFO	::casa	    data_auto_update = True
+2025-08-11 15:59:26	INFO	::casa	    datapath = ['/Users/tchawla/.casa/data']
+2025-08-11 15:59:26	INFO	::casa	    iplog = False
+2025-08-11 15:59:26	INFO	::casa	    iplogfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/ipython-20250811-155923.log'
+2025-08-11 15:59:26	INFO	::casa	    log2term = False
+2025-08-11 15:59:26	INFO	::casa	    logfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/casa-20250811-155923.log'
+2025-08-11 15:59:26	INFO	::casa	    measures_auto_update = True
+2025-08-11 15:59:26	INFO	::casa	    measurespath = '/Users/tchawla/.casa/data'
+2025-08-11 15:59:26	INFO	::casa	    nogui = False
+2025-08-11 15:59:26	INFO	::casa	    nologfile = False
+2025-08-11 15:59:26	INFO	::casa	    nologger = False
+2025-08-11 15:59:26	INFO	::casa	    pipeline = False
+2025-08-11 15:59:26	INFO	::casa	    startupfile = '/Users/tchawla/.casa/startup.py'
+2025-08-11 15:59:26	INFO	::casa	    user_site = False
+2025-08-11 15:59:26	INFO	::casa	
+2025-08-11 15:59:26	INFO	::casa	casarundata version is unknown, this is probably a legacy version not installed by casaconfig
+2025-08-11 15:59:26	INFO	::casa	measures version : WSRT_Measures_20250604-160001.ztar
+2025-08-11 15:59:26	INFO	::casa	
+2025-08-11 15:59:26	INFO	::casa	Checking Measures tables in data repository sub-directory /Users/tchawla/.casa/data/geodetic
+2025-08-11 15:59:26	INFO	::casa	  IERSeop2000 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-11 15:59:26	INFO	::casa	  IERSeop97 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-11 15:59:26	INFO	::casa	  IERSpredict (version date, last date in table (UTC)): 2025/06/04/15:15, 2025/09/02/00:00:00
+2025-08-11 15:59:26	INFO	::casa	  TAI_UTC (version date, last date in table (UTC)): 2025/05/11/15:15, 2017/01/01/00:00:00
+2025-08-11 15:59:32	INFO	imview::::casa	##########################################
+2025-08-11 15:59:32	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-11 15:59:32	INFO	imview::::casa	imview( raster='unedited_protodisk_m9.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-11 15:59:36	SEVERE	imview::::casa	unedited_protodisk_m9.im does not exist or is not an image
+2025-08-11 15:59:36	SEVERE	imview::::casa	Exception Reported: Error in imview: unedited_protodisk_m9.im does not exist or is not an image
+2025-08-11 15:59:36	INFO	imview::::casa	Traceback (most recent call last):
+2025-08-11 15:59:36	INFO	imview::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaviewer/gotasks/imview.py", line 464, in __call__
+2025-08-11 15:59:36	INFO	imview::::casa+	    task_result = _imview_t( _pc.document['raster'],_pc.document['contour'],_pc.document['zoom'],_pc.document['axes'],_pc.document['out'] )
+2025-08-11 15:59:36	INFO	imview::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaviewer/private/task_imview.py", line 128, in __call__
+2025-08-11 15:59:36	INFO	imview::::casa+	    panel = self.__load_files( "raster", gui, None, raster )
+2025-08-11 15:59:36	INFO	imview::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaviewer/private/task_imview.py", line 340, in __load_files
+2025-08-11 15:59:36	INFO	imview::::casa+	    panel = self.__load_raster( gui, panel, { 'file': files } ) if filetype == 'raster' else \
+2025-08-11 15:59:36	INFO	imview::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaviewer/private/task_imview.py", line 155, in __load_raster
+2025-08-11 15:59:36	INFO	imview::::casa+	    raise RuntimeError(raster['file'] + " does not exist or is not an image")
+2025-08-11 15:59:36	INFO	imview::::casa+	RuntimeError: unedited_protodisk_m9.im does not exist or is not an image
+2025-08-11 15:59:36	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 11:59:32.097294 End time: 2025-08-11 11:59:36.124424
+2025-08-11 15:59:36	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-11 15:59:36	INFO	imview::::casa	##########################################
+2025-08-11 16:00:12	INFO	importfits::::casa	##########################################
+2025-08-11 16:00:12	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:00:12	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:00:12	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-11 16:00:12	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-11 16:00:12	INFO	importfits::::	... converted to type double.
+2025-08-11 16:00:12	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-11 16:00:12	WARN	importfits::FITSCoordinateUtil::fromFITSHeader	Zero or no rest frequency provided for velocity axis.
+2025-08-11 16:00:12	WARN	importfits::::ImageFITSConverter	This HDU (0) did not contain a legible image.
+2025-08-11 16:00:12	WARN	importfits::::ImageFITSConverter	Next candidate image HDU is #1
+2025-08-11 16:00:12	WARN	importfits::::ImageFITSConverter+	 (note: use the whichhdu parameter to address HDUs directly)
+2025-08-11 16:00:12	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)	Exception Reported: Exception: There are 1 HDUs in FITS file unedited_dd_disk.fits . None of them is a legible image..
+2025-08-11 16:00:12	SEVERE	importfits::image::fromfits (file src/tools/image/image_cmpt.cc, line 2411)+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-11 16:00:12	SEVERE	importfits::::casa	Exception Reported: Error in importfits: Exception: There are 1 HDUs in FITS file unedited_dd_disk.fits . None of them is a legible image..
+2025-08-11 16:00:12	SEVERE	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-11 16:00:12	INFO	importfits::::casa	Traceback (most recent call last):
+2025-08-11 16:00:12	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/importfits.py", line 469, in __call__
+2025-08-11 16:00:12	INFO	importfits::::casa+	    task_result = _importfits_t( _pc.document['fitsimage'],_pc.document['imagename'],_pc.document['whichrep'],_pc.document['whichhdu'],_pc.document['zeroblanks'],_pc.document['overwrite'],_pc.document['defaultaxes'],_pc.document['defaultaxesvalues'],_pc.document['beam'] )
+2025-08-11 16:00:12	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_importfits.py", line 111, in importfits
+2025-08-11 16:00:12	INFO	importfits::::casa+	    _myia.fromfits(tmpname,fitsimage,whichrep,whichhdu,zeroblanks)
+2025-08-11 16:00:12	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/image.py", line 471, in fromfits
+2025-08-11 16:00:12	INFO	importfits::::casa+	    return self._swigobj.fromfits(outfile, infile, whichrep, whichhdu, zeroblanks, overwrite)
+2025-08-11 16:00:12	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatools/__casac__/image.py", line 1032, in fromfits
+2025-08-11 16:00:12	INFO	importfits::::casa+	    return _image.image_fromfits(self, *args, **kwargs)
+2025-08-11 16:00:12	INFO	importfits::::casa+	RuntimeError: Exception: There are 1 HDUs in FITS file unedited_dd_disk.fits . None of them is a legible image..
+2025-08-11 16:00:12	INFO	importfits::::casa+	... thrown by static casa::SPIIF casa::ImageFactory::fromFITS(const casacore::String&, const casacore::String&, casacore::Int, casacore::Int, casacore::Bool, casacore::Bool) at File: /source/casa6/casatools/src/code/imageanalysis/ImageAnalysis/ImageFactory2.cc, line: 398
+2025-08-11 16:00:12	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:00:11.946304 End time: 2025-08-11 12:00:11.956147
+2025-08-11 16:00:12	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:00:12	INFO	importfits::::casa	##########################################
+2025-08-11 16:00:50	INFO	importfits::::casa	##########################################
+2025-08-11 16:00:50	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:00:50	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:00:50	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-11 16:00:50	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-11 16:00:50	INFO	importfits::::	... converted to type double.
+2025-08-11 16:00:50	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-11 16:00:50	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-11 16:00:50	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/unedited_dd.image' All pixels fit in memory (3932160 pixels).
+2025-08-11 16:00:50	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-11 16:00:50	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-11 16:00:50	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-11 16:00:50	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-11 16:00:50	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-11 16:00:50	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-11 16:00:50	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-11 16:00:50	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:00:49.561673 End time: 2025-08-11 12:00:49.786699
+2025-08-11 16:00:50	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:00:50	INFO	importfits::::casa	##########################################
+2025-08-11 16:01:16	INFO	immoments::::casa	##########################################
+2025-08-11 16:01:16	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:01:16	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[9], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m9.im', stretch=False )
+2025-08-11 16:01:16	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:01:16	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:01:16	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:01:16	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m9.im
+2025-08-11 16:01:16	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:01:17	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:01:16.234612 End time: 2025-08-11 12:01:17.226602
+2025-08-11 16:01:17	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:01:17	INFO	immoments::::casa	##########################################
+2025-08-11 16:01:27	INFO	imview::::casa	##########################################
+2025-08-11 16:01:27	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-11 16:01:27	INFO	imview::::casa	imview( raster='unedited_dd_m9.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-11 16:01:28	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 12:01:26.648818 End time: 2025-08-11 12:01:27.640195
+2025-08-11 16:01:28	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-11 16:01:28	INFO	imview::::casa	##########################################
+2025-08-11 16:02:27	INFO	immoments::::casa	##########################################
+2025-08-11 16:02:27	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:02:27	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m0.im', stretch=False )
+2025-08-11 16:02:27	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:02:27	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:02:27	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:02:27	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m0.im
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments	Could not determine the units of the moment image(s) so the units 
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments+	will be the same as those of the input image. This may not be very useful.
+2025-08-11 16:02:27	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:02:27	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:02:26.962481 End time: 2025-08-11 12:02:27.157490
+2025-08-11 16:02:27	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:02:27	INFO	immoments::::casa	##########################################
+2025-08-11 16:02:42	INFO	immoments::::casa	##########################################
+2025-08-11 16:02:42	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:02:42	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m1.im', stretch=False )
+2025-08-11 16:02:42	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:02:42	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:02:42	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:02:42	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m1.im
+2025-08-11 16:02:42	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:02:43	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:02:42.436409 End time: 2025-08-11 12:02:42.632378
+2025-08-11 16:02:43	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:02:43	INFO	immoments::::casa	##########################################
+2025-08-11 16:02:50	INFO	imview::::casa	##########################################
+2025-08-11 16:02:50	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-11 16:02:50	INFO	imview::::casa	imview( raster='unedited_dd_m0.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-11 16:02:50	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 12:02:49.572953 End time: 2025-08-11 12:02:50.294463
+2025-08-11 16:02:50	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-11 16:02:50	INFO	imview::::casa	##########################################
+2025-08-11 16:05:11	INFO	importfits::::casa	##########################################
+2025-08-11 16:05:11	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:05:11	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=False, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:05:11	SEVERE	importfits::::casa	Exception Reported: Error in importfits: Output image exists already and you did not set overwrite to True.
+2025-08-11 16:05:11	INFO	importfits::::casa	Traceback (most recent call last):
+2025-08-11 16:05:11	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/importfits.py", line 469, in __call__
+2025-08-11 16:05:11	INFO	importfits::::casa+	    task_result = _importfits_t( _pc.document['fitsimage'],_pc.document['imagename'],_pc.document['whichrep'],_pc.document['whichhdu'],_pc.document['zeroblanks'],_pc.document['overwrite'],_pc.document['defaultaxes'],_pc.document['defaultaxesvalues'],_pc.document['beam'] )
+2025-08-11 16:05:11	INFO	importfits::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_importfits.py", line 62, in importfits
+2025-08-11 16:05:11	INFO	importfits::::casa+	    raise RuntimeError('Output image exists already and you did not set overwrite to True.')
+2025-08-11 16:05:11	INFO	importfits::::casa+	RuntimeError: Output image exists already and you did not set overwrite to True.
+2025-08-11 16:05:11	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:05:10.643415 End time: 2025-08-11 12:05:10.644974
+2025-08-11 16:05:11	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:05:11	INFO	importfits::::casa	##########################################
+2025-08-11 16:05:21	INFO	importfits::::casa	##########################################
+2025-08-11 16:05:21	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:05:21	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:05:21	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-11 16:05:21	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-11 16:05:21	INFO	importfits::::	... converted to type double.
+2025-08-11 16:05:21	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-11 16:05:21	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-11 16:05:21	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/unedited_dd.image' All pixels fit in memory (3932160 pixels).
+2025-08-11 16:05:21	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-11 16:05:21	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-11 16:05:21	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-11 16:05:21	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-11 16:05:21	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-11 16:05:21	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-11 16:05:21	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-11 16:05:21	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:05:21.183560 End time: 2025-08-11 12:05:21.429808
+2025-08-11 16:05:21	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:05:21	INFO	importfits::::casa	##########################################
+2025-08-11 16:05:30	INFO	immoments::::casa	##########################################
+2025-08-11 16:05:30	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:05:30	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m1.im', stretch=False )
+2025-08-11 16:05:30	SEVERE	immoments::::casa	Exception Reported: Error in immoments: Output file, unedited_dd_m1.im exists. immoment can not proceed, please
+2025-08-11 16:05:30	SEVERE	immoments::::casa+	remove it or change the output file name.
+2025-08-11 16:05:30	INFO	immoments::::casa	Traceback (most recent call last):
+2025-08-11 16:05:30	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/immoments.py", line 585, in __call__
+2025-08-11 16:05:30	INFO	immoments::::casa+	    task_result = _immoments_t( _pc.document['imagename'],_pc.document['moments'],_pc.document['axis'],_pc.document['region'],_pc.document['box'],_pc.document['chans'],_pc.document['stokes'],_pc.document['mask'],_pc.document['includepix'],_pc.document['excludepix'],_pc.document['outfile'],_pc.document['stretch'] )
+2025-08-11 16:05:30	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casatasks/private/task_immoments.py", line 112, in immoments
+2025-08-11 16:05:30	INFO	immoments::::casa+	    raise ValueError(
+2025-08-11 16:05:30	INFO	immoments::::casa+	ValueError: Output file, unedited_dd_m1.im exists. immoment can not proceed, please
+2025-08-11 16:05:30	INFO	immoments::::casa+	remove it or change the output file name.
+2025-08-11 16:05:30	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:05:29.744416 End time: 2025-08-11 12:05:29.746171
+2025-08-11 16:05:30	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:05:30	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:09	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:09	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:06:09	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m1_real.im', stretch=False )
+2025-08-11 16:06:09	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:06:09	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:06:09	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:06:09	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m1_real.im
+2025-08-11 16:06:09	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:06:09	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:06:09.043361 End time: 2025-08-11 12:06:09.241714
+2025-08-11 16:06:09	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:06:09	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:21	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:21	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:06:21	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[9], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m9_real.im', stretch=False )
+2025-08-11 16:06:21	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:06:21	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:06:21	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:06:21	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m9_real.im
+2025-08-11 16:06:21	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:06:21	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:06:20.587451 End time: 2025-08-11 12:06:21.433623
+2025-08-11 16:06:21	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:06:21	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:30	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:30	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:06:30	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m0_real.im', stretch=False )
+2025-08-11 16:06:30	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:06:30	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:06:30	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:06:30	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m0_real.im
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments	Could not determine the units of the moment image(s) so the units 
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments+	will be the same as those of the input image. This may not be very useful.
+2025-08-11 16:06:30	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:06:30	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:06:29.949030 End time: 2025-08-11 12:06:30.126120
+2025-08-11 16:06:30	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:06:30	INFO	immoments::::casa	##########################################
+2025-08-11 16:06:45	INFO	imview::::casa	##########################################
+2025-08-11 16:06:45	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-11 16:06:45	INFO	imview::::casa	imview( raster='unedited_dd_m0_real.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-11 16:06:45	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 12:06:44.557240 End time: 2025-08-11 12:06:45.410792
+2025-08-11 16:06:45	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-11 16:06:45	INFO	imview::::casa	##########################################
+2025-08-11 16:08:12	INFO	importfits::::casa	##########################################
+2025-08-11 16:08:12	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:08:12	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:08:12	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-11 16:08:12	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-11 16:08:12	INFO	importfits::::	... converted to type double.
+2025-08-11 16:08:12	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-11 16:08:12	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-11 16:08:12	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/unedited_dd.image' All pixels fit in memory (3932160 pixels).
+2025-08-11 16:08:13	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-11 16:08:13	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-11 16:08:13	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-11 16:08:13	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-11 16:08:13	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-11 16:08:13	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-11 16:08:13	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-11 16:08:13	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:08:12.124793 End time: 2025-08-11 12:08:12.601306
+2025-08-11 16:08:13	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:08:13	INFO	importfits::::casa	##########################################
+2025-08-11 16:08:20	INFO	importfits::::casa	##########################################
+2025-08-11 16:08:20	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-11 16:08:20	INFO	importfits::::casa	importfits( fitsimage='unedited_dd_disk.fits', imagename='unedited_dd.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-11 16:08:20	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-11 16:08:20	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-11 16:08:20	INFO	importfits::::	... converted to type double.
+2025-08-11 16:08:20	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-11 16:08:20	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-11 16:08:20	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/unedited_dd.image' All pixels fit in memory (3932160 pixels).
+2025-08-11 16:08:20	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-11 16:08:20	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-11 16:08:20	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-11 16:08:20	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-11 16:08:20	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-11 16:08:20	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-11 16:08:20	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-11 16:08:20	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-11 12:08:19.816191 End time: 2025-08-11 12:08:20.044899
+2025-08-11 16:08:20	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-11 16:08:20	INFO	importfits::::casa	##########################################
+2025-08-11 16:08:31	INFO	immoments::::casa	##########################################
+2025-08-11 16:08:31	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-11 16:08:31	INFO	immoments::::casa	immoments( imagename='unedited_dd.image', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='unedited_dd_m0_real2.im', stretch=False )
+2025-08-11 16:08:31	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-11 16:08:31	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-11 16:08:31	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-11 16:08:31	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments	
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments	Created unedited_dd_m0_real2.im
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments	Could not determine the units of the moment image(s) so the units 
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments+	will be the same as those of the input image. This may not be very useful.
+2025-08-11 16:08:31	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-11 16:08:31	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-11 12:08:30.777649 End time: 2025-08-11 12:08:30.962031
+2025-08-11 16:08:31	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-11 16:08:31	INFO	immoments::::casa	##########################################
+2025-08-11 16:08:38	INFO	imview::::casa	##########################################
+2025-08-11 16:08:38	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-11 16:08:38	INFO	imview::::casa	imview( raster='unedited_dd_m0_real2.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-11 16:08:38	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 12:08:37.603237 End time: 2025-08-11 12:08:38.352934
+2025-08-11 16:08:38	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-11 16:08:38	INFO	imview::::casa	##########################################
