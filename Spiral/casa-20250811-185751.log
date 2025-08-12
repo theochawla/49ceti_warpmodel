@@ -469,3 +469,129 @@
 2025-08-11 19:56:26	INFO	imview::::casa	Task imview complete. Start time: 2025-08-11 15:56:24.896101 End time: 2025-08-11 15:56:25.656494
 2025-08-11 19:56:26	INFO	imview::::casa	##### End Task: imview               #####
 2025-08-11 19:56:26	INFO	imview::::casa	##########################################
+2025-08-12 17:03:17	INFO	importfits::::casa	##########################################
+2025-08-12 17:03:17	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-12 17:03:17	INFO	importfits::::casa	importfits( fitsimage='logarini_replica.fits', imagename='elias_disk.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-12 17:03:17	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-12 17:03:17	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-12 17:03:17	INFO	importfits::::	... converted to type double.
+2025-08-12 17:03:17	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-12 17:03:17	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-12 17:03:17	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/elias_disk.image' All pixels fit in memory (3932160 pixels).
+2025-08-12 17:03:17	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-12 17:03:17	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-12 17:03:17	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-12 17:03:17	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-12 17:03:17	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-12 17:03:17	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-12 17:03:17	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-12 17:03:17	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-12 13:03:17.112082 End time: 2025-08-12 13:03:17.326498
+2025-08-12 17:03:17	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-12 17:03:17	INFO	importfits::::casa	##########################################
+2025-08-12 17:04:19	SEVERE	immoments::::casa	Exception Reported: Error in immoments: the imagename parameter must be a path that exists ('elias__disk.image' does not exist)
+2025-08-12 17:04:19	INFO	immoments::::casa	Traceback (most recent call last):
+2025-08-12 17:04:19	INFO	immoments::::casa+	  File "/soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casashell/private/immoments.py", line 583, in __call__
+2025-08-12 17:04:19	INFO	immoments::::casa+	    assert _pc.validate(_invocation_parameters,self.__schema), create_error_string(_pc.errors)
+2025-08-12 17:04:19	INFO	immoments::::casa+	AssertionError: the imagename parameter must be a path that exists ('elias__disk.image' does not exist)
+2025-08-12 17:04:33	INFO	immoments::::casa	##########################################
+2025-08-12 17:04:33	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-12 17:04:33	INFO	immoments::::casa	immoments( imagename='elias_disk.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.00020669047251246661, 10000000000.0], excludepix=-1, outfile='elias_disk_m1_3sigma.im', stretch=False )
+2025-08-12 17:04:33	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-12 17:04:33	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-12 17:04:33	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-12 17:04:33	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments+	
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments	Created elias_disk_m1_3sigma.im
+2025-08-12 17:04:33	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-12 17:04:33	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-12 13:04:32.750941 End time: 2025-08-12 13:04:32.937375
+2025-08-12 17:04:33	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-12 17:04:33	INFO	immoments::::casa	##########################################
+2025-08-12 17:04:49	INFO	imview::::casa	##########################################
+2025-08-12 17:04:49	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-12 17:04:49	INFO	imview::::casa	imview( raster='elias_disk_m1_3sigma.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-12 17:04:49	INFO	imview::::casa	Task imview complete. Start time: 2025-08-12 13:04:48.561777 End time: 2025-08-12 13:04:49.246018
+2025-08-12 17:04:49	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-12 17:04:49	INFO	imview::::casa	##########################################
+2025-08-12 17:05:42	INFO	immoments::::casa	##########################################
+2025-08-12 17:05:42	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-12 17:05:42	INFO	immoments::::casa	immoments( imagename='elias_disk.image', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='elias_disk_m0_3sigma.im', stretch=False )
+2025-08-12 17:05:42	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-12 17:05:42	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-12 17:05:42	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-12 17:05:42	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments	Created elias_disk_m0_3sigma.im
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments	Could not determine the units of the moment image(s) so the units 
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments+	will be the same as those of the input image. This may not be very useful.
+2025-08-12 17:05:42	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-12 17:05:42	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-12 13:05:42.191471 End time: 2025-08-12 13:05:42.398244
+2025-08-12 17:05:42	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-12 17:05:42	INFO	immoments::::casa	##########################################
+2025-08-12 17:05:52	INFO	imview::::casa	##########################################
+2025-08-12 17:05:52	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-12 17:05:52	INFO	imview::::casa	imview( raster='elias_disk_m0_3sigma.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-12 17:05:53	INFO	imview::::casa	Task imview complete. Start time: 2025-08-12 13:05:52.189491 End time: 2025-08-12 13:05:53.022159
+2025-08-12 17:05:53	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-12 17:05:53	INFO	imview::::casa	##########################################
+2025-08-12 17:07:39	INFO	immoments::::casa	##########################################
+2025-08-12 17:07:39	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-12 17:07:39	INFO	immoments::::casa	immoments( imagename='elias_disk.image', moments=[9], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=-1, excludepix=-1, outfile='elias_disk_m9_3sigma.im', stretch=False )
+2025-08-12 17:07:39	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-12 17:07:39	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-12 17:07:39	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-12 17:07:39	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments+	
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments+	The basic method
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments	Created elias_disk_m9_3sigma.im
+2025-08-12 17:07:39	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-12 17:07:39	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-12 13:07:38.577363 End time: 2025-08-12 13:07:39.480758
+2025-08-12 17:07:39	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-12 17:07:39	INFO	immoments::::casa	##########################################
+2025-08-12 17:07:44	INFO	imview::::casa	##########################################
+2025-08-12 17:07:44	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-12 17:07:44	INFO	imview::::casa	imview( raster='elias_disk_m9_3sigma.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-12 17:07:45	INFO	imview::::casa	Task imview complete. Start time: 2025-08-12 13:07:44.231591 End time: 2025-08-12 13:07:45.187300
+2025-08-12 17:07:45	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-12 17:07:45	INFO	imview::::casa	##########################################
+2025-08-12 17:08:21	INFO	immoments::::casa	##########################################
+2025-08-12 17:08:21	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-12 17:08:21	INFO	immoments::::casa	immoments( imagename='elias_disk.image', moments=[9], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.00020669047251246661, 10000000000.0], excludepix=-1, outfile='elias_disk_m9_3sigma1.im', stretch=False )
+2025-08-12 17:08:21	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-12 17:08:21	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-12 17:08:21	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-12 17:08:21	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments	
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments+	
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments	Created elias_disk_m9_3sigma1.im
+2025-08-12 17:08:21	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-12 17:08:22	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-12 13:08:21.307282 End time: 2025-08-12 13:08:21.571933
+2025-08-12 17:08:22	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-12 17:08:22	INFO	immoments::::casa	##########################################
+2025-08-12 17:08:27	INFO	imview::::casa	##########################################
+2025-08-12 17:08:27	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-12 17:08:27	INFO	imview::::casa	imview( raster='elias_disk_m9_3sigma1.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-12 17:08:28	INFO	imview::::casa	Task imview complete. Start time: 2025-08-12 13:08:27.159469 End time: 2025-08-12 13:08:28.048629
+2025-08-12 17:08:28	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-12 17:08:28	INFO	imview::::casa	##########################################

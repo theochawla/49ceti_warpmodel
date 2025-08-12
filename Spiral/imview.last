@@ -1,6 +1,6 @@
-raster  = 'high_incnospiral_m9_3sigma.im'
+raster  = 'elias_disk_m9_3sigma1.im'
 contour = {}
 zoom    = 1
 axes    = {}
 out     = ''
-#imview( raster='high_incnospiral_m9_3sigma.im',contour={},zoom=1,axes={},out='' )
+#imview( raster='elias_disk_m9_3sigma1.im',contour={},zoom=1,axes={},out='' )
