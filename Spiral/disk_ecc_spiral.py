@@ -103,7 +103,7 @@ class Disk:
         self.beta = 5 #cool
         self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
         self.pos = 0 # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = .0000001
+        self.surf_amp = .00000001
         self.vel_amp = 8
 
 
@@ -167,7 +167,7 @@ class Disk:
         zf = np.linspace(zmin,self.zmax,nzc)
 
         #adding this to triple check z-dimension is doing what I think it is
-        print("1d z-array " + str(zf))
+        #print("1d z-array " + str(zf))
 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
@@ -176,7 +176,7 @@ class Disk:
             for j in range(nfc):
                 rf[i,j] = (af[i]*(1.-e*e))/(1.+e*np.cos(ff[j]))
         
-        print("rf (1d) " +str(rf))
+        #print("rf (1d) " +str(rf))
 
         '''1d array of z-values as ones'''
         idz = np.ones(nzc)
@@ -295,22 +295,60 @@ class Disk:
         x:y:res'''
         gx, gy = np.mgrid[-1000:1000:200j,-1000:1000:200j]
         g_r, g_phi = cart2pol(gx, gy)
-        car = np.linspace(-100,100,400)
-        grid_angle = 0*gx
+
+        '''trying a gphi shift'''
+        g_phi = g_phi + np.pi
+
+        print("g_phi max" + str(np.max(g_phi)))
+        print("g_phi min" + str(np.min(g_phi)))
+
+        plt.pcolor(gx, gy, g_phi)
+        plt.title("g_phi")
+        plt.xlabel("gx")
+        plt.ylabel("gy")
+        plt.colorbar()
+        plt.show()
+
+        plt.pcolor(g_r, g_phi, g_phi)
+        plt.title("g_phi")
+        plt.xlabel("g_r")
+        plt.ylabel("g_phi")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(fcf[:,:,0])
+        plt.title("fcf")
+        #plt.xlabel("rcf")
+        #plt.ylabel("fcf")
+        plt.colorbar()
+        plt.show()
+
+        #car = np.linspace(-100,100,400)
+        #grid_angle = 0*gx
         #g_r = (gx**2+gy**2)**(0.5)
         #print(str(gr.shape)+"gr shape")
 
         #print(str(grid_angle.shape)+"grid_angle shape")
         #print(str(gr.shape)+"gr shape")
+
         spir0 = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
+        spir_phi_test = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi + np.pi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
+        plt.imshow(spir_phi_test)
+        plt.title("spir_phi_test")
+        plt.colorbar()
+        plt.savefig("cart_spir_surf.png")
+        plt.show()
+
 
         plt.imshow(spir0)
+        plt.title("spir0")
         plt.colorbar()
         plt.savefig("cart_spir_surf.png")
         plt.show()
         
         
         plt.scatter(g_r, g_phi, c=spir0)
+        plt.title("spir0, g_rvsg_phi")
         plt.colorbar()
         plt.savefig("spiral_b4_interp_surf.png")
         plt.show()
@@ -320,7 +358,7 @@ class Disk:
         g_r_tiled = np.append(g_r_flat, [[g_r_flat], [g_r_flat]])
 
         g_phi_flat = np.ravel(g_phi)
-        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi)]])
+        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi + np.pi/12)], [g_phi_flat-(2*np.pi + np.pi/12)]])
 
         spir_flat = np.ravel(spir0)
         spir_tiled = np.append(spir_flat, [[spir_flat],[spir_flat]])
@@ -329,18 +367,36 @@ class Disk:
         interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
         #print("g_r " + str(g_r))
         #print("g_phi " + str(g_phi))
-        plt.scatter(g_r_tiled, g_phi_tiled, c=spir_tiled)
+        plt.scatter(g_r_tiled, g_phi_tiled, c=spir_tiled, marker=".")
+        plt.title("tiled")
         plt.colorbar()
         plt.savefig("density_plotted1darray_tiled.png")
         plt.show()
         #print("acf [:,:,0] " + str(acf[:,:,0]))
         #print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
 
-        siggas = interp_test(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi) + siggas_unpert
+        
 
-        print("siggas " + str(siggas))
+        #plt.imshow(g_phi_tiled)
+        #plt.title('g_phi_imshow')
+        #plt.colorbar()
+        #plt.show()
+
+
+        '''trying to figure out right az offset here'''
+        '''switched to interpolating onto fcf grid'''
+        #siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi) + siggas_unpert
+        plt.pcolor(acf[:,:,0]/Disk.AU, fcf[:,:,0], interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]))
+        plt.title("surface perturbation, fcf")
+        plt.colorbar()
+        plt.show()
+
+        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + siggas_unpert
+
+        #print("siggas " + str(siggas))
 
         plt.imshow(siggas)
+        plt.title("siggas")
         plt.colorbar()
         plt.savefig("after_interp_surf.png")
         plt.show()
@@ -399,6 +455,7 @@ class Disk:
         '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
         
         phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
+        print("phi_vel shape "+ str(phi_vel.shape))
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
         #phi_vel = phi_vel-np.mean(phi_vel)
@@ -416,6 +473,7 @@ class Disk:
         '''tiling phi and rad vel'''
 
         phi_flat_vel = np.ravel(phi_vel)
+        print("phi_flat-vel length" + str(len(phi_flat_vel)))
         phi_tiled_vel = np.append(phi_flat_vel, [[phi_flat_vel],[phi_flat_vel]])
 
         rad_flat_vel = np.ravel(rad_vel)
@@ -425,6 +483,7 @@ class Disk:
         interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)      
 
         plt.scatter(g_r_tiled, g_phi_tiled, c=phi_tiled_vel)
+        plt.title("phi_vel tiled")
         plt.colorbar()
         plt.savefig("vel_phi_polarscatter_tiled.png")
         plt.show()
@@ -436,13 +495,13 @@ class Disk:
         interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
         interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
 
-        phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
-        rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)
+        phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
+        rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
 
         '''storing in self.vel, converting to cm/s'''
 
-        self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
-        self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, pcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
@@ -452,11 +511,13 @@ class Disk:
         print("self.vel_phi mean " + str(np.mean(self.vel_phi)))
 
         plt.imshow(self.vel_phi[:,:,0])
+        plt.title("self.vel_phi")
         plt.colorbar()
         plt.savefig("phi_vel_afterinterp.png")
         plt.show()
 
         plt.imshow(self.vel_rad[:,:,0])
+        plt.title("self.vel_rad")
         plt.colorbar()
         plt.savefig("rad_vel_afterinterp.png")
         plt.show()
