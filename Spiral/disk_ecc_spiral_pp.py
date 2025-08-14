@@ -97,15 +97,15 @@ class Disk:
         '''I will add these as real parameters at some point but just adding default values to test here'''
         
         self.ms = params[7] #star mass
-        self.md = 0.08 #disc mass
-        self.p = -.5 #surface density
-        self.ap = 13*np.pi/180 #pitch angle
+        self.md = 0.3 #disc mass
+        self.p = -1 #surface density
+        self.ap = 15*np.pi/180 #pitch angle
         self.m = 2 #azimuthal wavenumber
         self.beta = 5 #cool
-        self.incl = np.pi/2.1 #inclination of the disc towards the line of sight
+        self.incl = np.pi/6 #inclination of the disc towards the line of sight
         self.pos = 0 # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = .0000001
-        self.vel_amp = 8
+        self.surf_amp = 1
+        self.vel_amp = 1
 
 
         self.qq = params[0]                 # - temperature index
@@ -168,7 +168,7 @@ class Disk:
         zf = np.linspace(zmin,self.zmax,nzc)
 
         #adding this to triple check z-dimension is doing what I think it is
-        print("1d z-array " + str(zf))
+        #print("1d z-array " + str(zf))
 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
@@ -177,7 +177,7 @@ class Disk:
             for j in range(nfc):
                 rf[i,j] = (af[i]*(1.-e*e))/(1.+e*np.cos(ff[j]))
         
-        print("rf (1d) " +str(rf))
+        #print("rf (1d) " +str(rf))
 
         '''1d array of z-values as ones'''
         idz = np.ones(nzc)
@@ -321,7 +321,9 @@ class Disk:
         g_r_tiled = np.append(g_r_flat, [[g_r_flat], [g_r_flat]])
 
         g_phi_flat = np.ravel(g_phi)
-        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi)]])
+        '''using pi/12 offset'''
+        #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi)]])
+        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi + np.pi/12)], [g_phi_flat-(2*np.pi + np.pi/12)]])
 
         spir_flat = np.ravel(spir0)
         spir_tiled = np.append(spir_flat, [[spir_flat],[spir_flat]])

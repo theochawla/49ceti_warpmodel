@@ -62,7 +62,8 @@ class Disk:
     sc = 1.59e21   # - Av --> H column density (C. Qi 08,11)
     H2tog = 0.8    # - H2 abundance fraction (H2:gas)
     '''set Tco from 19. to 0'''
-    Tco = 0    # - freeze out
+    Tco = 0
+    
     sigphot = 0.79*sc   # - photo-dissociation column
 
 #    def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,-1,0,0,[.76,1000],[10,800]],obs=[180,131,300,170],rtg=True,vcs=True,line='co',ring=None):
@@ -74,9 +75,10 @@ class Disk:
     def __init__(self,q=-0.5,McoG=0.09,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
-                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None):
+                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None, md=.35, 
+                 p=-.5, ap=10, m=1, beta=5, pos=0, vel_amp=1, surf_amp=1, proto=False):
         
-        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund]
+        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, beta, pos, vel_amp, surf_amp, proto]
         obs=[nr,nphi,nz,zmax]
         #tb = time.clock()
         self.ring=ring
@@ -95,6 +97,8 @@ class Disk:
 
         '''I will add these as real parameters at some point but just adding default values to test here'''
         
+        '''default parameters'''
+        '''
         self.ms = params[7] #star mass
         self.md = 0.35 #disc mass
         self.p = -.5 #surface density
@@ -105,6 +109,21 @@ class Disk:
         self.pos = 0 # rotation of spiral (degrees), starting north, cw
         self.surf_amp = .00000001
         self.vel_amp = 8
+        
+        '''
+
+        '''longarini parameters'''
+        self.ms = params[7] #star mass
+        self.md = params[18] #disc mass
+        self.p = params[19] #surface density
+        self.ap = params[20]*np.pi/180 #pitch angle
+        self.m = params[21] #azimuthal wavenumber
+        self.beta = params[22] #cool
+        #self.incl = incl #inclination of the disc towards the line of sight
+        self.pos = params[23] # rotation of spiral (degrees), starting north, cw
+        self.vel_amp = params[24]
+        self.surf_amp = params[25]
+        self.proto = params[26]
 
 
         self.qq = params[0]                 # - temperature index
@@ -210,22 +229,44 @@ class Disk:
         ###### expanding to 3D should not affect this ######
         delta = 1.                # shape parameter
 
-        '''changing this to T at 100 instead of 150 AU'''
-        rcf100=rcf/(100.*Disk.AU)
 
-        #qq is "temperature index....???"
-        rcf100q=rcf100**self.qq
-        
-        '''zq is used for temp structure, but we won't need it'''
-        zq = self.zq0*Disk.AU*rcf100**1.3
-        
-        #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
-        tmid = self.tmid0*rcf100q
+        if self.proto==False:
 
-        '''setting tmid=tatm for debris disk optically thin assumption'''
-        tatm=tmid
-        #tatm = self.tatm0*rcf100q
-        tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
+            '''changing this to T at 100 instead of 150 AU'''
+            rcf100=rcf/(100.*Disk.AU)
+
+            #qq is "temperature index....???"
+            rcf100q=rcf100**self.qq
+            
+            '''zq is used for temp structure, but we won't need it'''
+            zq = self.zq0*Disk.AU*rcf100**1.3
+            
+            #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
+            tmid = self.tmid0*rcf100q
+
+            '''setting tmid=tatm for debris disk optically thin assumption'''
+            tatm=tmid
+            #tatm = self.tatm0*rcf100q
+            tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
+        
+        elif self.proto==True:
+            '''changing this to T at 100 instead of 150 AU'''
+            rcf150=rcf/(150.*Disk.AU)
+
+            #qq is "temperature index....???"
+            rcf150q=rcf150**self.qq
+            
+            '''zq is used for temp structure, but we won't need it'''
+            zq = self.zq0*Disk.AU*rcf150**1.3
+            
+            #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
+            tmid = self.tmid0*rcf150q
+
+            '''setting tmid=tatm for debris disk optically thin assumption'''
+            #tatm=tmid
+            tatm = self.tatm0*rcf150q
+            tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
+
 
         '''ii is 3d boolean grid of z values above some critical value'''
         ii = zcf > zq
@@ -293,7 +334,7 @@ class Disk:
 
         '''change grid resolution here.
         x:y:res'''
-        gx, gy = np.mgrid[-1000:1000:200j,-1000:1000:200j]
+        gx, gy = np.mgrid[-((self.Aout/Disk.AU)+50):(self.Aout/Disk.AU)+50:800j,-((self.Aout/Disk.AU)+50):((self.Aout)/Disk.AU)+50:800j]
         g_r, g_phi = cart2pol(gx, gy)
 
         '''trying a gphi shift'''
@@ -355,13 +396,18 @@ class Disk:
         
         '''tiling surface density grid'''
         g_r_flat = np.ravel(g_r)
-        g_r_tiled = np.append(g_r_flat, [[g_r_flat], [g_r_flat]])
+        g_r_tiled = np.concatenate([g_r_flat, g_r_flat, g_r_flat])
+        print("g_r_tiled.shape " + str(g_r_tiled.shape))
 
         g_phi_flat = np.ravel(g_phi)
-        g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi + np.pi/12)], [g_phi_flat-(2*np.pi + np.pi/12)]])
+        #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi )]])
+        '''there was an offset in tiling, so I added phi grid shift that seemed to fix it. pi/12 is arbitrary/by eye'''
+        g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/8)), (g_phi_flat-(2*np.pi)+ np.pi/8)])
+        print("g_phi_tiled.shape " + str(g_phi_tiled.shape))
 
         spir_flat = np.ravel(spir0)
-        spir_tiled = np.append(spir_flat, [[spir_flat],[spir_flat]])
+        spir_tiled = np.concatenate([spir_flat, spir_flat,spir_flat])
+        print("spir_tiled.shape " + str(spir_tiled.shape))
 
         '''interpolating tiled grid'''
         interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
@@ -780,6 +826,10 @@ class Disk:
         #        trhoG[zap] = 1e-18*trhoG[zap]
 
         # freeze out
+        if self.proto==True:
+            Tco = 19.
+        elif self.proto==False:
+            Tco = 0    # - freeze out
         zap = (tT <= Disk.Tco)
         if zap.sum() >0:
             self.Xmol[zap] = 1e-8*self.Xmol[zap]
