@@ -1,13 +1,13 @@
-imagename  = 'elias_disk.image'
-moments    = [9]
+imagename  = 'paperdisk.image'
+moments    = [0]
 axis       = 'spec'
 region     = ''
 box        = ''
 chans      = ''
 stokes     = ''
 mask       = ''
-includepix = [np.float64(0.00020669047251246661), 10000000000.0]
+includepix = [np.float64(0.0026954484476068383), 10000000000.0]
 excludepix = -1
-outfile    = 'elias_disk_m9_3sigma1.im'
+outfile    = 'paperdisk_m0_1sigma1.im'
 stretch    = False
-#immoments( imagename='elias_disk.image',moments=[9],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=[np.float64(0.00020669047251246661), 10000000000.0],excludepix=-1,outfile='elias_disk_m9_3sigma1.im',stretch=False )
+#immoments( imagename='paperdisk.image',moments=[0],axis='spec',region='',box='',chans='',stokes='',mask='',includepix=[np.float64(0.0026954484476068383), 10000000000.0],excludepix=-1,outfile='paperdisk_m0_1sigma1.im',stretch=False )

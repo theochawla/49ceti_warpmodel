@@ -1,0 +1,232 @@
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	Some or all of the expected auto updates did not happen.
+2025-08-14 19:34:56	INFO	::casa	This indicates that measurespath is not empty and does not contain data maintained by casaconfig.
+2025-08-14 19:34:56	INFO	::casa	If the IERSeop2000 table is found in datapth then casatools will import.
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	The casa data found at measurespath is not being maintained by casaconfig.
+2025-08-14 19:34:56	INFO	::casa	visit https://casadocs.readthedocs.io/en/stable/notebooks/external-data.html for more information
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:56	INFO	::casa	
+2025-08-14 19:34:57	INFO	::casa	Python version 3.10.12
+2025-08-14 19:34:57	INFO	::casa	CASA Version CASALITH 6.6.5.31
+2025-08-14 19:34:57	INFO	::casa	
+2025-08-14 19:34:57	INFO	::casa	optional configuration file not found, continuing CASA startup without it
+2025-08-14 19:34:57	INFO	::casa	loaded config file : /soft/casa-6.6.5-31-py3.10.el8/lib/py/lib/python3.10/site-packages/casaconfig/config.py
+2025-08-14 19:34:57	INFO	::casa	
+2025-08-14 19:34:57	INFO	::casa	config values
+2025-08-14 19:34:57	INFO	::casa	    agg = False
+2025-08-14 19:34:57	INFO	::casa	    cachedir = '/Users/tchawla/.casa'
+2025-08-14 19:34:57	INFO	::casa	    casaconfig_verbose = 1
+2025-08-14 19:34:57	INFO	::casa	    colors = 'Neutral'
+2025-08-14 19:34:57	INFO	::casa	    data_auto_update = True
+2025-08-14 19:34:57	INFO	::casa	    datapath = ['/Users/tchawla/.casa/data']
+2025-08-14 19:34:57	INFO	::casa	    iplog = False
+2025-08-14 19:34:57	INFO	::casa	    iplogfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/ipython-20250814-193454.log'
+2025-08-14 19:34:57	INFO	::casa	    log2term = False
+2025-08-14 19:34:57	INFO	::casa	    logfile = '/Volumes/disks/theo/49ceti_warpmodel/Spiral/casa-20250814-193454.log'
+2025-08-14 19:34:57	INFO	::casa	    measures_auto_update = True
+2025-08-14 19:34:57	INFO	::casa	    measurespath = '/Users/tchawla/.casa/data'
+2025-08-14 19:34:57	INFO	::casa	    nogui = False
+2025-08-14 19:34:57	INFO	::casa	    nologfile = False
+2025-08-14 19:34:57	INFO	::casa	    nologger = False
+2025-08-14 19:34:57	INFO	::casa	    pipeline = False
+2025-08-14 19:34:57	INFO	::casa	    startupfile = '/Users/tchawla/.casa/startup.py'
+2025-08-14 19:34:57	INFO	::casa	    user_site = False
+2025-08-14 19:34:57	INFO	::casa	
+2025-08-14 19:34:57	INFO	::casa	casarundata version is unknown, this is probably a legacy version not installed by casaconfig
+2025-08-14 19:34:57	INFO	::casa	measures version : WSRT_Measures_20250604-160001.ztar
+2025-08-14 19:34:57	INFO	::casa	
+2025-08-14 19:34:57	INFO	::casa	Checking Measures tables in data repository sub-directory /Users/tchawla/.casa/data/geodetic
+2025-08-14 19:34:57	INFO	::casa	  IERSeop2000 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-14 19:34:57	INFO	::casa	  IERSeop97 (version date, last date in table (UTC)): 2025/05/19/15:15, 2025/04/19/00:00:00
+2025-08-14 19:34:57	INFO	::casa	  IERSpredict (version date, last date in table (UTC)): 2025/06/04/15:15, 2025/09/02/00:00:00
+2025-08-14 19:34:57	INFO	::casa	  TAI_UTC (version date, last date in table (UTC)): 2025/05/11/15:15, 2017/01/01/00:00:00
+2025-08-14 19:35:32	INFO	imview::::casa	##########################################
+2025-08-14 19:35:32	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-14 19:35:32	INFO	imview::::casa	imview( raster='elias_disk_m0_3sigma.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-14 19:35:37	INFO	imview::::casa	Task imview complete. Start time: 2025-08-14 15:35:31.879406 End time: 2025-08-14 15:35:37.026174
+2025-08-14 19:35:37	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-14 19:35:37	INFO	imview::::casa	##########################################
+2025-08-14 19:36:31	INFO	importfits::::casa	##########################################
+2025-08-14 19:36:31	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-14 19:36:31	INFO	importfits::::casa	importfits( fitsimage='longarini_copy.fits', imagename='paperdisk.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-14 19:36:31	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-14 19:36:31	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-14 19:36:31	INFO	importfits::::	... converted to type double.
+2025-08-14 19:36:31	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-14 19:36:31	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-14 19:36:31	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/paperdisk.image' All pixels fit in memory (3932160 pixels).
+2025-08-14 19:36:31	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-14 19:36:31	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-14 19:36:31	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-14 19:36:31	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-14 19:36:31	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-14 19:36:31	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-14 19:36:31	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-14 19:36:31	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-14 15:36:31.095353 End time: 2025-08-14 15:36:31.325291
+2025-08-14 19:36:31	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-14 19:36:31	INFO	importfits::::casa	##########################################
+2025-08-14 19:37:10	INFO	imstat::::casa	##########################################
+2025-08-14 19:37:10	INFO	imstat::::casa	##### Begin Task: imstat             #####
+2025-08-14 19:37:10	INFO	imstat::::casa	imstat( imagename='paperdisk.image', axes=[0, 1], region='', box='', chans='', stokes='', listit=True, verbose=True, mask='', stretch=False, logfile='', append=True, algorithm='classic', fence=-1.0, center='mean', lside=True, zscore=-1.0, maxiter=-1, clmethod='auto', niter=3 )
+2025-08-14 19:37:10	INFO	imstat::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-14 19:37:10	INFO	imstat::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-14 19:37:10	INFO	imstat::image::statistics 	Determining stats for image paperdisk.image
+2025-08-14 19:37:10	INFO	imstat::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-14 19:37:10	INFO	imstat::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	Statistics calculated using Classic algorithm
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	Regions --- 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	         -- bottom-left corner (pixel) [blc]:  [0, 0, 0]
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	         -- top-right corner (pixel) [trc]:    [511, 511, 14]
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	         -- bottom-left corner (world) [blcf]: 00:00:00.852, -00.00.12.775, 3.457919e+11Hz
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::_logStartup	         -- top-right corner (world) [trcf]:   23:59:59.148, +00.00.12.775, 3.457867e+11Hz
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	VELOCITY column unit = km/s
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	Sum column unit = 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics+	Mean column unit = 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics+	Std_dev column unit = 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics+	Minimum column unit = 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics+	Maximum column unit = 
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	        VELOCITY  VELOCITY(Plane) Npts          Sum           Mean          Rms           Std_dev       Minimum       Maximum     
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      3.54995796                0  2.621440e+05  4.811280e+01  1.835358e-04  2.060389e-03  2.052203e-03 -1.494955e-18  4.743995e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      3.86995004                1  2.621440e+05  7.666387e+01  2.924495e-04  2.498804e-03  2.481636e-03 -1.617948e-18  4.777559e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      4.18994144                2  2.621440e+05  9.083327e+01  3.465014e-04  2.695448e-03  2.673089e-03 -1.923031e-18  4.275686e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      4.50993215                3  2.621440e+05  9.332353e+01  3.560010e-04  2.682478e-03  2.658755e-03 -1.889702e-18  4.153288e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      4.82992218                4  2.621440e+05  9.282158e+01  3.540862e-04  2.641246e-03  2.617409e-03 -1.813889e-18  4.744463e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      5.14991153                5  2.621440e+05  7.719155e+01  2.944624e-04  2.392832e-03  2.374649e-03 -3.322925e-18  4.429397e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	       5.4699002                6  2.621440e+05  6.955157e+01  2.653182e-04  2.278561e-03  2.263065e-03 -1.563757e-18  4.033436e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      5.78988818                7  2.621440e+05  6.748813e+01  2.574468e-04  2.248983e-03  2.234203e-03 -8.672176e-19  4.715565e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      6.10987548                8  2.621440e+05  7.002790e+01  2.671352e-04  2.282738e-03  2.267058e-03 -1.600362e-18  4.252075e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      6.42986209                9  2.621440e+05  7.864326e+01  3.000002e-04  2.404867e-03  2.386086e-03 -1.717976e-18  4.395935e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      6.74984802               10  2.621440e+05  9.128508e+01  3.482249e-04  2.615437e-03  2.592156e-03 -2.946420e-18  4.363597e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      7.06983327               11  2.621440e+05  9.232919e+01  3.522079e-04  2.674084e-03  2.650792e-03 -2.574017e-18  4.265648e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      7.38981784               12  2.621440e+05  8.960061e+01  3.417992e-04  2.677855e-03  2.655957e-03 -1.918644e-18  4.121283e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      7.70980172               13  2.621440e+05  7.685143e+01  2.931650e-04  2.500923e-03  2.483686e-03 -3.125002e-18  4.737202e-02
+2025-08-14 19:37:10	INFO	imstat::ImageStatsCalculator::statistics	      8.02978492               14  2.621440e+05  5.080179e+01  1.937934e-04  2.110924e-03  2.102014e-03 -1.001939e-18  4.087679e-02
+2025-08-14 19:37:10	INFO	imstat::::casa	Task imstat complete. Start time: 2025-08-14 15:37:10.051427 End time: 2025-08-14 15:37:10.214176
+2025-08-14 19:37:10	INFO	imstat::::casa	##### End Task: imstat               #####
+2025-08-14 19:37:10	INFO	imstat::::casa	##########################################
+2025-08-14 19:38:06	INFO	immoments::::casa	##########################################
+2025-08-14 19:38:06	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-14 19:38:06	INFO	immoments::::casa	immoments( imagename='paperdisk.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.008086345342820515, 10000000000.0], excludepix=-1, outfile='paperdisk_m1_3sigma1.im', stretch=False )
+2025-08-14 19:38:06	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-14 19:38:06	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-14 19:38:06	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-14 19:38:06	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments+	
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments	Created paperdisk_m1_3sigma1.im
+2025-08-14 19:38:06	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-14 19:38:07	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-14 15:38:06.392335 End time: 2025-08-14 15:38:06.560915
+2025-08-14 19:38:07	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-14 19:38:07	INFO	immoments::::casa	##########################################
+2025-08-14 19:38:21	INFO	imview::::casa	##########################################
+2025-08-14 19:38:21	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-14 19:38:21	INFO	imview::::casa	imview( raster='paperdisk_m1_3sigma1.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-14 19:38:21	INFO	imview::::casa	Task imview complete. Start time: 2025-08-14 15:38:20.646053 End time: 2025-08-14 15:38:21.408137
+2025-08-14 19:38:21	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-14 19:38:21	INFO	imview::::casa	##########################################
+2025-08-14 19:39:15	INFO	immoments::::casa	##########################################
+2025-08-14 19:39:15	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-14 19:39:15	INFO	immoments::::casa	immoments( imagename='paperdisk.image', moments=[1], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.0026954484476068383, 10000000000.0], excludepix=-1, outfile='paperdisk_m1_1sigma1.im', stretch=False )
+2025-08-14 19:39:15	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-14 19:39:15	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-14 19:39:15	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-14 19:39:15	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments+	
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments	Created paperdisk_m1_1sigma1.im
+2025-08-14 19:39:15	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-14 19:39:16	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-14 15:39:15.333037 End time: 2025-08-14 15:39:15.509124
+2025-08-14 19:39:16	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-14 19:39:16	INFO	immoments::::casa	##########################################
+2025-08-14 19:39:20	INFO	imview::::casa	##########################################
+2025-08-14 19:39:20	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-14 19:39:20	INFO	imview::::casa	imview( raster='paperdisk_m1_1sigma1.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-14 19:39:20	INFO	imview::::casa	Task imview complete. Start time: 2025-08-14 15:39:19.639011 End time: 2025-08-14 15:39:20.437317
+2025-08-14 19:39:20	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-14 19:39:20	INFO	imview::::casa	##########################################
+2025-08-14 19:49:54	INFO	immoments::::casa	##########################################
+2025-08-14 19:49:54	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-14 19:49:54	INFO	immoments::::casa	immoments( imagename='paperdisk.image', moments=[9], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.0026954484476068383, 10000000000.0], excludepix=-1, outfile='paperdisk_m9_1sigma1.im', stretch=False )
+2025-08-14 19:49:54	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-14 19:49:54	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-14 19:49:54	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-14 19:49:54	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments+	
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments	Created paperdisk_m9_1sigma1.im
+2025-08-14 19:49:54	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-14 19:49:54	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-14 15:49:53.662777 End time: 2025-08-14 15:49:53.868198
+2025-08-14 19:49:54	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-14 19:49:54	INFO	immoments::::casa	##########################################
+2025-08-14 19:50:00	INFO	imview::::casa	##########################################
+2025-08-14 19:50:00	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-14 19:50:00	INFO	imview::::casa	imview( raster='paperdisk_m9_1sigma1.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-14 19:50:01	INFO	imview::::casa	Task imview complete. Start time: 2025-08-14 15:50:00.358344 End time: 2025-08-14 15:50:01.069453
+2025-08-14 19:50:01	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-14 19:50:01	INFO	imview::::casa	##########################################
+2025-08-14 19:51:23	INFO	immoments::::casa	##########################################
+2025-08-14 19:51:23	INFO	immoments::::casa	##### Begin Task: immoments          #####
+2025-08-14 19:51:23	INFO	immoments::::casa	immoments( imagename='paperdisk.image', moments=[0], axis='spec', region='', box='', chans='', stokes='', mask='', includepix=[0.0026954484476068383, 10000000000.0], excludepix=-1, outfile='paperdisk_m0_1sigma1.im', stretch=False )
+2025-08-14 19:51:23	INFO	immoments::CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2025-08-14 19:51:23	INFO	immoments::CasacRegionManager::fromBCS	Using all spectral channels.
+2025-08-14 19:51:23	INFO	immoments::ImageRegion::fromRecord	Selected bounding box : 
+2025-08-14 19:51:23	INFO	immoments::ImageRegion::fromRecord+	    [0, 0, 0] to [511, 511, 14]  (00:00:00.852, -00.00.12.775, 3.457919e+11Hz to 23:59:59.148, +00.00.12.775, 3.457867e+11Hz)
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	Moment axis type is Frequency
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments	
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	***********************************************************************
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	You have selected the following methods
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	The basic clip method
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments	Created paperdisk_m0_1sigma1.im
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments	Could not determine the units of the moment image(s) so the units 
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments+	will be the same as those of the input image. This may not be very useful.
+2025-08-14 19:51:23	INFO	immoments::ImageMoments::createMoments	Begin computation of moments
+2025-08-14 19:51:23	INFO	immoments::::casa	Task immoments complete. Start time: 2025-08-14 15:51:22.786303 End time: 2025-08-14 15:51:22.947965
+2025-08-14 19:51:23	INFO	immoments::::casa	##### End Task: immoments            #####
+2025-08-14 19:51:23	INFO	immoments::::casa	##########################################
+2025-08-14 19:51:32	INFO	imview::::casa	##########################################
+2025-08-14 19:51:32	INFO	imview::::casa	##### Begin Task: imview             #####
+2025-08-14 19:51:32	INFO	imview::::casa	imview( raster='paperdisk_m0_1sigma1.im', contour={}, zoom=1, axes={}, out='' )
+2025-08-14 19:51:33	INFO	imview::::casa	Task imview complete. Start time: 2025-08-14 15:51:31.953757 End time: 2025-08-14 15:51:32.759188
+2025-08-14 19:51:33	INFO	imview::::casa	##### End Task: imview               #####
+2025-08-14 19:51:33	INFO	imview::::casa	##########################################
+2025-08-14 20:03:29	INFO	importfits::::casa	##########################################
+2025-08-14 20:03:29	INFO	importfits::::casa	##### Begin Task: importfits         #####
+2025-08-14 20:03:29	INFO	importfits::::casa	importfits( fitsimage='longarini_copy.fits', imagename='paperdisk.image', whichrep=0, whichhdu=-1, zeroblanks=True, overwrite=True, defaultaxes=False, defaultaxesvalues=[], beam=[] )
+2025-08-14 20:03:29	INFO	importfits::::	FITS card 17: CRPIX3  =                    1                                                  
+2025-08-14 20:03:29	INFO	importfits::::	Keyword value has wrong data type.
+2025-08-14 20:03:29	INFO	importfits::::	... converted to type double.
+2025-08-14 20:03:29	INFO	importfits::::ImageFITSConverter	Processing HDU 0
+2025-08-14 20:03:29	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Created image of shape [512, 512, 15]
+2025-08-14 20:03:29	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	Copy FITS file to '/Volumes/disks/theo/49ceti_warpmodel/Spiral/paperdisk.image' Copying row by row (512 pixels).
+2025-08-14 20:03:29	INFO	importfits::ImageFITSConverterImpl::FITSToImage 	No usable restoring beam information found.
+2025-08-14 20:03:29	WARN	importfits::::casa	This image has no beam or angular resolution provided, so you will not receive warnings from
+2025-08-14 20:03:29	WARN	importfits::::casa+	tasks such as imregrid if your image pixels do not sample the the angular resolution well.
+2025-08-14 20:03:29	WARN	importfits::::casa+	(This only affects warnings, not any functionality).
+2025-08-14 20:03:29	WARN	importfits::::casa+	Providing a beam and brightness units in an image can also be useful for flux calculations.
+2025-08-14 20:03:29	WARN	importfits::::casa+	If you wish to add a beam or brightness units to your image, please use
+2025-08-14 20:03:29	WARN	importfits::::casa+	the "beam" parameter or ia.setrestoringbeam() and ia.setbrightnessunit()
+2025-08-14 20:03:29	INFO	importfits::::casa	Task importfits complete. Start time: 2025-08-14 16:03:29.083629 End time: 2025-08-14 16:03:29.285606
+2025-08-14 20:03:29	INFO	importfits::::casa	##### End Task: importfits           #####
+2025-08-14 20:03:29	INFO	importfits::::casa	##########################################

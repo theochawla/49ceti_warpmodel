@@ -402,8 +402,10 @@ class Disk:
         g_phi_flat = np.ravel(g_phi)
         #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi )]])
         '''there was an offset in tiling, so I added phi grid shift that seemed to fix it. pi/12 is arbitrary/by eye'''
-        g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/8)), (g_phi_flat-(2*np.pi)+ np.pi/8)])
+        g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
         print("g_phi_tiled.shape " + str(g_phi_tiled.shape))
+        print("tile max " + str(np.max(g_phi_flat+(2*np.pi))))
+        print("tile min " + str(np.min(g_phi_flat+(2*np.pi))))
 
         spir_flat = np.ravel(spir0)
         spir_tiled = np.concatenate([spir_flat, spir_flat,spir_flat])
@@ -437,7 +439,9 @@ class Disk:
         plt.colorbar()
         plt.show()
 
-        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + siggas_unpert
+
+        '''trying to scale perturbation of disk by surface density... I think this is what dsigma/sigma means'''
+        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0])*(siggas_unpert) + (siggas_unpert)
 
         #print("siggas " + str(siggas))
 

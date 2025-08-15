@@ -1,5 +1,5 @@
-fitsimage         = 'logarini_replica.fits'
-imagename         = 'elias_disk.image'
+fitsimage         = 'longarini_copy.fits'
+imagename         = 'paperdisk.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
@@ -7,4 +7,4 @@ overwrite         = True
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='logarini_replica.fits',imagename='elias_disk.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='longarini_copy.fits',imagename='paperdisk.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )
