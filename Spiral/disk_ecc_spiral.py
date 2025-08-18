@@ -442,6 +442,7 @@ class Disk:
 
         '''trying to scale perturbation of disk by surface density... I think this is what dsigma/sigma means'''
         siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0])*(siggas_unpert) + (siggas_unpert)
+        siggas_unscale = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + (siggas_unpert)
 
         #print("siggas " + str(siggas))
 
@@ -449,6 +450,20 @@ class Disk:
         plt.title("siggas")
         plt.colorbar()
         plt.savefig("after_interp_surf.png")
+        plt.show()
+
+        x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
+
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
+        plt.title("siggas cart pert scaled")
+        plt.colorbar()
+        plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_unscale))
+        plt.title("siggas cart pert unscaled")
+        plt.colorbar()
+        plt.savefig("siggas_pert_unscaled_cart.jpg")
         plt.show()
 
 
