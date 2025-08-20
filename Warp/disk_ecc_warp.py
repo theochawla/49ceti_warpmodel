@@ -269,7 +269,8 @@ class Disk:
 
         acf=r_full_grid
         #fcf=f_full_grid + np.pi
-        fcf = f_full_grid -np.pi/4
+        #fcf = f_full_grid -np.pi/3
+        fcf = f_full_grid -1
         zcf=z_full_grid
 
 

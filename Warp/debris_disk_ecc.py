@@ -224,7 +224,7 @@ class Disk:
 #            plt.colorbar()
             plt.show()
 
-        if 1:
+        if 0:
             # check that siggas adds up to Mdisk #
             df=ff[1]-ff[0]
             dA = 0.5*(rp1-rm1)*df*rf
