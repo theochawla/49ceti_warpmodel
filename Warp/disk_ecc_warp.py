@@ -19,6 +19,8 @@ from astropy import constants as const
 from scipy.special import ellipk,ellipe
 from scipy.integrate import trapz
 
+from scipy.interpolate import LinearNDInterpolator as interpnd
+
 #testing time
 import time
 
@@ -167,7 +169,12 @@ class Disk:
 
         '''trying a linear grid'''
         af = np.linspace(amin,amax,nac)
-        zf = np.linspace(zmin,self.zmax,nzc)
+        '''experimenting with z asymmetry'''
+        zf_og = np.linspace(zmin,self.zmax,nzc)
+        zf_inv = np.linspace(self.zmax, zmin, nzc)
+
+        zf = np.concatenate((zf_inv, zf_og))
+
         print("zmax = " + str(self.zmax)) 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
@@ -177,13 +184,17 @@ class Disk:
             for j in range(nfc):
                 rf[i,j] = (af[i]*(1.-e*e))/(1.+e*np.cos(ff[j]))
 
-        idz = np.ones(nzc)
+
+        '''modifying idz to match zf length. saving unmodified z to compare'''
+        idz_og = np.ones(nzc)
+        idz = np.ones(len(zf))
         idf = np.ones(self.nphi)
         #rcf = np.outer(rf,idz)
         ida = np.ones(nac)
         ##zcf = np.outer(ida,zf)
         ##acf = af[:,np.newaxis]*np.ones(nzc)
         #order of dimensions: a, f, z
+        pcf,acf,zcf_og = np.meshgrid(pf,af,zf_og)
         pcf,acf,zcf = np.meshgrid(pf,af,zf)
         #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
         #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
@@ -197,6 +208,7 @@ class Disk:
         self.acf=acf
         print("acf shape = "+str(acf.shape))
         self.zcf=zcf
+        self.zcf_og = zcf_og
         
 
         '''warp code'''
@@ -247,6 +259,11 @@ class Disk:
         plt.show()
         '''now to make 3d grid:'''
 
+        '''saving these because I think I can use them in rt grid'''
+        self.x_grid = rotation[:,:,0]
+        self.y_grid = rotation[:,:,1]
+        self.z_grid = rotation[:,:,2]
+
         '''keeping z grid, adding each point in zf to each slice
         this doesn't perfectly replicate geoemetry of warp: 
         I think we would need to apply a rotational matrix to each z slice'''
@@ -263,8 +280,14 @@ class Disk:
 
 
         '''making r & phi grid 3d along z axis'''
-        r_full_grid = r_grid[:,:, np.newaxis]+np.ones(len(zf))
-        f_full_grid = f_grid[:,:, np.newaxis]+np.ones(len(zf))
+
+        '''this is maybe where the plus one offset is coming from..? might need 
+        to multply not add'''
+        #r_full_grid = r_grid[:,:, np.newaxis]+np.ones(len(zf))
+        #f_full_grid = f_grid[:,:, np.newaxis]+np.ones(len(zf))
+
+        r_full_grid = r_grid[:,:, np.newaxis]*np.ones(len(zf))
+        f_full_grid = f_grid[:,:, np.newaxis]*np.ones(len(zf))
 
         plt.imshow(r_grid)
         plt.title("r_grid")
@@ -296,11 +319,12 @@ class Disk:
         #fcf=f_full_grid + np.pi
         #fcf = f_full_grid -np.pi/3
         '''I'm really not sure why but the fcf grid was offset, and subtracting 1 fixed it...?? Why??'''
-        fcf = f_full_grid -1
+        #fcf = f_full_grid -1
+        fcf = f_full_grid
         zcf=z_full_grid
 
         '''useful for plotting polar graphs in cart space'''
-        x_polar, y_polar = pol2cart(acf[:,:,0], fcf[:,:,0])
+        self.x_polar, self.y_polar = pol2cart(acf[:,:,0], fcf[:,:,0])
 
         plt.imshow(fcf[:,:,0])
         plt.title("fcf")
@@ -315,7 +339,8 @@ class Disk:
 
         # bundle the grid for helper functions
         ###### add angle to grid? ######
-        grid = {'nac':nac,'nfc':nfc,'nzc':nzc,'rcf':r_full_grid,'amax':amax,'zcf':z_full_grid}#'ff':ff,'af':af,
+        '''changing nzc definition'''
+        grid = {'nac':nac,'nfc':nfc,'nzc':len(zf),'rcf':r_full_grid,'amax':amax,'zcf':z_full_grid}#'ff':ff,'af':af,
         self.grid=grid
 
         #print("grid {t}".format(t=time.clock()-tst))
@@ -368,8 +393,13 @@ class Disk:
         plt.savefig("warp_siggas.jpg")
         plt.show()
 
-        plt.pcolor(x_polar, y_polar, siggas)
-        plt.title("siggas cart")
+        print("siggas min " +str(np.min(siggas)))
+        print("siggas max " +str(np.max(siggas)))
+        print("siggas mean " +str(np.mean(siggas)))
+
+        plt.pcolor(self.x_polar, self.y_polar, np.log10(siggas))
+        plt.title("siggas cart log10")
+        plt.savefig("siggas_cart.jpg")
         plt.colorbar()
         plt.show()
 
@@ -401,7 +431,7 @@ class Disk:
         plt.savefig("warp_vel.jpg")
         plt.show()
 
-        plt.pcolor(x_polar, y_polar, self.vel[:,:,0])
+        plt.pcolor(self.x_polar, self.y_polar, self.vel[:,:,0])
         plt.colorbar()
         plt.title("vel warp with pi shift cart")
         plt.show()
@@ -415,9 +445,9 @@ class Disk:
         plt.savefig("warp_vel.jpg")
         plt.show()
 
-        plt.pcolor(x_polar, y_polar, self.vel2[:,:,0])
+        plt.pcolor(self.x_polar, self.y_polar, self.vel2[:,:,0])
         plt.colorbar()
-        plt.title("vel warp without pi shift cart")
+        plt.title("vel warp without pi shift cart ")
         plt.show()
 
         ###### Major change: vel is linear not angular ######
@@ -447,11 +477,18 @@ class Disk:
             tempg[ii] = 2.73
             print('Beware: removed NaNs from temperature (#%s)' % ii.sum())
 
+        print("tempg min " +str(np.min(tempg)))
+        print("tempg max " +str(np.max(tempg)))
+        print("tempg mean " +str(np.mean(tempg)))
+
         #print("nan chekc {t}".format(t=time.clock()-tst))
         # find photodissociation boundary layer from top
         zpht_up = np.zeros((nac,nfc))
         zpht_low = np.zeros((nac,nfc))
-        sig_col = np.zeros((nac,nfc,nzc))
+
+        '''which sig_col need to be... I'm going to try len(zf)'''
+        sig_col_og = np.zeros((nac,nfc,nzc))
+        sig_col = np.zeros((nac,nfc,len(zf)))
         #zice = np.zeros((nac,nfc))
         for ia in range(nac):
             for jf in range (nfc):
@@ -479,7 +516,16 @@ class Disk:
                 #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
                 #else:
                 #    zice[ia,jf] = zmin
+
+        print("zpht_up min " +str(np.min(zpht_up)))
+        print("zpht_up max " +str(np.max(zpht_up)))
+        print("zpht_up mean " +str(np.mean(zpht_up)))
+
         self.sig_col = sig_col
+
+        print("sig_col min " +str(np.min(sig_col)))
+        print("sig_col max " +str(np.max(sig_col)))
+        print("sig_col_up mean " +str(np.mean(sig_col)))
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
 
@@ -489,7 +535,10 @@ class Disk:
         self.pf = pf
         self.nac = nac
         self.zf = zf
-        self.nzc = nzc
+        '''not sure where else nzc is referenced but just in case'''
+        self.nzc_og = nzc
+        self.nzc = len(zf)
+
         self.tempg = tempg
         #self.Omg0 = Omg#velrot
         self.zpht_up = zpht_up
@@ -570,6 +619,7 @@ class Disk:
         #sky coordinates
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
+        '''do i need the -1 or did I add that...'''
         phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
         #foo = np.floor(self.nz/2)
 
@@ -581,8 +631,13 @@ class Disk:
         #S = (S_old[:,np.newaxis,np.newaxis]*np.ones((self.nr,self.nphi))).T
 
         # arrays in [phi,r,s] on sky coordinates
+        '''may actually have to also interpolate x and y warp grids onto these ones...'''
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
+
+        '''interped z grid'''
+        zinterp = interpnd((np.ravel(self.x_grid), np.ravel(self.y_grid)), np.ravel(self.z_grid))
+        Z = zinterp(np.ravel(X), np.ravel(Y))
 
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
 
@@ -591,18 +646,33 @@ class Disk:
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
         else:
             zsky_max = 2*(self.zmax/self.costhet)
+
+        '''z_mirror happens here. The problem is that it uses a 1d (not 2d) array to do iit
+        because it assumes azimuthal symmetry...'''
         zsky = np.arange(self.nz)/self.nz*(-zsky_max)+zsky_max/2.
         print("zsky shape" + str(zsky.shape))
         print("zsky min" +str(np.min(zsky)))
         print("zsky max" +str(np.max(zsky)))
 
+        '''trying new z definition using 2d grid. need to think about how to 
+        project z axis onto sky.'''
+
+        if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
+            diskZ = Z*self.sinthet
+        else:
+            diskZ = Z*self.costhet
+
+        tdiskZ = diskZ.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
+
 
         '''maybe this is where the z mirroring is happening?'''
+        '''maybe if I interpolate z grid onto this resolution and them add zsky...'''
         
-        tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
+        #tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         print("tdiskZ shape" + str(tdiskZ.shape))
         print("tdisk min " + str(np.min(tdiskZ)))
         print("tdisk max " + str(np.max(tdiskZ)))
+
 
 
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
@@ -626,6 +696,13 @@ class Disk:
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
+
+        plt.pcolor(X, Y, tdiskZ[:,:,0])
+        plt.title(tdiskZ)
+        plt.colorbar()
+        plt.savefig("tdiskZ.jpg")
+        plt.show()
+
 
         plt.imshow(tphi[:,:,0])
         plt.title("tphi")
@@ -861,6 +938,8 @@ class Disk:
 
         #compute rho structure
         rho0 = np.zeros((nac,nfc,nzc))
+
+
         sigint = siggas
 
         #compute gravo-thermal constant
@@ -869,10 +948,13 @@ class Disk:
         #t1 = time.clock()
         #differential equation for vertical density profile
         dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
-        #dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
-        #dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
-        #plt.pcolor([self.x_polar, self.y_polar, tempg:,:,0])
-        #plt.
+        dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
+        dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        
+        plt.pcolor(self.x_polar, self.y_polar, tempg[:,:,0])
+        plt.title("tempg cart")
+        plt.colorbar()
+        plt.show()
 
         #numerical integration to get vertical density profile
         foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
@@ -881,11 +963,19 @@ class Disk:
 
         #normalize the density profile (note: this is just half the sigma value!)
         rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        print("rho0 shape " + str(rho0.shape))
+        print("rho0 min " +str(np.min(rho0)))
+        print("rho0 max " +str(np.max(rho0)))
+        print("rho0 mean " +str(np.mean(rho0)))
+
+        '''to see how warp affects densty profile'''
 
         #plt.pcolor(x_polar, y_polar, rho0[:,:,0])
         #plt.title("rho0 cart")
         #plt.colorbar()
         #plt.show()
+
+
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 
