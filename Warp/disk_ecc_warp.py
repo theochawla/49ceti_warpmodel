@@ -173,7 +173,8 @@ class Disk:
         zf_og = np.linspace(zmin,self.zmax,nzc)
         zf_inv = np.linspace(self.zmax, zmin, nzc)
 
-        zf = np.concatenate((zf_inv, zf_og))
+        #zf = np.concatenate((zf_inv, zf_og))
+        zf = zf_og
 
         print("zmax = " + str(self.zmax)) 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
@@ -488,7 +489,8 @@ class Disk:
 
         '''which sig_col need to be... I'm going to try len(zf)'''
         sig_col_og = np.zeros((nac,nfc,nzc))
-        sig_col = np.zeros((nac,nfc,len(zf)))
+        #sig_col = np.zeros((nac,nfc,len(zf)))
+        sig_col = sig_col_og
         #zice = np.zeros((nac,nfc))
         for ia in range(nac):
             for jf in range (nfc):
@@ -528,6 +530,11 @@ class Disk:
         print("sig_col_up mean " +str(np.mean(sig_col)))
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
+
+        plt.imshow(sig_col[:,:,0])
+        plt.title("sig-col imshow")
+        plt.colorbar()
+        plt.show()
 
         self.af = af
         #self.ff = ff
@@ -662,16 +669,21 @@ class Disk:
         else:
             diskZ = Z*self.costhet
 
-        tdiskZ = diskZ.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
+        tdiskZ = diskZ.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)+zsky*self.costhet
 
 
         '''maybe this is where the z mirroring is happening?'''
         '''maybe if I interpolate z grid onto this resolution and them add zsky...'''
         
-        #tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
+        tdiskZ_og = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         print("tdiskZ shape" + str(tdiskZ.shape))
         print("tdisk min " + str(np.min(tdiskZ)))
         print("tdisk max " + str(np.max(tdiskZ)))
+
+        plt.pcolor(X, Y, tdiskZ_og[:,:,0])
+        plt.title("tdiskZ original cart")
+        plt.colorbar()
+        plt.show()
 
 
 
@@ -698,9 +710,14 @@ class Disk:
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
 
         plt.pcolor(X, Y, tdiskZ[:,:,0])
-        plt.title(tdiskZ)
+        plt.title("tdiskZ")
         plt.colorbar()
         plt.savefig("tdiskZ.jpg")
+        plt.show()
+
+        plt.imshow(tdiskZ[:,:,0])
+        plt.title("tdiskZ")
+        plt.colorbar()
         plt.show()
 
 
