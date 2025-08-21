@@ -54,15 +54,27 @@ def w_func(self, r, type):
     elif type == "pa":
         a = self.pa
 
+    print("a " + str(a))
+    print("r0 " + str(r0))
+    print("dr " + str(dr))
+    print("r max" + str(np.max(r)))
+    print("r min" + str(np.min(r)))
     r0 = 1.0 if r0 is None else r0
     dr = 1.0 if dr is None else dr
     return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
 
 
 def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
+    inc_ = 0
     x = p0[:, :, 0]
     y = p0[:, :, 1]
     z = p0[:, :, 2]
+
+    plt.pcolor(x, y, z)
+    plt.title("z apply matrix input")
+    plt.colorbar()
+    plt.show()
+
 
     warp = warp[:, None]
     print(warp.shape)
@@ -156,6 +168,7 @@ class Disk:
         '''trying a linear grid'''
         af = np.linspace(amin,amax,nac)
         zf = np.linspace(zmin,self.zmax,nzc)
+        print("zmax = " + str(self.zmax)) 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
         #print("ff" + str(ff))
@@ -212,6 +225,12 @@ class Disk:
         yi = acf[:,:,0] * np.sin(pcf[:,:,0])
 
         '''reshaping to play nice with rotational matrix'''
+
+        plt.pcolor(xi, yi, zcf[:,:,0])
+        plt.title('zcf')
+        plt.colorbar()
+        plt.show()
+
         points_i = np.moveaxis([xi, yi, zcf[:,:,0]], 0, 2)
         print(points_i.shape)
 
@@ -221,12 +240,18 @@ class Disk:
         self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
         
+
+        plt.pcolor(rotation[:,:,0], rotation[:,:,1], rotation[:,:,2])
+        plt.title("z after warp")
+        plt.colorbar()
+        plt.show()
         '''now to make 3d grid:'''
 
         '''keeping z grid, adding each point in zf to each slice
         this doesn't perfectly replicate geoemetry of warp: 
         I think we would need to apply a rotational matrix to each z slice'''
         z_grid = rotation[:,:,2]
+
         z_full_grid = z_grid[:,:,np.newaxis] + zf
         '''translating x &y grids back to polar coordinates'''
 
@@ -270,9 +295,12 @@ class Disk:
         acf=r_full_grid
         #fcf=f_full_grid + np.pi
         #fcf = f_full_grid -np.pi/3
+        '''I'm really not sure why but the fcf grid was offset, and subtracting 1 fixed it...?? Why??'''
         fcf = f_full_grid -1
         zcf=z_full_grid
 
+        '''useful for plotting polar graphs in cart space'''
+        x_polar, y_polar = pol2cart(acf[:,:,0], fcf[:,:,0])
 
         plt.imshow(fcf[:,:,0])
         plt.title("fcf")
@@ -340,6 +368,11 @@ class Disk:
         plt.savefig("warp_siggas.jpg")
         plt.show()
 
+        plt.pcolor(x_polar, y_polar, siggas)
+        plt.title("siggas cart")
+        plt.colorbar()
+        plt.show()
+
         ## Add an extra ring
         if self.ring is not None:
             w = np.abs(rcf-self.Rring)<self.Wring/2.
@@ -347,6 +380,8 @@ class Disk:
                 tempg[w] = tempg[w]*(rcdf[w]/(150*Disk.AU))**(self.sig_enhance-self.qq)/((rcf[w].max())/(150.*Disk.AU))**(-self.qq+self.sig_enhance)
 
 
+        
+        '''may need to make sure correct grid is being used herre'''
         self.calc_hydrostatic(tempg,siggas,grid)
 
 
@@ -366,6 +401,11 @@ class Disk:
         plt.savefig("warp_vel.jpg")
         plt.show()
 
+        plt.pcolor(x_polar, y_polar, self.vel[:,:,0])
+        plt.colorbar()
+        plt.title("vel warp with pi shift cart")
+        plt.show()
+
         fcf = f_full_grid
         self.vel2 = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
@@ -373,6 +413,11 @@ class Disk:
         plt.title("vel warp without pi shift")
         plt.colorbar()
         plt.savefig("warp_vel.jpg")
+        plt.show()
+
+        plt.pcolor(x_polar, y_polar, self.vel2[:,:,0])
+        plt.colorbar()
+        plt.title("vel warp without pi shift cart")
         plt.show()
 
         ###### Major change: vel is linear not angular ######
@@ -480,8 +525,8 @@ class Disk:
 
         '''I think I need to add parameters here for warp model...'''
         self.w_i = params[18]               # - inclination of warp
-        self.w_r0 = params[19]              # - inflection radius
-        self.w_dr = params[20]              # - how many annuli it takes for warp transition
+        self.w_r0 = params[19]*Disk.AU              # - inflection radius
+        self.w_dr = params[20]*Disk.AU         # - how many annuli it takes for warp transition
         self.pa = params[21]                # - position angle (how rotated the face-on disk is) of warp
 
 
@@ -824,8 +869,10 @@ class Disk:
         #t1 = time.clock()
         #differential equation for vertical density profile
         dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
-        dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
-        dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        #dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
+        #dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        #plt.pcolor([self.x_polar, self.y_polar, tempg:,:,0])
+        #plt.
 
         #numerical integration to get vertical density profile
         foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
@@ -834,6 +881,11 @@ class Disk:
 
         #normalize the density profile (note: this is just half the sigma value!)
         rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+
+        #plt.pcolor(x_polar, y_polar, rho0[:,:,0])
+        #plt.title("rho0 cart")
+        #plt.colorbar()
+        #plt.show()
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 
