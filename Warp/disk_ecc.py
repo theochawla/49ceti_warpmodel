@@ -447,12 +447,14 @@ class Disk:
         theta is inclination'''
         zsky = np.arange(self.nz)/self.nz*(-zsky_max)+zsky_max/2.
         
-        '''are these x & y projected onto sky plane..?'''
+        '''are these z & y projected onto sky plane..?'''
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''
+            '''theta crit is a critical inclination angle determining whether disk thickness
+            or disk radius is more important to the line sight through the disk'''
             theta_crit = np.arctan((self.Aout*(1+self.ecc)+tdiskY)/(self.zmax-tdiskZ))
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<self.thet)] = ((self.Aout*(1+self.ecc)+tdiskY[(theta_crit<self.thet)])/self.sinthet)
@@ -465,6 +467,16 @@ class Disk:
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<np.abs(self.thet))] = -((self.Aout*(1+self.ecc)-tdiskY[(theta_crit<np.abs(self.thet))])/self.sinthet)
 
+
+        plt.imshow(tdiskZ[:,:,0])
+        plt.title("tdiskZ imshow")
+        plt.colorbar()
+        plt.show()
+
+        plt.pcolor(X,Y,tdiskZ[:,:,0])
+        plt.title("tdiskZ cart")
+        plt.colorbar()
+        plt.show()
         # transform grid to disk coordinates
         #tdiskZ = self.zmax*(np.ones((self.nphi,self.nr,self.nz)))-self.costhet*S
         #if self.thet > np.arctan(self.Aout/self.zmax):

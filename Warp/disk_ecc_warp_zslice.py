@@ -2,6 +2,11 @@
 
 #two methods for creating an instance of this class
 
+'''with this version, I'm going to try making a 3d disk first and then warping each zslice.
+This needs to happen after calc_hydrostatic but before sky projection.
+Will still need to think about 2d grids for sky projection, and how aop factors in.
+'''
+
 # from disk import *
 # x=Disk()
 
@@ -153,9 +158,323 @@ class Disk:
         #tf = time.clock()
         #print("disk init took {t} seconds".format(t=(tf-tb)))
 
-       
+    '''using unedited set_structure'''
+    
 
     def set_structure(self):
+        #tst=time.clock()
+        '''Calculate the disk density and temperature structure given the specified parameters'''
+        # Define the desired regular cylindrical (r,z) grid
+        nac = 500#256             # - number of unique a rings
+        #nrc = 256             # - numver of unique r points
+        amin = self.Ain       # - minimum a [AU]
+        amax = self.Aout      # - maximum a [AU]
+        e = self.ecc          # - eccentricity
+        nzc = int(2.5*nac)#nac*5           # - number of unique z points
+        '''defining z-array: .1 AU to specified max value in AU. logarithmic. number specified by
+        # of annuli'''
+        zmin = .1*Disk.AU      # - minimum z [AU]
+        nfc = self.nphi       # - number of unique f points
+        '''putting into linspace for now to compare to warp model'''
+        af = np.linspace(amin,amax,nac)
+        zf = np.linspace(zmin,self.zmax,nzc)
+        #zf = np.logspace(np.log10(zmin),np.log10(self.zmax),nzc)
+
+        #adding this to triple check z-dimension is doing what I think it is
+        #print("1d z-array " + str(zf))
+
+        pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
+        ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
+        #print("ff" + str(ff))
+        rf = np.zeros((nac,nfc))
+        for i in range(nac):
+            for j in range(nfc):
+                rf[i,j] = (af[i]*(1.-e*e))/(1.+e*np.cos(ff[j]))
+
+        '''1d array of z-values as ones'''
+        idz = np.ones(nzc)
+        idf = np.ones(self.nphi)
+        #rcf = np.outer(rf,idz)
+        ida = np.ones(nac)
+        ##zcf = np.outer(ida,zf)
+        ##acf = af[:,np.newaxis]*np.ones(nzc)
+        #order of dimensions: a, f, z
+        '''meshgrid of z values above midplane'''
+        pcf,acf,zcf = np.meshgrid(pf,af,zf)
+        #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
+        #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
+        fcf = (pcf - self.aop) % (2*np.pi)
+
+        plt.imshow(fcf[:,:,0])
+        plt.title("fcf")
+        plt.colorbar()
+        plt.savefig("warp_fcf.jpg")
+        plt.show()
+
+        #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
+
+        plt.imshow(zcf[0,:,:])
+        plt.title("zcf")
+        plt.colorbar()
+        plt.savefig("original_zcf.jpg")
+        plt.show()
+
+        plt.imshow(zcf[10,:,:])
+        plt.title("zcf p=10 index slice")
+        plt.colorbar()
+        plt.savefig("original_zcf.jpg")
+        plt.show()
+        
+        '''should be 0 grid in shape of radius, phi, z above midplane'''
+        rcf=rf[:,:,np.newaxis]*idz
+        print(str(rcf.shape))
+        #print("coords init {t}".format(t=time.clock()-tst))
+
+        if 1:
+            print('plotting')
+            plt.plot((rcf*np.cos(fcf)).flatten(),(rcf*np.sin(fcf)).flatten())
+            plt.show()
+
+        # rcf[0][:] = radius at all z for first radial bin
+        # zcf[0][:] = z in first radial bin
+
+        # Here introduce new z-grid (for now just leave old one in)
+
+        # Interpolate dust temperature and density onto cylindrical grid
+        ###### doesnt seem to be used anywhere ######
+        #tf = 0.5*np.pi-np.arctan(zcf/rcf)  # theta values
+        #rrf = np.sqrt(rcf**2.+zcf**2)
+
+        # bundle the grid for helper functions
+        ###### add angle to grid? ######
+        '''nac, nfc, nzc are resolution (int) in each dimension. rcf is 0s grid in 3d. 
+        amax is max a (AU), zcf is z meshgrid'''
+        grid = {'nac':nac,'nfc':nfc,'nzc':nzc,'rcf':rcf,'amax':amax,'zcf':zcf}#'ff':ff,'af':af,
+        self.grid=grid
+
+        #print("grid {t}".format(t=time.clock()-tst))
+        #define temperature structure
+        # use Dartois (03) type II temperature structure
+        ###### expanding to 3D should not affect this ######
+        '''using debris disk parameters, setting tmid = tatm, and using 100 AU instead of 150 AU'''
+
+        delta = 1.                # shape parameter
+        rcf100=rcf/(100.*Disk.AU)
+        rcf100q=rcf100**self.qq
+        
+        '''# zq0 = Zq, in AU, at 150 AU (????)'''
+        '''zq should be 3d and scalled by 150 AU...???'''
+        zq = self.zq0*Disk.AU*rcf100**1.3
+        #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
+        tmid = self.tmid0*rcf100q
+        tatm = tmid
+        #tatm = self.tatm0*rcf100q
+        tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
+
+        '''ii is 3d boolean grid of z values above some critical value'''
+        ii = zcf > zq
+        tempg[ii] = tatm[ii]
+        #Type I structure
+#        tempg = tmid*np.exp(np.log(tatm/tmid)*zcf/zq)
+        ###### this step is slow!!! ######
+        #print("temp struct {t}".format(t=time.clock()-tst)
+
+        # Calculate vertical density structure
+        # nolonger use exponential tail
+        ## Circular:
+        #Sc = self.McoG*(2.-self.pp)/(2*np.pi*self.Rc*self.Rc)
+        #siggas = Sc*(rf/self.Rc)**(-1*self.pp)*np.exp(-1*(rf/self.Rc)**(2-self.pp))
+        ## Elliptical:
+        #asum = (np.power(af,-1*self.pp)).sum()
+        rp1 = np.roll(rf,-1,axis=0)
+        rm1 = np.roll(rf,1,axis=0)
+        #*** Approximations used here ***#
+        #siggas = (self.McoG*np.sqrt(1.-e*e))/((rp1-rm1)*np.pi*(1.+e*np.cos(fcf[:,:,0]))*np.power(acf[:,:,0],self.pp+1.)*asum)
+        #siggas[0,:] = (self.McoG*np.sqrt(1.-e*e))/((rf[1,:]-rf[0,:])*2.*np.pi*(1.+e*np.cos(ff))*np.power(af[0]*idf,self.pp+1.)*asum)
+        #siggas[nac-1,:] = (self.McoG*np.sqrt(1.-e*e))/((rf[nac-1,:]-rf[nac-2,:])*2.*np.pi*(1.+e*np.cos(ff))*np.power(af[nac-1]*idf,self.pp+1.)*asum)
+        Sc = self.McoG*(2.-self.pp)/(self.Rc*self.Rc)
+        siggas_r = Sc*(acf[:,:,0]/self.Rc)**(-1*self.pp)*np.exp(-1*(acf[:,:,0]/self.Rc)**(2-self.pp))
+        #Sc = self.McoG*(2.-self.pp)/((amax**(2-self.pp)-amin**(2-self.pp)))
+        #siggas_r = Sc*acf[:,:,0]**(-1*self.pp)
+        dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
+        siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
+
+        print("siggas shape: "+ str(siggas.shape))
+
+        plt.imshow(siggas)
+        plt.title("siggas")
+        plt.colorbar()
+        plt.savefig("nowarp_siggas.jpg")
+        plt.show()
+
+
+        ## Add an extra ring
+        if self.ring is not None:
+            w = np.abs(rcf-self.Rring)<self.Wring/2.
+            if w.sum()>0:
+                tempg[w] = tempg[w]*(rcdf[w]/(150*Disk.AU))**(self.sig_enhance-self.qq)/((rcf[w].max())/(150.*Disk.AU))**(-self.qq+self.sig_enhance)
+
+        self.calc_hydrostatic(tempg,siggas,grid)
+
+        #print("hydro done {t}".format(t=time.clock()-tst))
+        #Calculate radial pressure differential
+        ### nolonger use pressure term ###
+        #Pgas = Disk.kB/Disk.m0*self.rho0*tempg
+        #dPdr = (np.roll(Pgas,-1,axis=0)-Pgas)/(np.roll(rcf,-1,axis=0)-rcf)
+        #print(dPdr[:5,0,0],dPdr[200:205,0,500])
+        #dPdr = 0#(np.roll(Pgas,-1,axis=0)-Pgas)/(np.roll(rcf,-1,axis=0)-rcf)
+
+
+        #Calculate velocity field
+        #Omg = np.sqrt((dPdr/(rcf*self.rho0)+Disk.G*self.Mstar/(rcf**2+zcf**2)**1.5))
+        #w = np.isnan(Omg)
+        #if w.sum()>0:
+        #    Omg[w] = np.sqrt((Disk.G*self.Mstar/(rcf[w]**2+zcf[w]**2)**1.5))
+
+        #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
+        #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
+        '''vel already factors in aop because it uses fcf grid
+        should I warp before or after vel grid... I think after? If it's circular, how
+        would this affect los vel'''
+        self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
+
+
+        plt.imshow(self.vel[:,:,0])
+        plt.title("vel")
+        plt.colorbar()
+        plt.savefig("nowarp_vel.jpg")
+        plt.show()
+        ###### Major change: vel is linear not angular ######
+        #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
+        #velrot = np.zeros((3,nac,nfc,nzc))
+        #x,y velocities with refrence to semimajor axis (f)
+        #velx = (-1.*Omk*acf*np.sin(fcf))/np.sqrt(1.-self.ecc**2)
+        #vely = (Omk*acf*(self.ecc+np.cos(fcf)))/np.sqrt(1.-self.ecc**2)
+        #x,y velocities with refrence to sky (phi) only care about Vy on sky
+        #velrot[0] = self.cosaop*vel[0] - self.sinaop*vel[1]
+        #velrot = self.sinaop*velx + self.cosaop*vely
+
+        # Check for NANs
+        ### nolonger use Omg ###
+        #ii = np.isnan(Omg)
+        #Omg[ii] = Omk[ii]
+        ii = np.isnan(self.rho0)
+        if ii.sum() > 0:
+            self.rho0[ii] = 1e-60
+            print('Beware: removed NaNs from density (#%s)' % ii.sum())
+        ii = np.isnan(tempg)
+        if ii.sum() > 0:
+            tempg[ii] = 2.73
+            print('Beware: removed NaNs from temperature (#%s)' % ii.sum())
+
+        '''warp before or after this photodissociation...? I kind of think before (uses rho)'''
+        '''actually let's start with after because it uses zmax'''
+
+        
+        
+        
+        #print("nan chekc {t}".format(t=time.clock()-tst))
+        # find photodissociation boundary layer from top
+        zpht_up = np.zeros((nac,nfc))
+        zpht_low = np.zeros((nac,nfc))
+        sig_col = np.zeros((nac,nfc,nzc))
+        #zice = np.zeros((nac,nfc))
+        for ia in range(nac):
+            for jf in range (nfc):
+                psl = (Disk.Hnuctog/Disk.m0*self.rho0[ia,jf,:])[::-1]
+                zsl = self.zmax - (zcf[ia,jf,:])[::-1]
+                foo = (zsl-np.roll(zsl,1))*(psl+np.roll(psl,1))/2.
+                foo[0] = 0
+                nsl = foo.cumsum()
+                sig_col[ia,jf,:] = nsl[::-1]*Disk.m0/Disk.Hnuctog
+                pht = (np.abs(nsl) >= self.sigbound[0])
+                if pht.sum() == 0:
+                    zpht_up[ia,jf] = np.min(self.zmax-zsl)
+                else:
+                    zpht_up[ia,jf] = np.max(self.zmax-zsl[pht])
+                #Height of lower column density boundary
+                pht = (np.abs(nsl) >= self.sigbound[1])
+                if pht.sum() == 0:
+                    zpht_low[ia,jf] = np.min(self.zmax-zsl)
+                else:
+                    zpht_low[ia,jf] = np.max(self.zmax-zsl[pht])
+                #used to be a seperate loop
+                ###### only used for plotting
+                #foo = (tempg[ia,jf,:] < Disk.Tco)
+                #if foo.sum() > 0:
+                #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
+                #else:
+                #    zice[ia,jf] = zmin
+        self.sig_col = sig_col
+        #szpht = zpht
+        #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
+
+        '''ok, let's warp some grids here. We need structural grids (with aop applied),
+        vel, rho, sig_col. (?)....
+        This may take forever to run because they need to be interpolated, then transformed
+        at each slice. 
+        Can I use a single interpolated grid for all...?
+
+        '''
+        '''defining warp, taking parmas from input into Disk'''
+        '''defines change in inclination'''
+        warp_i  = w_func(self, af, type="w")
+        '''defines twist'''
+        twist_i = w_func(self, af, type="pa")
+
+        inc_obs = np.deg2rad(self.thet)
+        #PA_obs = np.deg2rad(pa)
+        PA_obs = np.deg2rad(0)
+
+        '''need cartesian system for warp rotation
+        initial I used 2d slices of this but I'm going to try to do this in 3d...
+        I'm going to use fcf so it takes into account aop'''
+        #xi = acf[:,:,0] * np.cos(pcf[:,:,0])
+        xi = acf * np.cos(fcf)
+        #print(xi.shape)
+        #yi = acf[:,:,0] * np.sin(pcf[:,:,0])
+        yi = acf * np.sin(fcf)
+
+        '''reshaping to play nice with rotational matrix'''
+        points_i = np.moveaxis([xi, yi, zcf], 0, 2)
+
+        '''applying warp via rotational matrix'''
+        rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
+        #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
+        self.rotation = rotation
+        '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
+
+
+        szpht = zpht
+        #zpht = scipy.signal.medfilt(zpht,kernel_size=7) #smooth it
+
+        # find height where CO freezes out
+        # only used for ploting
+        zice = np.zeros(nrc)
+        for ir in range(nrc):
+            foo = (tempg[ir,:] < Disk.Tco)
+            if foo.sum() > 0:
+                zice[ir] = np.max(zcf[ir,foo])
+            else:
+                zice[ir] = zmin
+        
+        self.af = af
+        #self.ff = ff
+        #self.rf = rf
+        self.pf = pf
+        self.nac = nac
+        self.zf = zf
+        self.nzc = nzc
+        self.tempg = tempg
+        #self.Omg0 = Omg#velrot
+        self.zpht_up = zpht_up
+        self.zpht_low = zpht_low
+        self.pcf = pcf  #only used for plotting can remove after testing
+        self.rcf = rcf  #only used for plotting can remove after testing
+
+       
+
+    def set_structure_warp(self):
         #tst=time.clock()
         # Define the desired regular cylindrical (r,z) grid
         nac = 500#256             # - number of unique a rings
