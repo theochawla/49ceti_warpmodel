@@ -537,6 +537,8 @@ class Disk:
         # arrays in [phi,r,s] on sky coordinates
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
+
+
        
         plt.imshow(X)
         plt.title("X_skygrid")
@@ -713,6 +715,8 @@ class Disk:
         #zpht = np.interp(tr.flatten(),self.rf,self.zpht).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
 
+        
+        
         plt.imshow(tsig_col[:,:,0])
         plt.title("tsig_col")
         plt.colorbar()

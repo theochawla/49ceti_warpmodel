@@ -485,6 +485,7 @@ class Disk:
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
 
+        
         plt.imshow(tphi[:,:,0])
         plt.title("tphi")
         plt.colorbar()
@@ -497,6 +498,39 @@ class Disk:
         #xydisk =  tr[:,:,0] <= self.Aout*(1.+self.ecc)+Smax*self.sinthet  # - tracing outline of disk on observer xy plane
         self.r = tr
 
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5,4)
+        plt.pcolor(X, Y, np.ones(X.shape)*zsky[0])
+        plt.xlim(-5e15, 5e15)
+        plt.ylim(-5e15, 5e15)
+        plt.colorbar(label="tdiskZ (midplane)")
+        plt.title("X Y (sky coordinates)")
+        plt.show()
+        
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5,4)
+        plt.pcolor(X, tdiskY[:,:,0], tdiskZ[:,:,0])
+        plt.xlim(-5e15, 5e15)
+        plt.ylim(-5e15, 5e15)
+        plt.colorbar(label="Xshape*zsky")
+        plt.title("X, tdiskY (disk coordinates)")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5,4)
+        plt.pcolor(tdiskY[:,:,0], tdiskZ[:,:,0], X)
+        plt.xlim(-5e15, 5e15)
+        plt.ylim(-5e15, 5e15)
+        plt.colorbar()
+        plt.title("sky grid y by z")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5,4)
+        plt.pcolor(X, tdiskY[:,:,0], tdiskZ[:,:,0])
+        plt.colorbar()
+        plt.title("sky grid 3 x by y")
+        plt.show()
 
 
 

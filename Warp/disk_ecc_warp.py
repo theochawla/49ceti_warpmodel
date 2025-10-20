@@ -818,11 +818,15 @@ class Disk:
         plt.show()
 
         plt.pcolor(x_full_rt_grid[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
-        plt.title("sky grid 3 x by y")
+        plt.title("Disk in sky plane")
         plt.xlim(-5e15, 5e15)
         plt.ylim(-5e15, 5e15)
+        #plt.show()
+    
 
         plt.pcolor(x_full_rt_grid[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
+        #plt.xlim(-5e15, 5e15)
+        #plt.ylim(-5e15, 5e15)
         plt.colorbar()
         plt.show()
 
