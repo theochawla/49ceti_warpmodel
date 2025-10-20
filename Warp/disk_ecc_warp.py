@@ -101,6 +101,34 @@ def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
 
     return np.moveaxis([xp, yp, zp], 0, 2)
 
+def matrix_mine(x, y, z, warp, twist, inc_, PA_):
+
+    warp = warp[:, None]
+    print("warp.shape" + str(warp.shape))
+    twist = twist[:, None]
+    print("twist.shape" + str(twist.shape))
+
+    cosw = np.cos(warp)
+    sinw = np.sin(warp)
+    
+
+    cost = np.cos(twist)
+    sint = np.sin(twist)
+
+    cosPA = np.cos(PA_)
+    sinPA = np.sin(PA_)
+
+    cosi = np.cos(inc_)
+    sini = np.sin(inc_)
+
+    xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
+    yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
+    zp = y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
+
+    return xp, yp, zp
+
+
+
 class Disk:
     'Common class for circumstellar disk structure'
     #Define useful constants
