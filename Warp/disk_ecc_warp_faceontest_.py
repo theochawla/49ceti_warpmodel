@@ -129,6 +129,34 @@ def matrix_mine(x, y, z, warp, twist, inc_, PA_):
 
 
 
+def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
+
+    warp = warp[None, :, None]
+    print("warp.shape" + str(warp.shape))
+    twist = twist[None, :, None]
+    print("twist.shape" + str(twist.shape))
+
+    cosw = np.cos(warp)
+    sinw = np.sin(warp)
+    
+
+    cost = np.cos(twist)
+    sint = np.sin(twist)
+
+    cosPA = np.cos(PA_)
+    sinPA = np.sin(PA_)
+
+    cosi = np.cos(inc_)
+    sini = np.sin(inc_)
+
+    xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
+    yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
+    zp = y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
+
+    return xp, yp, zp
+
+
+
 class Disk:
     'Common class for circumstellar disk structure'
     #Define useful constants
@@ -685,7 +713,7 @@ class Disk:
         '''trying meshgridding first before converting to polar to match
         set_structure method'''
 
-        phi_mesh, R_mesh, Z = np.meshgrid(phi, R, z_l)
+        R_mesh, phi_mesh, Z = np.meshgrid(R, phi, z_l)
         print("grid shape " + str(phi_mesh.shape))
 
         plt.pcolor(R_mesh[:,:,0], phi_mesh[:,:,0], Z[:,:,0])
@@ -771,7 +799,7 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        X_w, Y_w, Z_w = matrix_mine(X, Y, Z, warp_rt, twist_rt,0,0)
+        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
 
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
         plt.title("z after warp")
@@ -1038,11 +1066,6 @@ class Disk:
         plt.savefig("warp_vel.jpg")
         plt.show()
 
-        plt.imshow(tvel[:,:,0])
-        plt.title("tvel")
-        plt.colorbar()
-        plt.savefig("warp_vel.jpg")
-        plt.show()
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(tdiskZ.shape)
 
         plt.imshow(tvel[:,:,0])
