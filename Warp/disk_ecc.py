@@ -549,7 +549,17 @@ class Disk:
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        print("zind max " + str(np.max(zind)))
+        print("zind min " + str(np.min(zind)))
+        print("zind len " + str(len(zind)))
 
+        print("aind max " + str(np.max(aind)))
+        print("aind min " + str(np.min(aind)))
+        print("aind len " + str(len(aind)))
+
+        print("phiind max " + str(np.max(phiind)))
+        print("phiind min " + str(np.min(phiind)))
+        print("phiind len " + str(len(phiind)))
 
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######

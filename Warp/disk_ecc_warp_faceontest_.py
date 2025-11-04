@@ -193,14 +193,14 @@ class Disk:
         e = self.ecc          # - eccentricity
         nzc = int(2.5*nac)#nac*5           # - number of unique z points
         #modifying for z asymmetry
-        zmin = -self.zmax      # - minimum z [AU]
+        self.zmin = -self.zmax      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
 
         '''trying a linear grid'''
         af = np.linspace(amin,amax,nac)
         '''experimenting with z asymmetry'''
         self.af = af
-        zf_og = np.linspace(zmin,self.zmax,nzc)
+        zf_og = np.linspace(self.zmin,self.zmax,nzc)
         self.zf = zf_og
         #zf_inv = np.linspace(self.zmax, zmin, nzc)
 
@@ -461,6 +461,7 @@ class Disk:
 
         #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
+        #self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
         plt.imshow(self.vel[:,:,0])
@@ -665,25 +666,45 @@ class Disk:
         #ytop = Smax*self.sinthet/2.       # y origin offset for observer xy center
         #sky coordinates
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
-        #R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
+        R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
+        print("nr " + str(self.nr))
+
         #print("nr " + str(self.nr))
         #print("nphi " + str(self.nphi))
         '''do i need the -1 or did I add that... I could put in aop here, but 
         I'm going to rely on twist_i to define rotation.'''
-        #phi = np.arange(self.nphi)*2*np.pi/(len(R))
-        #phi = np.linspace(0, 2*np.pi, len(R))
+        #phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+        phi = np.linspace(0, 2*np.pi, self.nphi)
+        print("nphi " + str(self.nphi))
         #z_l = self.zf
+        #z_l = np.arange(self.nz)/self.nz*(-self.zmax)+s/2.
+        z_l = np.linspace(self.zmin,self.zmax,self.nz)
+        print("nz " + str(self.nz))
 
 
         '''trying meshgridding first before converting to polar to match
         set_structure method'''
 
-        #R_mesh, phi_mesh, Z = np.meshgrid(R, phi, z_l)
+        phi_mesh, R_mesh, Z = np.meshgrid(phi, R, z_l)
+        print("grid shape " + str(phi_mesh.shape))
 
-        #plt.pcolor(R_mesh[:,:,0], phi_mesh[:,:,0], Z[:,:,0])
-        #plt.title('unwarped rt_polar grid')
-        #plt.colorbar()
-        #plt.show()
+        plt.pcolor(R_mesh[:,:,0], phi_mesh[:,:,0], Z[:,:,0])
+        plt.title('unwarped rt_polar grid')
+        plt.colorbar()
+        plt.show()
+
+        '''converting to xy'''
+
+        warp_rt  = w_func(self, R, type="w")
+        twist_rt = w_func(self, R, type="pa")
+
+        X, Y = pol2cart(R_mesh, phi_mesh)
+
+        print("X shape " +str(X.shape))
+        print("Y shape " +str(Y.shape))
+        print("Z shape " +str(Z.shape))
+
+
 
         #print("Rmax & min " + str(np.max(R)) + str(np.min(R)))
         #print("phi max & min " + str(np.max(phi)) + str(np.min(phi)))
@@ -737,10 +758,10 @@ class Disk:
 
         '''reshaping to play nice with rotational matrix'''
 
-        #plt.pcolor(X[:,:,0], Y[:,:,0], Z[:,:,0])
-        #plt.title('zcf')
-        #plt.colorbar()
-        #plt.show()
+        plt.pcolor(X[:,:,0], Y[:,:,0], Z[:,:,0])
+        plt.title('zcf')
+        plt.colorbar()
+        plt.show()
 
         #points_i = np.moveaxis([X, Y, Z], 0, 2)
         #print("points_i.shape" + str(points_i.shape))
@@ -750,12 +771,12 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        #X_w, Y_w, Z_w = matrix_mine(X,Y,Z,warp_i, twist_i,0,0)
+        X_w, Y_w, Z_w = matrix_mine(X, Y, Z, warp_rt, twist_rt,0,0)
 
-        #plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
-        #plt.title("z after warp")
-        #plt.colorbar()
-        #plt.show()
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
+        plt.title("z after warp")
+        plt.colorbar()
+        plt.show()
         '''now to make 3d grid:'''
 
         '''saving these because I think I can use them in rt grid'''
@@ -864,9 +885,9 @@ class Disk:
         plt.show()
         '''
 
-        X_w = self.x_grid
-        Y_w = self.y_grid
-        Z_w = self.z_grid
+        #X_w = self.x_grid
+        #Y_w = self.y_grid
+        #Z_w = self.z_grid
 
 
 
@@ -915,7 +936,7 @@ class Disk:
         #S = np.ones(tdiskZ.shape)
         top_zslice = tdiskZ[:,:,-1]
 
-        S = tdiskZ - top_zslice[:,:,np.newaxis]*np.ones(len(self.zf))
+        S = tdiskZ - top_zslice[:,:,np.newaxis]*np.ones(self.nz)
 
         '''for passing through disk face:
         I want to use shape of ellipse in [:,:,-1] plane as a mask
@@ -933,6 +954,7 @@ class Disk:
         #if self.thet > np.arctan(self.Aout/self.zmax):
         #    tdiskZ -=(Y*self.sinthet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
+        #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tr = np.sqrt(X_w**2+tdiskY**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
@@ -978,34 +1000,67 @@ class Disk:
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
         
-        zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
+        print("zind max " + str(np.max(zind)))
+        print("zind min " + str(np.min(zind)))
+        print("zind len " + str(len(zind)))
+
         #zind = self.zf
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
+        print("phiind max " + str(np.max(phiind)))
+        print("phiind min " + str(np.min(phiind)))
+        print("phiind len " + str(len(phiind)))
         #phiind = self.pf
-        aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        #aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
+        print("aind max " + str(np.max(aind)))
+        print("aind min " + str(np.min(aind)))
+        print("aind len " + str(len(aind)))
         #aind = self.af
 
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
-        tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.af,self.pf,self.zf) #interpolate onto coordinates xind,yind #tempg
+        
+        #tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+        print("tempg shape " + str(self.tempg.shape))
+        #tT = ndimage.map_coordinates(self.tempg,[[phiind],[aind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
+        tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(tdiskZ.shape)
+        print("tT shape " + str(tT.shape))
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
-        tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.af,self.pf,self.zf)
+        #tvel = ndimage.map_coordinates(self.vel,[[phiind],[aind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+
+        plt.imshow(tT[:,:,0])
+        plt.title("tT")
+        plt.colorbar()
+        plt.savefig("warp_vel.jpg")
+        plt.show()
 
         plt.imshow(tvel[:,:,0])
         plt.title("tvel")
         plt.colorbar()
         plt.savefig("warp_vel.jpg")
         plt.show()
+        tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(tdiskZ.shape)
 
+        plt.imshow(tvel[:,:,0])
+        plt.title("tvel, tdiskZ reshape")
+        plt.colorbar()
+        plt.savefig("warp_vel.jpg")
+        plt.show()
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
         #zpht = np.interp(tr.flatten(),self.rf,self.zpht).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
-        tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+        #tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+        tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(tdiskZ.shape)
 
-        zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
-        zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+        #zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+        zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(tdiskZ.shape)
+        #zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+        zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(tdiskZ.shape)
         tT[notdisk] = 0
         self.sig_col = tsig_col
 

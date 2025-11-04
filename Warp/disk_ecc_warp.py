@@ -193,13 +193,13 @@ class Disk:
         e = self.ecc          # - eccentricity
         nzc = int(2.5*nac)#nac*5           # - number of unique z points
         #modifying for z asymmetry
-        zmin = -self.zmax      # - minimum z [AU]
+        self.zmin = -self.zmax      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
 
         '''trying a linear grid'''
         af = np.linspace(amin,amax,nac)
         '''experimenting with z asymmetry'''
-        zf_og = np.linspace(zmin,self.zmax,nzc)
+        zf_og = np.linspace(self.zmin,self.zmax,nzc)
         self.zf = zf_og
         #zf_inv = np.linspace(self.zmax, zmin, nzc)
 
