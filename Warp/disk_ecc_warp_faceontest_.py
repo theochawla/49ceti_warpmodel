@@ -947,7 +947,7 @@ class Disk:
         #plt.ylim(-5e15, 5e15)
         plt.colorbar()
         plt.show()
-        '''
+        
         if (self.thet<np.pi/2) & (self.thet>0):
             theta_crit = np.arctan((self.Aout*(1+self.ecc)+tdiskY)/(self.zmax-tdiskZ))
             S = (self.zmax-tdiskZ)/self.costhet
@@ -960,14 +960,14 @@ class Disk:
             theta_crit = np.arctan((self.Aout*(1+self.ecc)-tdiskY)/(self.zmax-tdiskZ))
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<np.abs(self.thet))] = -((self.Aout*(1+self.ecc)-tdiskY[(theta_crit<np.abs(self.thet))])/self.sinthet)
-        '''
+        
         #S = np.ones(tdiskZ.shape)
         top_zslice = tdiskZ[:,:,-1]
 
         #S = tdiskZ - top_zslice[:,:,np.newaxis]*np.ones(self.nz)
-        S = (self.zmax-tdiskZ)/self.costhet
-        print("zmax "  + str(self.zmax))
-        print("tdiskZmax " + str(np.max(tdiskZ)))
+        #S = (self.zmax-tdiskZ)/self.costhet
+        #print("zmax "  + str(self.zmax))
+        #print("tdiskZmax " + str(np.max(tdiskZ)))
 
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
