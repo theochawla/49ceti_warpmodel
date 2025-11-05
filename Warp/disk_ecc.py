@@ -467,6 +467,18 @@ class Disk:
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<np.abs(self.thet))] = -((self.Aout*(1+self.ecc)-tdiskY[(theta_crit<np.abs(self.thet))])/self.sinthet)
 
+        print("zmax "  + str(self.zmax))
+        print("tdiskZmax " + str(np.max(tdiskZ)))
+
+        plt.imshow(S[:,:,0])
+        plt.title("S bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(S[:,:,-1])
+        plt.title("S top of disk")
+        plt.colorbar()
+        plt.show()
 
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ imshow")

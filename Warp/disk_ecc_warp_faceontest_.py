@@ -964,7 +964,20 @@ class Disk:
         #S = np.ones(tdiskZ.shape)
         top_zslice = tdiskZ[:,:,-1]
 
-        S = tdiskZ - top_zslice[:,:,np.newaxis]*np.ones(self.nz)
+        #S = tdiskZ - top_zslice[:,:,np.newaxis]*np.ones(self.nz)
+        S = (self.zmax-tdiskZ)/self.costhet
+        print("zmax "  + str(self.zmax))
+        print("tdiskZmax " + str(np.max(tdiskZ)))
+
+        plt.imshow(S[:,:,0])
+        plt.title("S bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(S[:,:,-1])
+        plt.title("S top of disk")
+        plt.colorbar()
+        plt.show()
 
         '''for passing through disk face:
         I want to use shape of ellipse in [:,:,-1] plane as a mask
@@ -1151,6 +1164,8 @@ class Disk:
             plt.show()
 
         # store disk
+
+        '''originally, I think these parameters were X, Y, and tdiskZ?'''
         self.X = X
         self.Y = Y
         self.Z = tdiskZ
@@ -1382,20 +1397,20 @@ class Disk:
 
 
         '''theo: adding some extra plots and print statements to make sure warp structure is correct'''
-        print(self.rcf.shape)
-        print(self.rotation[:,-1,0])
+        #print(self.rcf.shape)
+        #print(self.rotation[:,-1,0])
 
-        plt.scatter(self.rotation[:,:,0], self.rotation[:,:,1], c=self.rotation[:,:,2])
-        plt.show()
+        #plt.scatter(self.rotation[:,:,0], self.rotation[:,:,1], c=self.rotation[:,:,2])
+        #plt.show()
 
 
-        fig, ax = plt.subplots()
-        plt.scatter(self.rcf[:,:,0], self.pcf[:,:,0], c=self.zcf[:,:,0])
-        ax.set_xlabel("radius")
-        ax.set_ylabel("phi (radians)")
-        plt.show()
+        #fig, ax = plt.subplots()
+        #plt.scatter(self.rcf[:,:,0], self.pcf[:,:,0], c=self.zcf[:,:,0])
+        #ax.set_xlabel("radius")
+        #ax.set_ylabel("phi (radians)")
+        #plt.show()
 
-        plt.scatter(self.r_grid, self.f_grid)
+        #plt.scatter(self.r_grid, self.f_grid)
         '''end changes'''
 
 
