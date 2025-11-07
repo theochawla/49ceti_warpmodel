@@ -1,10 +1,10 @@
-fitsimage         = 'unedited_disk.fits'
-imagename         = 'unedited_disk.image'
+fitsimage         = 'zuleta_replica.fits'
+imagename         = 'zuleta_replica.image'
 whichrep          = 0
 whichhdu          = -1
 zeroblanks        = True
-overwrite         = False
+overwrite         = True
 defaultaxes       = False
 defaultaxesvalues = []
 beam              = []
-#importfits( fitsimage='unedited_disk.fits',imagename='unedited_disk.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=False,defaultaxes=False,defaultaxesvalues=[],beam=[] )
+#importfits( fitsimage='zuleta_replica.fits',imagename='zuleta_replica.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )

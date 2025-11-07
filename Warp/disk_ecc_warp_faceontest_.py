@@ -1166,8 +1166,8 @@ class Disk:
         # store disk
 
         '''originally, I think these parameters were X, Y, and tdiskZ?'''
-        self.X = X
-        self.Y = Y
+        self.X = X_w
+        self.Y = Y_w
         self.Z = tdiskZ
         print()
         self.S = S

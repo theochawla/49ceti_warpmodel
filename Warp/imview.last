@@ -1,6 +1,6 @@
-raster  = 'unwarped_protodisk_m9.im'
+raster  = 'zuleta_replica_m0.im/'
 contour = {}
 zoom    = 1
 axes    = {}
 out     = ''
-#imview( raster='unwarped_protodisk_m9.im',contour={},zoom=1,axes={},out='' )
+#imview( raster='zuleta_replica_m0.im/',contour={},zoom=1,axes={},out='' )
