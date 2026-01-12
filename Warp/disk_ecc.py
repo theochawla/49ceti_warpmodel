@@ -158,15 +158,15 @@ class Disk:
         #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
         #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
         fcf = (pcf - self.aop) % (2*np.pi)
-
+        '''
         plt.imshow(fcf[:,:,0])
         plt.title("fcf")
         plt.colorbar()
         plt.savefig("warp_fcf.jpg")
         plt.show()
-
+        '''
         #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
-
+        '''
         plt.imshow(zcf[0,:,:])
         plt.title("zcf")
         plt.colorbar()
@@ -178,13 +178,13 @@ class Disk:
         plt.colorbar()
         plt.savefig("original_zcf.jpg")
         plt.show()
-        
+        '''
         '''should be 0 grid in shape of radius, phi, z above midplane'''
         rcf=rf[:,:,np.newaxis]*idz
-        print(str(rcf.shape))
+        #print(str(rcf.shape))
         #print("coords init {t}".format(t=time.clock()-tst))
 
-        if 1:
+        if 0:
             print('plotting')
             plt.plot((rcf*np.cos(fcf)).flatten(),(rcf*np.sin(fcf)).flatten())
             plt.show()
@@ -253,14 +253,14 @@ class Disk:
         dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
         siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
 
-        print("siggas shape: "+ str(siggas.shape))
-
+        #print("siggas shape: "+ str(siggas.shape))
+        '''
         plt.imshow(siggas)
         plt.title("siggas")
         plt.colorbar()
         plt.savefig("nowarp_siggas.jpg")
         plt.show()
-
+        '''
 
         ## Add an extra ring
         if self.ring is not None:
@@ -311,12 +311,13 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
-
+        '''
         plt.imshow(self.vel[:,:,0])
         plt.title("vel")
         plt.colorbar()
         plt.savefig("nowarp_vel.jpg")
         plt.show()
+        '''
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))
@@ -436,6 +437,19 @@ class Disk:
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
 
+        plt.plot(X, Y)
+        plt.title("X by Y")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+
+        print("X shape " + str(X.shape))
+
+        print("X_0 " + str(X[0,0]))
+        print("X_-1 " + str(X[0,-1]))
+
+        print("Y_0 " + str(Y[0,0]))
+        print("Y_-1 " + str(Y[0,-1]))
+
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
@@ -450,6 +464,23 @@ class Disk:
         '''are these z & y projected onto sky plane..?'''
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
+
+        plt.imshow(tdiskY[:,:,0])
+        plt.title("tdiskY[:,:,0]")
+
+        plt.imshow(tdiskY[:,:,-1])
+        plt.title("tdiskY[:,:,-1]")
+
+        plt.imshow(tdiskZ[:,:,0])
+        plt.title("tdiskZ[:,:,0]")
+
+        plt.imshow(tdiskZ[:,:,-1])
+        plt.title("tdiskZ[:,:,-1]")
+
+        del_tdiskY = tdiskY[0,0,-1]-tdiskY[0,0,0]
+        del_tdiskY2 = tdiskY[10,10,-1]-tdiskY[10,10,0]
+        print("on sky thickness " + str(del_tdiskY))
+        print("on sky thickness 2 " + str(del_tdiskY2))
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''
@@ -469,7 +500,7 @@ class Disk:
 
         print("zmax "  + str(self.zmax))
         print("tdiskZmax " + str(np.max(tdiskZ)))
-
+        
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
         plt.colorbar()
@@ -479,7 +510,7 @@ class Disk:
         plt.title("S top of disk")
         plt.colorbar()
         plt.show()
-
+        '''
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ imshow")
         plt.colorbar()
@@ -489,6 +520,7 @@ class Disk:
         plt.title("tdiskZ cart")
         plt.colorbar()
         plt.show()
+        '''
         # transform grid to disk coordinates
         #tdiskZ = self.zmax*(np.ones((self.nphi,self.nr,self.nz)))-self.costhet*S
         #if self.thet > np.arctan(self.Aout/self.zmax):
@@ -497,19 +529,20 @@ class Disk:
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
 
-        
+        '''
         plt.imshow(tphi[:,:,0])
         plt.title("tphi")
         plt.colorbar()
         plt.savefig("nowarp_tphi.jpg")
         plt.show()
+        '''
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
         notdisk = (tr > self.Aout*(1.+self.ecc)) | (tr < self.Ain*(1-self.ecc))  # - individual grid elements not in disk
         isdisk = (tr>self.Ain*(1-self.ecc)) & (tr<self.Aout*(1+self.ecc)) & (np.abs(tdiskZ)<self.zmax)
         S -= S[isdisk].min() #Reset the min S to 0
         #xydisk =  tr[:,:,0] <= self.Aout*(1.+self.ecc)+Smax*self.sinthet  # - tracing outline of disk on observer xy plane
         self.r = tr
-
+        '''
         fig, ax = plt.subplots()
         fig.set_size_inches(5,4)
         plt.pcolor(X, Y, np.ones(X.shape)*zsky[0])
@@ -543,7 +576,7 @@ class Disk:
         plt.colorbar()
         plt.title("sky grid 3 x by y")
         plt.show()
-
+        '''
 
 
         #print("new grid {t}".format(t=time.clock()-tst))
@@ -561,6 +594,7 @@ class Disk:
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        '''
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
         print("zind len " + str(len(zind)))
@@ -572,7 +606,7 @@ class Disk:
         print("phiind max " + str(np.max(phiind)))
         print("phiind min " + str(np.min(phiind)))
         print("phiind len " + str(len(phiind)))
-
+        '''
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
@@ -580,7 +614,7 @@ class Disk:
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
-
+        '''
         plt.imshow(tT[:,:,0])
         plt.title("tT")
         plt.colorbar()
@@ -592,6 +626,7 @@ class Disk:
         plt.colorbar()
         plt.savefig("nowarp_tvel.jpg")
         plt.show()
+        '''
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
@@ -600,13 +635,13 @@ class Disk:
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
-
+        '''
         plt.imshow(tsig_col[:,:,0])
         plt.title("tsig_col")
         plt.colorbar()
         plt.savefig("nowarp_tsig_col.jpg")
         plt.show()
-        
+        '''
         self.sig_col = tsig_col
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
@@ -646,7 +681,7 @@ class Disk:
         trhoG[notdisk] = 0
         self.rhoH2 = trhoH2
 
-        self.add_dust_ring(self.Rin,self.Rout,0.,0.,initialize=True) #initialize dust density to 0
+        self.add_dust_ring(self.Ain,self.Aout,0.,0.,initialize=True) #initialize dust density to 0
         #print("zap {t}".format(t=time.clock()-tst))
         #temperature and turbulence broadening
         #moved this to the set_line method
@@ -728,33 +763,34 @@ class Disk:
             self.dtg = 0*self.r
             self.kap = 2.3
 
-        w = (self.r>(Rin*Disk.AU)) & (self.r<(Rout*Disk.AU))
+        w = (self.r>(self.Ain*Disk.AU)) & (self.r<(self.Aout*Disk.AU))
         Rmid = (Rin+Rout)/2.*Disk.AU
         self.dtg[w] += dtg*(self.r[w]/Rmid)**(-ppD)
         self.rhoD = self.rhoH2*self.dtg*2*Disk.mh
 
     def add_mol_ring(self,Rin,Rout,Sig0,Sig1,abund,alpha=0,initialize=False,just_frozen=False):
+        '''Changed Rin to Ain (out)--Theo'''
         ''' Add a ring of fixed abundance, between Rin and Rout (in the radial direction) and Sig0 and Sig1 (in the vertical direction). The abundance is treated as a power law in the radial direction, with alpha as the power law exponent, and normalized at the inner edge of the ring (abund~abund0*(r/Rin)^(alpha))
         disk.add_mol_ring(10,100,.79,1000,1e-4)
         just_frozen: only apply the abundance adjustment to the areas of the disk where CO is nominally frozen out.'''
         if initialize:
             self.Xmol = np.zeros(np.shape(self.r))+1e-18
         if just_frozen:
-            add_mol = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU) & (self.T<self.Tco)
+            add_mol = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>self.Ain*Disk.AU) & (self.r<self.Aout*Disk.AU) & (self.T<self.Tco)
         else:
-            add_mol = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU)
+            add_mol = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>self.Ain*Disk.AU) & (self.r<self.Aout*Disk.AU)
         if add_mol.sum()>0:
-            self.Xmol[add_mol]+=abund*(self.r[add_mol]/(Rin*Disk.AU))**(alpha)
+            self.Xmol[add_mol]+=abund*(self.r[add_mol]/(self.Ain*Disk.AU))**(alpha)
         #add soft boundaries
-        edge1 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rout*Disk.AU)
+        edge1 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>self.Aout*Disk.AU)
         if edge1.sum()>0:
-            self.Xmol[edge1] += abund*(self.r[edge1]/(Rin*Disk.AU))**(alpha)*np.exp(-(self.r[edge1]/(Rout*Disk.AU))**16)
-        edge2 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r<Rin*Disk.AU)
+            self.Xmol[edge1] += abund*(self.r[edge1]/(self.Ain*Disk.AU))**(alpha)*np.exp(-(self.r[edge1]/(self.Aout*Disk.AU))**16)
+        edge2 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r<self.Ain*Disk.AU)
         if edge2.sum()>0:
-            self.Xmol[edge2] += abund*(self.r[edge2]/(Rin*Disk.AU))**(alpha)*(1-np.exp(-(self.r[edge2]/(Rin*Disk.AU))**20.))
-        edge3 = (self.sig_col*Disk.Hnuctog/Disk.m0<Sig0*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU)
+            self.Xmol[edge2] += abund*(self.r[edge2]/(self.Ain*Disk.AU))**(alpha)*(1-np.exp(-(self.r[edge2]/(self.Ain*Disk.AU))**20.))
+        edge3 = (self.sig_col*Disk.Hnuctog/Disk.m0<Sig0*Disk.sc) & (self.r>self.Ain*Disk.AU) & (self.r<self.Aout*Disk.AU)
         if edge3.sum()>0:
-            self.Xmol[edge3] += abund*(self.r[edge3]/(Rin*Disk.AU))**(alpha)*(1-np.exp(-((self.sig_col[edge3]*Disk.Hnuctog/Disk.m0)/(Sig0*Disk.sc))**8.))
+            self.Xmol[edge3] += abund*(self.r[edge3]/(self.Ain*Disk.AU))**(alpha)*(1-np.exp(-((self.sig_col[edge3]*Disk.Hnuctog/Disk.m0)/(Sig0*Disk.sc))**8.))
         zap = (self.Xmol<0)
         if zap.sum()>0:
             self.Xmol[zap]=1e-18

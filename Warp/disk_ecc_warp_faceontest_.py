@@ -55,12 +55,13 @@ def w_func(self, r, type):
 
     elif type == "pa":
         a = self.pa
-
+    '''
     print("a " + str(a))
     print("r0 " + str(r0))
     print("dr " + str(dr))
     print("r max" + str(np.max(r)))
     print("r min" + str(np.min(r)))
+    '''
     r0 = 1.0 if r0 is None else r0
     dr = 1.0 if dr is None else dr
     return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
@@ -71,17 +72,17 @@ def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
     x = p0[:, :, 0]
     y = p0[:, :, 1]
     z = p0[:, :, 2]
-
+    '''
     plt.pcolor(x, y, z)
     plt.title("z apply matrix input")
     plt.colorbar()
     plt.show()
-
+    '''
 
     warp = warp[:, None]
-    print("warp.shape" + str(warp.shape))
+    #print("warp.shape" + str(warp.shape))
     twist = twist[:, None]
-    print("twist.shape" + str(twist.shape))
+    #print("twist.shape" + str(twist.shape))
 
     cosw = np.cos(warp)
     sinw = np.sin(warp)
@@ -104,9 +105,9 @@ def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
 def matrix_mine(x, y, z, warp, twist, inc_, PA_):
 
     warp = warp[:, None, None]
-    print("warp.shape" + str(warp.shape))
+    #print("warp.shape" + str(warp.shape))
     twist = twist[:, None, None]
-    print("twist.shape" + str(twist.shape))
+    #print("twist.shape" + str(twist.shape))
 
     cosw = np.cos(warp)
     sinw = np.sin(warp)
@@ -132,9 +133,9 @@ def matrix_mine(x, y, z, warp, twist, inc_, PA_):
 def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
 
     warp = warp[None, :, None]
-    print("warp.shape" + str(warp.shape))
+    #print("warp.shape" + str(warp.shape))
     twist = twist[None, :, None]
-    print("twist.shape" + str(twist.shape))
+    #print("twist.shape" + str(twist.shape))
 
     cosw = np.cos(warp)
     sinw = np.sin(warp)
@@ -235,7 +236,7 @@ class Disk:
         #zf = np.concatenate((zf_inv, zf_og))
         zf = zf_og
 
-        print("zmax = " + str(self.zmax)) 
+        #print("zmax = " + str(self.zmax)) 
         pf = np.linspace(0,2*np.pi,self.nphi) #f is with refrence to semi major axis
         self.pf = pf
         ff = (pf - self.aop) % (2*np.pi) # phi values are offset by aop- refrence to sky
@@ -267,7 +268,7 @@ class Disk:
         '''adding to Kevin's function: I want to take grid and warp it, so I need to store grid var...?'''
         self.pcf=pcf
         self.acf=acf
-        print("acf shape = "+str(acf.shape))
+        #print("acf shape = "+str(acf.shape))
         self.zcf=zcf
         self.zcf_og = zcf_og
         
@@ -354,7 +355,7 @@ class Disk:
 
         #r_full_grid = r_grid[:,:, np.newaxis]*np.ones(len(zf))
         #f_full_grid = f_grid[:,:, np.newaxis]*np.ones(len(zf))
-
+        '''
         plt.imshow(r_full_grid[:,:,0])
         plt.title("r_grid")
         plt.colorbar()
@@ -378,6 +379,7 @@ class Disk:
         plt.colorbar()
         plt.savefig("warp_zgrid.jpg")
         plt.show()
+        '''
 
         '''just going to try this; fcf right now is from -pi to pi, try adding pi to match unedited fcf'''
 
@@ -391,13 +393,13 @@ class Disk:
 
         '''useful for plotting polar graphs in cart space'''
         self.x_polar, self.y_polar = pol2cart(acf[:,:,0], pcf[:,:,0])
-
+        '''
         plt.imshow(pcf[:,:,0])
         plt.title("pcf")
         plt.colorbar()
         plt.savefig("warp_fcf.jpg")
         plt.show()
-
+        '''
         # Interpolate dust temperature and density onto cylindrical grid
         ###### doesnt seem to be used anywhere ######
         #tf = 0.5*np.pi-np.arctan(zcf/rcf)  # theta value
@@ -451,24 +453,25 @@ class Disk:
         dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
         siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
         
-        print('siggas shape: '+str(siggas.shape))
-        
+        #print('siggas shape: '+str(siggas.shape))
+        '''
         plt.imshow(siggas)
         plt.title("siggas")
         plt.colorbar()
         plt.savefig("warp_siggas.jpg")
         plt.show()
-
+        '''
         print("siggas min " +str(np.min(siggas)))
         print("siggas max " +str(np.max(siggas)))
         print("siggas mean " +str(np.mean(siggas)))
 
+        '''
         plt.pcolor(self.x_polar, self.y_polar, np.log10(siggas))
         plt.title("siggas cart log10")
         plt.savefig("siggas_cart.jpg")
         plt.colorbar()
         plt.show()
-
+        '''
         ## Add an extra ring
         if self.ring is not None:
             w = np.abs(rcf-self.Rring)<self.Wring/2.
@@ -491,7 +494,7 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         #self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
-
+        '''
         plt.imshow(self.vel[:,:,0])
         plt.title("vel warp with pi shift")
         plt.colorbar()
@@ -502,10 +505,10 @@ class Disk:
         plt.colorbar()
         plt.title("vel warp with pi shift cart")
         plt.show()
-
+        '''
         fcf = p_full_grid
         self.vel2 = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
-
+        '''
         plt.imshow(self.vel2[:,:,0])
         plt.title("vel warp without pi shift")
         plt.colorbar()
@@ -516,7 +519,7 @@ class Disk:
         plt.colorbar()
         plt.title("vel warp without pi shift cart ")
         plt.show()
-
+        '''
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))
@@ -543,11 +546,11 @@ class Disk:
         if ii.sum() > 0:
             tempg[ii] = 2.73
             print('Beware: removed NaNs from temperature (#%s)' % ii.sum())
-
+        '''
         print("tempg min " +str(np.min(tempg)))
         print("tempg max " +str(np.max(tempg)))
         print("tempg mean " +str(np.mean(tempg)))
-
+        '''
         #print("nan chekc {t}".format(t=time.clock()-tst))
         # find photodissociation boundary layer from top
         zpht_up = np.zeros((nac,nfc))
@@ -584,24 +587,25 @@ class Disk:
                 #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
                 #else:
                 #    zice[ia,jf] = zmin
-
+        '''
         print("zpht_up min " +str(np.min(zpht_up)))
         print("zpht_up max " +str(np.max(zpht_up)))
         print("zpht_up mean " +str(np.mean(zpht_up)))
-
+        '''
         self.sig_col = sig_col
-
+        '''
         print("sig_col min " +str(np.min(sig_col)))
         print("sig_col max " +str(np.max(sig_col)))
         print("sig_col_up mean " +str(np.mean(sig_col)))
+        '''
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
-
+        '''
         plt.imshow(sig_col[:,:,0])
         plt.title("sig-col imshow")
         plt.colorbar()
         plt.show()
-
+        '''
         self.af = af
         #self.ff = ff
         #self.rf = rf
@@ -695,38 +699,51 @@ class Disk:
         #sky coordinates
         #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
-        print("nr " + str(self.nr))
+        '''as in disk_ecc to run consistency test'''
+        phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+        #print("nr " + str(self.nr))
 
         #print("nr " + str(self.nr))
         #print("nphi " + str(self.nphi))
         '''do i need the -1 or did I add that... I could put in aop here, but 
         I'm going to rely on twist_i to define rotation.'''
         #phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
-        phi = np.linspace(0, 2*np.pi, self.nphi)
-        print("nphi " + str(self.nphi))
+        #phi = np.linspace(0, 2*np.pi, self.nphi)
+        #print("nphi " + str(self.nphi))
         #z_l = self.zf
         #z_l = np.arange(self.nz)/self.nz*(-self.zmax)+s/2.
         z_l = np.linspace(self.zmin,self.zmax,self.nz)
-        print("nz " + str(self.nz))
+        #print("nz " + str(self.nz))
 
 
         '''trying meshgridding first before converting to polar to match
         set_structure method'''
 
         R_mesh, phi_mesh, Z = np.meshgrid(R, phi, z_l)
-        print("grid shape " + str(phi_mesh.shape))
-
+        #print("grid shape " + str(phi_mesh.shape))
+        '''
         plt.pcolor(R_mesh[:,:,0], phi_mesh[:,:,0], Z[:,:,0])
         plt.title('unwarped rt_polar grid')
         plt.colorbar()
         plt.show()
-
+        '''
         '''converting to xy'''
 
         warp_rt  = w_func(self, R, type="w")
         twist_rt = w_func(self, R, type="pa")
 
         X, Y = pol2cart(R_mesh, phi_mesh)
+
+        plt.plot(X[:,:,0], Y[:,:,0])
+        plt.title("X by Y")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+
+        print("X_0 " + str(X[0,0,0]))
+        print("X_-1 " + str(X[0,-1,0]))
+
+        print("Y_0 " + str(Y[0,0,0]))
+        print("Y_-1 " + str(Y[0,-1,0]))
 
         print("X shape " +str(X.shape))
         print("Y shape " +str(Y.shape))
@@ -785,12 +802,12 @@ class Disk:
 
 
         '''reshaping to play nice with rotational matrix'''
-
+        '''
         plt.pcolor(X[:,:,0], Y[:,:,0], Z[:,:,0])
         plt.title('zcf')
         plt.colorbar()
         plt.show()
-
+        '''
         #points_i = np.moveaxis([X, Y, Z], 0, 2)
         #print("points_i.shape" + str(points_i.shape))
 
@@ -800,11 +817,12 @@ class Disk:
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
         X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
-
+        '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
         plt.title("z after warp")
         plt.colorbar()
         plt.show()
+        '''
         '''now to make 3d grid:'''
 
         '''saving these because I think I can use them in rt grid'''
@@ -924,11 +942,28 @@ class Disk:
         tdiskY = (Y_w*self.costhet + Z_w*self.sinthet)
         tdiskZ = (Y_w*self.sinthet - Z_w*self.costhet)
 
+        plt.imshow(tdiskY[:,:,0])
+        plt.title("tdiskY[:,:,0]")
+
+        plt.imshow(tdiskY[:,:,-1])
+        plt.title("tdiskY[:,:,-1]")
+
+        plt.imshow(tdiskZ[:,:,0])
+        plt.title("tdiskZ[:,:,0]")
+
+        plt.imshow(tdiskZ[:,:,-1])
+        plt.title("tdiskZ[:,:,-1]")
+
+        del_tdiskY = tdiskY[0,0,-1]-tdiskY[0,0,0]
+        del_tdiskY2 = tdiskY[10,10,-1]-tdiskY[10,10,0]
+        print("on sky thickness " + str(del_tdiskY))
+        print("on sky thickness 2 " + str(del_tdiskY2))
+
         #tdiskZ = (Z.repeat(self.nz).reshape(self.nphi,self.nr,self.nz) - tdiskY*self.sinthet)*self.costhet
-        print("tdiskZ shape" + str(tdiskZ.shape))
+        #print("tdiskZ shape" + str(tdiskZ.shape))
         print("tdiskZ min " + str(np.min(tdiskZ)))
         print("tdiskZ max " + str(np.max(tdiskZ)))
-
+        '''
         plt.pcolor(tdiskY[:,:,0], tdiskZ[:,:,0], X_w[:,:,0])
         plt.pcolor(tdiskY[:,:,-1], tdiskZ[:,:,-1], X_w[:,:,0])
         plt.colorbar()
@@ -947,6 +982,7 @@ class Disk:
         #plt.ylim(-5e15, 5e15)
         plt.colorbar()
         plt.show()
+        '''
         
         if (self.thet<np.pi/2) & (self.thet>0):
             theta_crit = np.arctan((self.Aout*(1+self.ecc)+tdiskY)/(self.zmax-tdiskZ))
@@ -968,7 +1004,7 @@ class Disk:
         #S = (self.zmax-tdiskZ)/self.costhet
         #print("zmax "  + str(self.zmax))
         #print("tdiskZmax " + str(np.max(tdiskZ)))
-
+        
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
         plt.colorbar()
@@ -1000,7 +1036,7 @@ class Disk:
         tr = np.sqrt(X_w**2+tdiskY**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
         tphi = np.arctan2(tdiskY,X_w)%(2*np.pi)
-
+        '''
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ")
         plt.colorbar()
@@ -1018,6 +1054,7 @@ class Disk:
         plt.colorbar()
         plt.savefig("warp_tr.jpg")
         plt.show()
+        '''
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
         notdisk = (tr > self.Aout*(1.+self.ecc)) | (tr < self.Ain*(1-self.ecc))  # - individual grid elements not in disk
         isdisk = (tr>self.Ain*(1-self.ecc)) & (tr<self.Aout*(1+self.ecc)) & (np.abs(tdiskZ)<self.zmax)
@@ -1043,49 +1080,55 @@ class Disk:
         
         #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
+        '''
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
         print("zind len " + str(len(zind)))
-
+        '''
         #zind = self.zf
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
+        '''
         print("phiind max " + str(np.max(phiind)))
         print("phiind min " + str(np.min(phiind)))
         print("phiind len " + str(len(phiind)))
+        '''
         #phiind = self.pf
         #aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
         aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
+        '''
         print("aind max " + str(np.max(aind)))
         print("aind min " + str(np.min(aind)))
         print("aind len " + str(len(aind)))
+        '''
         #aind = self.af
 
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         
         #tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
-        print("tempg shape " + str(self.tempg.shape))
+        #print("tempg shape " + str(self.tempg.shape))
         #tT = ndimage.map_coordinates(self.tempg,[[phiind],[aind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(tdiskZ.shape)
-        print("tT shape " + str(tT.shape))
+        #print("tT shape " + str(tT.shape))
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         #tvel = ndimage.map_coordinates(self.vel,[[phiind],[aind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
-
+        '''
         plt.imshow(tT[:,:,0])
         plt.title("tT")
         plt.colorbar()
         plt.savefig("warp_vel.jpg")
         plt.show()
-
+        '''
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(tdiskZ.shape)
-
+        '''
         plt.imshow(tvel[:,:,0])
         plt.title("tvel, tdiskZ reshape")
         plt.colorbar()
         plt.savefig("warp_vel.jpg")
         plt.show()
+        '''
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
@@ -1100,13 +1143,13 @@ class Disk:
         tT[notdisk] = 0
         self.sig_col = tsig_col
 
-
+        '''
         plt.imshow(self.sig_col[:,:,0])
         plt.title("sig_col")
         plt.colorbar()
         plt.savefig("sig_col_warp.jpg")
         plt.show()
-
+        '''
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 
@@ -1286,12 +1329,12 @@ class Disk:
         dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
         dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
         dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
-        
+        '''
         plt.pcolor(self.x_polar, self.y_polar, tempg[:,:,0])
         plt.title("tempg cart")
         plt.colorbar()
         plt.show()
-
+        '''
         #numerical integration to get vertical density profile
         foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
         foo[:,:,0] = np.zeros((nac,nfc))
@@ -1299,11 +1342,12 @@ class Disk:
 
         #normalize the density profile (note: this is just half the sigma value!)
         rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        '''
         print("rho0 shape " + str(rho0.shape))
         print("rho0 min " +str(np.min(rho0)))
         print("rho0 max " +str(np.max(rho0)))
         print("rho0 mean " +str(np.mean(rho0)))
-
+        '''
         '''to see how warp affects density profile'''
 
         #plt.pcolor(x_polar, y_polar, rho0[:,:,0])
