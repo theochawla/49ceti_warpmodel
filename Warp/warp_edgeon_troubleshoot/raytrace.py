@@ -48,7 +48,6 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     nu0 = obs[1]*GHz
     Zmax = obs[5]*AU
     veloc = obs[6]*kms
-    #print("veloc shape " + str(veloc.shape))
 
 
     # - disk parameters
@@ -82,26 +81,6 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
 
-    #print("disk.vel max " + str(np.max(disk.vel)))
-    #print("disk.vel min " + str(np.min(disk.vel)))
-    #print("disk.vel mean" + str(np.mean(disk.vel)))
-
-    '''
-    plt.imshow(disk.vel[:,:,0])
-    plt.colorbar()
-    plt.savefig("diskdotvel.jpg")
-    plt.show()
-
-    print("dV max" + str(np.max(dV)))
-    print("dV min" + str(np.min(dV)))
-
-    plt.imshow(dV[:,:,0])
-    plt.colorbar()
-    plt.savefig("dV_unspiral.jpg")
-    plt.show()
-    '''
-
-    #print("dV " + str(dV))
 
     if wind:
         # add a 'wind'
@@ -111,11 +90,6 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #print(height.shape,disk.cs.shape,disk.Z.shape)
 
     Signu = SignuF1*np.exp(-dV**2/disk.dBV**2)/disk.dBV*(1.-np.exp(-(BBF2*nu)/disk.T))   # - absorbing cross section
-    #print('disk.vel shape ' + str(disk.vel.shape))
-
-    #print("Signu shape " + str(Signu.shape))
-    #print("Signu max " + str(np.max(Signu)))
-    
 
 
     Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
@@ -131,30 +105,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
 
-    #print("Snu shape " + str(Snu.shape))
-    #print("Snu mas " + str(np.max(Snu)))
-    #print("Knu shape " + str(Knu.shape))
-    #print("Knu mas " + str(np.max(Knu)))
-
     #ds = (S-np.roll(S,1,axis=2))/2.
     #arg = ds*(Knu + np.roll(Knu,1,axis=2))
     #arg[:,:,0]=0.
     #tau = arg.cumsum(axis=2)
     tau = cumtrapz(Knu,S,axis=2,initial=0)
     arg = Knu*Snu*np.exp(-tau)
-
-    #print("tau shape " + str(tau.shape))
-    #print("tau first z slice max" + str(np.max(tau[:,:,0])))
-    #print("arg shape " + str(arg.shape))
-    #print("arg first z slice max " + str(np.max(arg[:,:,0])))
-
-
-    #print("gas model output 1 max " + str(np.max(trapz(arg,S,axis=2))))
-    #print("gas model output 2 =tau ")
-    #print("gas model output 3 max " + str(np.max(cumtrapz(arg,S,axis=2,initial=0.))))
-
-    #print("S Shape " + str(S.shape))
-    #print("S min " + str(np.min(S)))
 
     return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 
@@ -398,8 +354,6 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
 
     # calculate level population
         tnl = gl*abund*disk.rhoG*np.exp(-(El/kB)/disk.T)/parZ
-        print("rhoG max " + str(np.max(disk.rhoG)))
-        print("rhoG shape " + str(disk.rhoG.shape))
         w = tnl<0
         if w.sum()>0:
             tnl[w] = 0
@@ -414,14 +368,11 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         dchans = nchans
 
 
-
     for i in range(int(dchans)):
         obs[6] = chans[i]  # - vsys
         if isgas:
             Inu,Inuz,tau_dust = gasmodel(disk,params,obs,moldat,tnl,wind,includeDust=includeDust)
         #Inu_dust,tau_dust = dustmodel(disk,freq0)
-            print("Inu shape " + str(Inu.shape))
-            print("Inu max " + str(np.max(Inu)))
             cube[:,:,i] = Inu
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
@@ -434,7 +385,6 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         cube[:,:,dchans:] = cube[:,:,-(dchans+1):-(nchans+1):-1]
         cube2[:,:,:,dchans:] = cube2[:,:,:,-(dchans+1):-(nchans+1):-1]
         cube3[:,:,:,dchans:] = cube3[:,:,:,-(dchans+1):-(nchans+1):-1]
-
 
     if extra == 1 :
         # plot tau=1 surface in central channel
@@ -479,18 +429,9 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         #hdut=fits.PrimaryHDU((imt_s).T,hdrt)
         hdut.writeto(modfile+'p_tau1.fits',overwrite=True,output_verify='fix')
 
-    print("cube max" + str(np.max(cube)))
-    print("cube shape " + str(cube.shape))
-
-    print("X max" + str(np.max(X)))
-    print("Y max " + str(np.max(Y)))
-    print("X shape " + str(X.shape))
 
     # - interpolate onto a square grid
     im = xy_interpol(cube,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
-
-    print("im max" + str(np.max(im)))
-    print("im shape " + str(im.shape))
 
     if isgas:
     # - interpolate onto velocity grid of observed star
@@ -552,10 +493,6 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         chanstep*=bin
         chans = chanmin+np.arange(nchans)*chanstep
 
-    #print("im2 " + str(im2))
-    #print("im2 max" + str(np.max(im2)))
-    #print("im2 shape " + str(im2))
-
     # - make header
     if isgas:
         if obsv is not None:
@@ -567,9 +504,6 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         hdr = write_h_cont(dd=distance,xnpix=xnpix,xpixscale=xpixscale)
     # - shift and rotate model
     im_s = ndimage.rotate(im2,90.+PA,reshape=False) #***#
-    #print("im_s " + str(im_s))
-    print("im_s max" + str(np.max(im_s)))
-    print("im_s shape " + str(im_s.shape))
 
     pixshift = np.array([-1.,1.])*offs/(3600.*np.abs([hdr['cdelt1'],hdr['cdelt2']]))
     im_s = ndimage.shift(im_s,(pixshift[0],pixshift[1],0),mode='nearest')*Jy*(xpixscale/rad)**2

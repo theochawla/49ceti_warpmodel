@@ -1,6 +1,0 @@
-raster  = 'zuleta_replica_m0.im/'
-contour = {}
-zoom    = 1
-axes    = {}
-out     = ''
-#imview( raster='zuleta_replica_m0.im/',contour={},zoom=1,axes={},out='' )

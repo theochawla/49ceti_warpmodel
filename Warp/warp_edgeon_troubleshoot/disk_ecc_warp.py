@@ -228,9 +228,6 @@ class Disk:
         #order of dimensions: a, f, z
         pcf,acf,zcf_og = np.meshgrid(pf,af,zf_og)
         pcf,acf,zcf = np.meshgrid(pf,af,zf)
-
-        print("zcf min " + str(np.min(zcf)))
-        print("zcf max " + str(np.max(zcf)))
         #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
         #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
         fcf = (pcf - self.aop) % (2*np.pi)

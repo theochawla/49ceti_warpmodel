@@ -1,0 +1,10 @@
+fitsimage         = 'faceon_spiral.fits'
+imagename         = 'faceon_spiral.image'
+whichrep          = 0
+whichhdu          = -1
+zeroblanks        = True
+overwrite         = True
+defaultaxes       = False
+defaultaxesvalues = []
+beam              = []
+#importfits( fitsimage='faceon_spiral.fits',imagename='faceon_spiral.image',whichrep=0,whichhdu=-1,zeroblanks=True,overwrite=True,defaultaxes=False,defaultaxesvalues=[],beam=[] )

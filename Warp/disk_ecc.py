@@ -646,6 +646,7 @@ class Disk:
         trhoG[notdisk] = 0
         self.rhoH2 = trhoH2
 
+        self.add_dust_ring(self.Rin,self.Rout,0.,0.,initialize=True) #initialize dust density to 0
         #print("zap {t}".format(t=time.clock()-tst))
         #temperature and turbulence broadening
         #moved this to the set_line method

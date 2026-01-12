@@ -462,7 +462,7 @@ class Disk:
         plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
-        fig.set_size_inches(5, 4)
+        fig.set_size_inches(6, 4)
         plt.savefig("siggas_pert_scaled_cart.jpg")
         plt.show()
         '''
