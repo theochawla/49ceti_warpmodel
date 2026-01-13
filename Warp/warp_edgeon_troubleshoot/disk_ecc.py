@@ -373,10 +373,40 @@ class Disk:
                 #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
                 #else:
                 #    zice[ia,jf] = zmin
+        '''
+        print("zpht_up min " +str(np.min(zpht_up)))
+        print("zpht_up max " +str(np.max(zpht_up)))
+        print("zpht_up mean " +str(np.mean(zpht_up)))
+
+        plt.imshow(self.rho0[:,:,0])
+        plt.title("rho0 bottom slice")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.rho0[:,:,-1])
+        plt.title("rho0 top slice")
+        plt.colorbar()
+        plt.show()
+        
+        plt.imshow(sig_col[:,:,0])
+        plt.title("sig_col bottom slice")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(sig_col[:,:,-1])
+        plt.title("sig_col top slice")
+        plt.colorbar()
+        plt.show()
+        '''
+        
         self.sig_col = sig_col
+        '''
+        print("sig_col min " +str(np.min(sig_col)))
+        print("sig_col max " +str(np.max(sig_col)))
+        print("sig_col_up mean " +str(np.mean(sig_col)))
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
-
+        '''
         '''
 
         szpht = zpht
@@ -453,6 +483,7 @@ class Disk:
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
+            print("True")
         else:
             zsky_max = 2*(self.zmax/self.costhet)
 
@@ -465,7 +496,7 @@ class Disk:
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         
-
+        '''
         plt.imshow(tdiskY[:,:,0])
         plt.title("tdiskY[:,:,0]")
         plt.colorbar()
@@ -495,6 +526,7 @@ class Disk:
         print("del_tdiskY 1 " + str(del_tdiskY[0,0]))
         print("del_tdiskY 1 " + str(del_tdiskY[10,10]))
         print("del_tdiskY 1 " + str(del_tdiskY[100,100]))
+        '''
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''
@@ -514,7 +546,7 @@ class Disk:
 
         print("zmax "  + str(self.zmax))
         print("tdiskZmax " + str(np.max(tdiskZ)))
-        
+        '''
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
         plt.colorbar()
@@ -524,6 +556,8 @@ class Disk:
         plt.title("S top of disk")
         plt.colorbar()
         plt.show()
+        '''
+        
         '''
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ imshow")
@@ -608,7 +642,7 @@ class Disk:
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
-        '''
+        
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
         print("zind len " + str(len(zind)))
@@ -620,7 +654,7 @@ class Disk:
         print("phiind max " + str(np.max(phiind)))
         print("phiind min " + str(np.min(phiind)))
         print("phiind len " + str(len(phiind)))
-        '''
+        
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
@@ -628,19 +662,40 @@ class Disk:
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
-        '''
+        
         plt.imshow(tT[:,:,0])
-        plt.title("tT")
+        plt.title("tT bottom of disk")
         plt.colorbar()
-        plt.savefig("nowarp_tT.jpg")
+        plt.show()
+
+        plt.imshow(tT[:,:,-1])
+        plt.title("tT top of disk")
+        plt.colorbar()
         plt.show()
 
         plt.imshow(tvel[:,:,0])
-        plt.title("tvel")
+        plt.title("tvel bottom of disk")
         plt.colorbar()
-        plt.savefig("nowarp_tvel.jpg")
         plt.show()
-        '''
+
+        plt.imshow(tvel[:,:,-1])
+        plt.title("tvel top of disk")
+        plt.colorbar()
+        plt.show()
+
+        print("in rt self.sig_col min " + str(np.min(self.sig_col)))
+        print("in rt self.sig_col max " + str(np.max(self.sig_col)))
+        print("in rt self.sig_col mean " + str(np.mean(self.sig_col)))
+
+        plt.imshow(self.sig_col[:,:,0])
+        plt.title("sig_col in rt bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,-1])
+        plt.title("sig_col in rt top of disk")
+        plt.colorbar()
+        plt.show()
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
@@ -649,13 +704,27 @@ class Disk:
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
-        '''
-        plt.imshow(tsig_col[:,:,0])
-        plt.title("tsig_col")
+        
+        plt.imshow(zpht_up[:,:,0])
+        plt.title("zpht_up bottom of disk")
         plt.colorbar()
-        plt.savefig("nowarp_tsig_col.jpg")
         plt.show()
-        '''
+
+        plt.imshow(zpht_up[:,:,-1])
+        plt.title("zpht_up top of disk")
+        plt.colorbar()
+        plt.show()
+        
+        plt.imshow(tsig_col[:,:,0])
+        plt.title("tsig_col bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(tsig_col[:,:,-1])
+        plt.title("tsig_col top of disk")
+        plt.colorbar()
+        plt.show()
+        
         self.sig_col = tsig_col
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
@@ -819,7 +888,14 @@ class Disk:
         nzc = grid['nzc']
         rcf = grid['rcf']
         zcf = grid['zcf']
+        print("zcf max " + str(np.max(zcf)))
+        print("zcf min " + str(np.min(zcf)))
         dz = (zcf - np.roll(zcf,1))#,axis=2))
+
+        print("dz max " + str(np.max(dz)))
+        print("dz min " + str(np.min(dz)))
+        print("dz shape " + str(dz.shape))
+
 
         #compute rho structure
         rho0 = np.zeros((nac,nfc,nzc))
@@ -830,7 +906,8 @@ class Disk:
 
         #t1 = time.clock()
         #differential equation for vertical density profile
-        dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
+        dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz\
+    
         dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
         dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
 
