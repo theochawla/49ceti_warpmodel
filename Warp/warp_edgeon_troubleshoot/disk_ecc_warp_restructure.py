@@ -572,6 +572,8 @@ class Disk:
 
         R_mesh, phi_mesh, Z = np.meshgrid(R, phi, z_l)
         #print("grid shape " + str(phi_mesh.shape))
+        #fcf = (pcf - self.aop) % (2*np.pi)
+        #phi_mesh_aop = (phi_mesh - self.aop) % (2*np.pi)
         '''
         plt.pcolor(R_mesh[:,:,0], phi_mesh[:,:,0], Z[:,:,0])
         plt.title('unwarped rt_polar grid')
