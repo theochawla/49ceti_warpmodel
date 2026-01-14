@@ -222,7 +222,8 @@ class Disk:
         nzc = int(2.5*nac)#nac*5           # - number of unique z points
         '''defining z-array: .1 AU to specified max value in AU. logarithmic. number specified by
         # of annuli'''
-        zmin = .1*Disk.AU      # - minimum z [AU]
+        #zmin = .1*Disk.AU      # - minimum z [AU]
+        zmin = -self.zmax      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
         '''putting into linspace for now to compare to warp model'''
         af = np.linspace(amin,amax,nac)
@@ -584,11 +585,6 @@ class Disk:
 
         X, Y = pol2cart(R_mesh, phi_mesh)
 
-        plt.plot(X[:,:,0], Y[:,:,0])
-        plt.title("X by Y")
-        plt.xlabel("X")
-        plt.ylabel("Y")
-
         print("X_0 " + str(X[0,0,0]))
         print("X_-1 " + str(X[0,-1,0]))
 
@@ -801,12 +797,40 @@ class Disk:
             print("normal zsky_w True")
 
 
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
+        plt.colorbar()
+        plt.title("Warp, disk coordinates")
+        plt.show()
+
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], zsky_w[:,:,0])
+        plt.colorbar()
+        plt.title("warp zsky")
+        plt.show()
         #tdiskY = (Y_w*self.costhet - Z_w*self.sinthet)
         #tdiskZ = (Y_w*self.sinthet + Z_w*self.costhet)
         #no way this works
 
-        tdiskY = (Y_w*self.costhet + zsky_w*self.sinthet)
+        tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
         tdiskZ = (Y_w*self.sinthet - zsky_w*self.costhet)
+
+        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
+        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
+        plt.colorbar()
+        plt.title("Warp on sky")
+        plt.xlim(-4.5e15, 4.5e15)
+        plt.ylim(-4.5e15, 4.5e15)
+        plt.show()
+
+        tdiskY_nosky = (Y_w*self.costhet - Z_w*self.sinthet)
+        tdiskZ_nosky = (Y_w*self.sinthet + Z_w*self.costhet)
+        
+        plt.pcolor(X_w[:,:,-1], tdiskY_nosky[:,:,-1], tdiskZ_nosky[:,:,-1])
+        plt.pcolor(X_w[:,:,0], tdiskY_nosky[:,:,0], tdiskZ_nosky[:,:,0])
+        plt.colorbar()
+        plt.title("Warp on sky, og tdiskZ")
+        plt.xlim(-4.5e15, 4.5e15)
+        plt.ylim(-4.5e15, 4.5e15)
+        plt.show()
         '''
         plt.imshow(tdiskY[:,:,0])
         plt.title("tdiskY[:,:,0]")
@@ -957,10 +981,12 @@ class Disk:
         #xind = np.interp(tr.flatten(),self.rf,range(self.nrc)) #rf,nrc
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
+
+        zf_new = np.linspace(-self.zmax, self.zmax, self.nzc)
         
-        zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
-        #zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
-        #zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
+        #zind = np.interp(tdiskZ.flatten(),zf_new,range(self.nzc)) #zf,nzc
+        #zind = np.interp(tdiskZ.flatten(),z_l,range(self.nz)) #zf,nzc
+        zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
         
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
@@ -1290,9 +1316,18 @@ class Disk:
         nzc = grid['nzc']
         rcf = grid['rcf']
         zcf = grid['zcf']
+        midpoint = int(round(nzc/2))
+        zcf_tophalf = zcf[:,:,midpoint:-1]
+        rcf_tophalf = rcf[:,:,midpoint:-1]
+
+        tempg_tophalf = tempg[:,:,midpoint:-1]
+        #siggas_tophalf = siggas[:,:,0:midpoint]
+        
         print("zcf max " + str(np.max(zcf)))
         print("zcf min " + str(np.min(zcf)))
-        dz = (zcf - np.roll(zcf,1))#,axis=2))
+        print("zcf tophalf max " + str(np.max(zcf_tophalf)))
+        print("zcf tophalf min " + str(np.min(zcf_tophalf)))
+        dz = (zcf_tophalf - np.roll(zcf_tophalf,1))#,axis=2))
 
         print("dz max " + str(np.max(dz)))
         print("dz min " + str(np.min(dz)))
@@ -1308,10 +1343,10 @@ class Disk:
 
         #t1 = time.clock()
         #differential equation for vertical density profile
-        dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz\
+        dlnT = (np.log(tempg_tophalf)-np.roll(np.log(tempg_tophalf),1,axis=2))/dz
     
-        dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
-        dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        dlnp = -1.*grvc*zcf_tophalf/(tempg_tophalf*(rcf_tophalf**2+zcf_tophalf**2)**1.5)-dlnT
+        dlnp[:,:,0] = -1.*grvc*zcf_tophalf[:,:,0]/(tempg_tophalf[:,:,0]*(rcf_tophalf[:,:,0]**2.+zcf_tophalf[:,:,0]**2.)**1.5)
 
         #numerical integration to get vertical density profile
         foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
@@ -1319,9 +1354,20 @@ class Disk:
         lnp = foo.cumsum(axis=2)
 
         #normalize the density profile (note: this is just half the sigma value!)
-        rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        rho0_tophalf = 0.5*((sigint/np.trapz(np.exp(lnp),zcf_tophalf,axis=2))[:,:,np.newaxis]*np.ones(midpoint-1))*np.exp(lnp)
+        rho0[:,:,midpoint:-1] = rho0_tophalf
+
+        rho0_bottomhalf = rho0_tophalf.flatten()[::-1].reshape(nac,nfc,midpoint-1)
+        rho0[:,:,0:midpoint-1] = rho0_bottomhalf
+
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
+
+        '''from disk.py'''
+        
+        #gaussian profile 
+        #hr = np.sqrt(2*T[0]*rf[ir]**3./grvc)
+        #dens = sigint[ir]/(np.sqrt(np.pi)*hr)*np.exp(-(z/hr)**2.)
 
         #print('Doing hydrostatic equilibrium')
         #t1 = time.clock()
