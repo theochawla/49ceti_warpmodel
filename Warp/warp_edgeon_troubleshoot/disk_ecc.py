@@ -471,6 +471,7 @@ class Disk:
         plt.title("X by Y")
         plt.xlabel("X")
         plt.ylabel("Y")
+        plt.show()
 
         print("X shape " + str(X.shape))
 
@@ -495,6 +496,14 @@ class Disk:
         '''are these z & y projected onto sky plane..?'''
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
+
+        plt.pcolor(X, tdiskY[:,:,0], tdiskZ[:,:,0])
+        plt.pcolor(X, tdiskY[:,:,-1], tdiskZ[:,:,-1])
+        plt.colorbar()
+        plt.title("Disk on sky")
+        plt.xlim(-4.5e15, 4.5e15)
+        plt.ylim(-4.5e15, 4.5e15)
+        plt.show()
         
         '''
         plt.imshow(tdiskY[:,:,0])
@@ -662,6 +671,18 @@ class Disk:
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
+        plt.show()
+
+        plt.pcolor(X, tdiskY[:,:,0], tT[:,:,0])
+        plt.pcolor(X, tdiskY[:,:,-1], tT[:,:,-1])
+        plt.title("tT, top and bottom")
+        plt.show()
+
+        plt.pcolor(X, tdiskY[:,:,0], tvel[:,:,0])
+        plt.pcolor(X, tdiskY[:,:,-1], tvel[:,:,-1])
+        plt.title("tvel, top and bottom")
+        plt.show()
+
         
         plt.imshow(tT[:,:,0])
         plt.title("tT bottom of disk")
@@ -722,6 +743,12 @@ class Disk:
 
         plt.imshow(tsig_col[:,:,-1])
         plt.title("tsig_col top of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.pcolor(X, tdiskY[:,:,0], tsig_col[:,:,0])
+        plt.pcolor(X, tdiskY[:,:,-1], tsig_col[:,:,-1])
+        plt.title("Cart tsig top & bottom")
         plt.colorbar()
         plt.show()
         

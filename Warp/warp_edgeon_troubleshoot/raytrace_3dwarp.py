@@ -23,6 +23,11 @@ kms = 1e5          # - convert km/s to cm/s
 GHz = 1e9          # - convert from GHz to Hz
 
 def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
+    '''theo--
+    something here must be inheriting warp structure, and I think it's loading in cube in 
+    sky plane instead of disk plane... '''
+
+
     '''Given a disk object, calculate the radiative transfer.
     Return image stack with each slice corresponding to a different velocity channel
     :param disk:
@@ -74,12 +79,16 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     # - Calculate source function and absorbing coefficient
     try:
         disk.ecc
+        print("disk.ecc is being used ")
     except:
         #Non-eccentric models define disk.Omg
         dV = veloc + (handed*np.sin(thet)*disk.Omg*disk.X[:,:,np.newaxis]*np.ones(nz))
+        print("disk.Omg is being used")
     else:
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
+        print("disk.vel is being used")
+        print("disk.vel shape " + str(disk.vel.shape))
 
 
     if wind:
@@ -311,8 +320,12 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
     '''just trying this for now: maybe X and Y need to be 2d for current version of this code. trying bottom slice of disk.'''
     #X = disk.X
     #Y = disk.Y
-    X = disk.X[:,:,50]
-    Y = disk.Y[:,:,50]
+    '''trying to define X & Y in terms of unwarped disk coordinates...'''
+    R = np.linspace(0,disk.Aout*(1+disk.ecc),disk.nr) #******* not on cluster*** #
+    phi = np.arange(disk.nphi)*2*np.pi/(disk.nphi-1)
+    X = (np.outer(R,np.cos(phi))).transpose()
+    Y = (np.outer(R,np.sin(phi))).transpose()
+
 
     if isgas:
     # approximation for partition function
@@ -377,9 +390,25 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             Inu,Inuz,tau_dust = gasmodel(disk,params,obs,moldat,tnl,wind,includeDust=includeDust)
         #Inu_dust,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu
+            
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
+            if i==1:
+                plt.imshow(cube[:,:,i])
+                plt.colorbar()
+                plt.title("cube i=1 slice (Inu)")
+                plt.show()
+
+                plt.imshow(cube2[:,:,50,i])
+                plt.colorbar()
+                plt.title("cube2 i=1 0 slice (Inuz)")
+                plt.show()
+
+                plt.imshow(cube3[:,:,50,i])
+                plt.colorbar()
+                plt.title("cube3 i=1 0 slice (tau_dust)")
+                plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu
@@ -435,6 +464,11 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
 
     # - interpolate onto a square grid
     im = xy_interpol(cube,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
+
+    plt.imshow(im[:,:,0])
+    plt.colorbar()
+    plt.title("im")
+    plt.show()
 
     if isgas:
     # - interpolate onto velocity grid of observed star
