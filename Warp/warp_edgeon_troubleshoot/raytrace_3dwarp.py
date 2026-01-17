@@ -90,6 +90,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         print("disk.vel is being used")
         print("disk.vel shape " + str(disk.vel.shape))
 
+        plt.imshow(disk.vel[:,:,0])
+        plt.title("disk.vel bottom of disk")
+        plt.colorbar()
+        plt.show()
+
 
     if wind:
         # add a 'wind'

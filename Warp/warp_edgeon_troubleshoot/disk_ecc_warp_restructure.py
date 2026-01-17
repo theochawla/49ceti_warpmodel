@@ -222,8 +222,8 @@ class Disk:
         nzc = int(2.5*nac)#nac*5           # - number of unique z points
         '''defining z-array: .1 AU to specified max value in AU. logarithmic. number specified by
         # of annuli'''
-        #zmin = .1*Disk.AU      # - minimum z [AU]
-        zmin = -self.zmax      # - minimum z [AU]
+        zmin = .1*Disk.AU      # - minimum z [AU]
+        #zmin = -self.zmax      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
         '''putting into linspace for now to compare to warp model'''
         af = np.linspace(amin,amax,nac)
@@ -812,8 +812,8 @@ class Disk:
         #tdiskZ = (Y_w*self.sinthet + Z_w*self.costhet)
         #no way this works
 
-        tdiskY = (Y_w*self.costhet - zsky_w*self.sinthet)
-        tdiskZ = (Y_w*self.sinthet + zsky_w*self.costhet)
+        tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
+        tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
 
         plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
         plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
@@ -843,7 +843,7 @@ class Disk:
         plt.title("tdiskY[:,:,-1]")
         plt.colorbar()
         plt.show()
-
+        '''
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ[:,:,0]")
         plt.colorbar()
@@ -853,6 +853,7 @@ class Disk:
         plt.title("tdiskZ[:,:,-1]")
         plt.colorbar()
         plt.show()
+        '''
 
         del_tdiskY = tdiskY[:,:,-1]-tdiskY[:,:,0]
         plt.imshow(del_tdiskY)
@@ -985,10 +986,29 @@ class Disk:
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
 
+
         zf_new = np.linspace(-self.zmax, self.zmax, self.nzc)
+        z_w_skymax = np.max(zsky_w)
+        zf_sky = np.linspace(-z_w_skymax, z_w_skymax, self.nzc)
+
+        zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        #print("nzc " + str(self.nzc))
+
+        #print("flattened tdiskZ first 10 " + str(tdiskZ[0:10]))
+        #print("flattened tdiskZ last 10 " + str(tdiskZ[-10:-1]))
+
+        print("zf first 10 " + str(self.zf[0:10]))
+        print("zf last 10 " + str(self.zf[-10:-1]))
         
-        #zind = np.interp(tdiskZ.flatten(),zf_new,range(self.nzc)) #zf,nzc
-        zind = np.interp(tdiskZ.flatten(),z_l,range(self.nz)) #zf,nzc
+        #zind = np.interp(tdiskZ.flatten(),zf_new,range(self.nzc)) #zf,nz
+
+        zind_shaped = zind.reshape(tdiskZ.shape)
+
+        plt.imshow(zind_shaped[:,:,0])
+        plt.title("zind shaped")
+        plt.colorbar()
+        plt.show()
+        #zind = np.interp(tdiskZ.flatten(),z_l,range(self.nz)) #zf,nzc
         #zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
         #zind = np.interp(tdiskZ_nosky.flatten(),self.zf,range(self.nzc)) #zf,nzc
         
@@ -998,14 +1018,29 @@ class Disk:
         
         #zind = self.zf
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
+
+        phiind_shaped = phiind.reshape(tphi.shape)
+
+        plt.imshow(phiind_shaped[:,:,0])
+        plt.title("phiind shaped")
+        plt.colorbar()
+        plt.show()
         
         print("phiind max " + str(np.max(phiind)))
         print("phiind min " + str(np.min(phiind)))
         print("phiind len " + str(len(phiind)))
     
         #phiind = self.pf
-        #aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
-        aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
+        aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        #aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
+
+        aind_shaped = aind.reshape(tr.shape)
+
+        plt.imshow(aind_shaped[:,:,0])
+        plt.title("aind shaped")
+        plt.colorbar()
+        plt.show()
+
         
         print("aind max " + str(np.max(aind)))
         print("aind min " + str(np.min(aind)))
@@ -1075,6 +1110,21 @@ class Disk:
 
         plt.imshow(self.sig_col[:,:,0])
         plt.title("sig_col in rt bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,500])
+        plt.title("sig_col in rt top of disk 500")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,100])
+        plt.title("sig_col in rt top of disk 100")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,25])
+        plt.title("sig_col in rt top of disk 25")
         plt.colorbar()
         plt.show()
 

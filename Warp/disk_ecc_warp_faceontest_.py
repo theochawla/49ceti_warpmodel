@@ -1143,13 +1143,13 @@ class Disk:
         tT[notdisk] = 0
         self.sig_col = tsig_col
 
-        '''
+        
         plt.imshow(self.sig_col[:,:,0])
         plt.title("sig_col")
         plt.colorbar()
         plt.savefig("sig_col_warp.jpg")
         plt.show()
-        '''
+        
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 

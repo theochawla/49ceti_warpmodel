@@ -515,7 +515,7 @@ class Disk:
         plt.title("tdiskY[:,:,-1]")
         plt.colorbar()
         plt.show()
-
+        
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ[:,:,0]")
         plt.colorbar()
@@ -525,7 +525,7 @@ class Disk:
         plt.title("tdiskZ[:,:,-1]")
         plt.colorbar()
         plt.show()
-
+        
         del_tdiskY = tdiskY[:,:,-1]-tdiskY[:,:,0]
         plt.imshow(del_tdiskY)
         plt.colorbar()
@@ -648,9 +648,50 @@ class Disk:
         #xind = np.interp(tr.flatten(),self.rf,range(self.nrc)) #rf,nrc
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
+        
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+
+        print("nzc " + str(self.nzc))
+
+        print("flattened tdiskZ first 10 " + str(tdiskZ[0:10]))
+        print("flattened tdiskZ last 10 " + str(tdiskZ[-10:-1]))
+
+        print("zf first 10 " + str(self.zf[0:10]))
+        print("zf last 10 " + str(self.zf[-10:-1]))
+
+        zind_shaped = zind.reshape(tdiskZ.shape)
+
+        plt.imshow(zind_shaped[:,:,0])
+        plt.title("zind shaped")
+        plt.colorbar()
+        plt.show()
+
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+
+        #phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
+
+        phiind_shaped = phiind.reshape(tphi.shape)
+
+        plt.imshow(phiind_shaped[:,:,0])
+        plt.title("phiind shaped")
+        plt.colorbar()
+        plt.show()
+        
+        print("phiind max " + str(np.max(phiind)))
+        print("phiind min " + str(np.min(phiind)))
+        print("phiind len " + str(len(phiind)))
+    
+        #phiind = self.pf
+        #aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        #aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
+
+        aind_shaped = aind.reshape(tr.shape)
+
+        plt.imshow(aind_shaped[:,:,0])
+        plt.title("aind shaped")
+        plt.colorbar()
+        plt.show()
         
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
@@ -710,6 +751,21 @@ class Disk:
 
         plt.imshow(self.sig_col[:,:,0])
         plt.title("sig_col in rt bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,500])
+        plt.title("sig_col in rt top of disk 500")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,100])
+        plt.title("sig_col in rt top of disk 100")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(self.sig_col[:,:,25])
+        plt.title("sig_col in rt top of disk 25")
         plt.colorbar()
         plt.show()
 
