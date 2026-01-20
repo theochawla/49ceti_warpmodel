@@ -23,11 +23,6 @@ kms = 1e5          # - convert km/s to cm/s
 GHz = 1e9          # - convert from GHz to Hz
 
 def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
-    '''theo--
-    something here must be inheriting warp structure, and I think it's loading in cube in 
-    sky plane instead of disk plane... '''
-
-
     '''Given a disk object, calculate the radiative transfer.
     Return image stack with each slice corresponding to a different velocity channel
     :param disk:
@@ -85,10 +80,6 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     else:
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
-        plt.imshow(disk.vel[:,:,0])
-        plt.title("disk.vel bottom of disk")
-        plt.colorbar()
-        plt.show()
 
 
     if wind:
@@ -386,27 +377,10 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
-        if i==1:
-                plt.imshow(cube[:,:,i])
-                plt.colorbar()
-                plt.title("cube i=1 slice (Inu)")
-                plt.show()
-
-                plt.imshow(cube2[:,:,50,i])
-                plt.colorbar()
-                plt.title("cube2 i=1 0 slice (Inuz)")
-                plt.show()
-
-                plt.imshow(cube3[:,:,50,i])
-                plt.colorbar()
-                plt.title("cube3 i=1 0 slice (tau_dust)")
-                plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu
             cube2[:,:,:,i] = tau_dust
-
-        
     if flipme:
         cube[:,:,dchans:] = cube[:,:,-(dchans+1):-(nchans+1):-1]
         cube2[:,:,:,dchans:] = cube2[:,:,:,-(dchans+1):-(nchans+1):-1]
@@ -458,11 +432,6 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
 
     # - interpolate onto a square grid
     im = xy_interpol(cube,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
-
-    plt.imshow(im[:,:,0])
-    plt.colorbar()
-    plt.title("im")
-    plt.show()
 
     if isgas:
     # - interpolate onto velocity grid of observed star
