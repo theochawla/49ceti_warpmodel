@@ -1278,13 +1278,16 @@ class Disk:
         # store disk
 
         '''originally, I think these parameters were X, Y, and tdiskZ?'''
-        self.X = X_w
-        self.Y = Y_w
-        self.X_unwarp = X
-        self.Y_unwarp = Y
-        self.tY = tdiskY
-        self.Z = tdiskZ
-        print()
+        #self.X = X_w
+        #self.Y = Y_w
+        #self.X_unwarp = X
+        #self.Y_unwarp = Y
+        self.X = X
+        self.Y = tdiskY_unwarped
+        #self.tY = tdiskY
+        #self.tY_unwarp = tdiskY_unwarped
+        #self.tZ_unwarp = tdiskZ_unwarped
+        self.Z = tdiskZ_unwarped
         self.S = S
         #self.r = tr
         self.T = tT

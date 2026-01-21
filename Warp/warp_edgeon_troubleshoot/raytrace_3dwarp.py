@@ -323,13 +323,13 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
     cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
     cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
     '''just trying this for now: maybe X and Y need to be 2d for current version of this code. trying bottom slice of disk.'''
-    #X = disk.X
-    #Y = disk.Y
+    X = disk.X[:,:,150]
+    Y = disk.Y[:,:,150]
     '''trying to define X & Y in terms of unwarped disk coordinates...'''
-    R = np.linspace(0,disk.Aout*(1+disk.ecc),disk.nr) #******* not on cluster*** #
-    phi = np.arange(disk.nphi)*2*np.pi/(disk.nphi-1)
-    X = (np.outer(R,np.cos(phi))).transpose()
-    Y = (np.outer(R,np.sin(phi))).transpose()
+    #R = np.linspace(0,disk.Aout*(1+disk.ecc),disk.nr) #******* not on cluster*** #
+    #phi = np.arange(disk.nphi)*2*np.pi/(disk.nphi-1)
+    #X = (np.outer(R,np.cos(phi))).transpose()
+    #Y = (np.outer(R,np.sin(phi))).transpose()
 
 
     if isgas:
