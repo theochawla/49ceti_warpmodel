@@ -305,6 +305,7 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
     #tchans = chans.astype('|S6') # - convert channel names to string
 
     # extract disk structure from Disk object
+
     cube=np.zeros((disk.nphi,disk.nr,nchans))
     cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
     cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
@@ -377,6 +378,21 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
+            if i==1:
+                plt.imshow(cube[:,:,i])
+                plt.colorbar()
+                plt.title("cube i=1 slice (Inu)")
+                plt.show()
+
+                plt.imshow(cube2[:,:,50,i])
+                plt.colorbar()
+                plt.title("cube2 i=1 0 slice (Inuz)")
+                plt.show()
+
+                plt.imshow(cube3[:,:,50,i])
+                plt.colorbar()
+                plt.title("cube3 i=1 0 slice (tau_dust)")
+                plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu
@@ -404,7 +420,23 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             ztau1tot[:,:,i] = findtau1(disk,cube2[:,:,:,i],cube[:,:,i],cube3[:,:,:,i],flag=extra-3)
             #ztau1tot[:,:,i] = cube2[:,:,290,i]*Disk.AU
         #now create images of ztau1, similar to images of intensity
+        plt.imshow(ztau[:,:,0])
+        plt.title("ztau 0")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(ztau[:,:,-1])
+        plt.title("ztau -1")
+        plt.colorbar()
+        plt.show()
+
         imt = xy_interpol(ztau1tot,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
+
+        plt.imshow(imt[:,:,0])
+        plt.title("imt 0")
+        plt.colorbar()
+        plt.show()
+
         imt[np.isnan(imt)]=-170*disk.AU
         velo = chans+vsys
         if obsv is not None:
@@ -601,12 +633,28 @@ def xy_interpol(cube,dec,ra,xnpix,imres,flipme=0):
     nphi = thing[0]
     nr = thing[1]
     sY = ( ((np.arange(npix[1])+0.5)*imres-imres*npix[1]/2.)[:,np.newaxis]*np.ones(nx)).transpose()
+    plt.imshow(sY)
+    plt.colorbar()
+    plt.title("sY")
+    plt.show()
     sX = ((np.arange(npix[0])+0.5)*imres-imres*npix[0]/2.).repeat(ny).reshape(nx,ny)
+    plt.imshow(sX)
+    plt.colorbar()
+    plt.title("sX")
+    plt.show()
     dx = sX[1,0] - sX[0,0]
     dy = sY[0,1] - sY[0,0]
 
     pR = np.sqrt(sX**2+sY**2)
+    plt.imshow(pR)
+    plt.colorbar()
+    plt.title("pR")
+    plt.show()
     pPhi = np.arccos(sX/pR)
+    plt.imshow(pPhi)
+    plt.colorbar()
+    plt.title("pPhi")
+    plt.show()
     pPhi[(sY <=0)] = 2*np.pi - pPhi[(sY <= 0)]
     pPhi = pPhi.flatten()
     pR = pR.flatten()
@@ -617,6 +665,10 @@ def xy_interpol(cube,dec,ra,xnpix,imres,flipme=0):
     # - do interpolation
     iR = np.interp(pR,r,range(nr))
     iPhi = np.interp(pPhi,phi,range(nphi))
+
+    plt.plot(r, phi)
+    plt.title("r, phi")
+    plt.show()
 
     if flipme:
         dchans = nchans/2. + 0.5
@@ -679,6 +731,9 @@ def findtau1(disk,tau,Inu,cube3,flag=0.):
             #    ztau1[iphi,ir] = -170*disk.AU
             #if (iphi % 50 ==0) & (ir %50==0):
             #    print(tau[iphi,ir,-1],ztau1[iphi,ir]/disk.AU)
+    plt.imshow(ztau1)
+    plt.title("ztau1")
+    plt.show()
     return ztau1
 #c18o 2-1: 4.1e-5
 #13co 2-1: 5.1e-5

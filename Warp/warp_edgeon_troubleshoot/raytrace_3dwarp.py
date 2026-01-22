@@ -87,13 +87,14 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     else:
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
-        print("disk.vel is being used")
-        print("disk.vel shape " + str(disk.vel.shape))
-
+        #print("disk.vel is being used")
+        #print("disk.vel shape " + str(disk.vel.shape))
+        '''
         plt.imshow(disk.vel[:,:,0])
         plt.title("disk.vel bottom of disk")
         plt.colorbar()
         plt.show()
+        '''
 
 
     if wind:
@@ -107,6 +108,8 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
 
     Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
+    print("Knu shape " + str(Knu.shape))
+
     if includeDust and disk.rhoD is not None:
         Knu_dust = disk.kap*disk.rhoD      # - dust absorbing coefficient
     else:
@@ -400,17 +403,22 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
             if i==1:
-                plt.imshow(cube[:,:,i])
+                plt.imshow(np.log10(cube[:,:,i]))
                 plt.colorbar()
                 plt.title("cube i=1 slice (Inu)")
                 plt.show()
 
-                plt.imshow(cube2[:,:,50,i])
+                plt.imshow(np.log10(cube[:,:,i+5]))
+                plt.colorbar()
+                plt.title("cube i=6 slice (Inu)")
+                plt.show()
+
+                plt.imshow(np.log10(cube2[:,:,50,i]))
                 plt.colorbar()
                 plt.title("cube2 i=1 0 slice (Inuz)")
                 plt.show()
 
-                plt.imshow(cube3[:,:,50,i])
+                plt.imshow(np.log10(cube3[:,:,50,i]))
                 plt.colorbar()
                 plt.title("cube3 i=1 0 slice (tau_dust)")
                 plt.show()
@@ -441,7 +449,24 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             ztau1tot[:,:,i] = findtau1(disk,cube2[:,:,:,i],cube[:,:,i],cube3[:,:,:,i],flag=extra-3)
             #ztau1tot[:,:,i] = cube2[:,:,290,i]*Disk.AU
         #now create images of ztau1, similar to images of intensity
+        
+        plt.imshow(ztau[:,:,0])
+        plt.title("ztau 0")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(ztau[:,:,-1])
+        plt.title("ztau -1")
+        plt.colorbar()
+        plt.show()
+
         imt = xy_interpol(ztau1tot,X*arcsec,Y*arcsec,xnpix=xnpix,imres=imres,flipme=flipme)
+
+        plt.imshow(imt[:,:,0])
+        plt.title("imt 0")
+        plt.colorbar()
+        plt.show()
+
         imt[np.isnan(imt)]=-170*disk.AU
         velo = chans+vsys
         if obsv is not None:
@@ -459,6 +484,7 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             hdrt=write_h(nchans=nchans,dd=distance,xnpix=xnpix,xpixscale=xpixscale,lstep=chanstep,vmin=velo[0])
         #imt2[np.isnan(imt2)] = -170*disk.AU
         #imt2[np.isinf(imt2)] = -170*disk.AU
+        '''this is where position angle rotation happens'''
         imt_s=ndimage.rotate(imt2,90.+PA,reshape=False)
         pixshift=np.array([-1.,1.])*offs/(3600.*np.abs([hdrt['cdelt1'],hdrt['cdelt2']]))
         imt_s = ndimage.shift(imt_s,(pixshift[0],pixshift[1],0),mode='nearest')
@@ -643,18 +669,47 @@ def xy_interpol(cube,dec,ra,xnpix,imres,flipme=0):
     nphi = thing[0]
     nr = thing[1]
     sY = ( ((np.arange(npix[1])+0.5)*imres-imres*npix[1]/2.)[:,np.newaxis]*np.ones(nx)).transpose()
+    
+    plt.imshow(sY)
+    plt.colorbar()
+    plt.title("sY")
+    plt.show()
+    
     sX = ((np.arange(npix[0])+0.5)*imres-imres*npix[0]/2.).repeat(ny).reshape(nx,ny)
+
+    plt.imshow(sX)
+    plt.colorbar()
+    plt.title("sX")
+    plt.show()
+
     dx = sX[1,0] - sX[0,0]
     dy = sY[0,1] - sY[0,0]
 
     pR = np.sqrt(sX**2+sY**2)
+
+    plt.imshow(pR)
+    plt.colorbar()
+    plt.title("pR")
+    plt.show()
+
     pPhi = np.arccos(sX/pR)
+
+    plt.imshow(pPhi)
+    plt.colorbar()
+    plt.title("pPhi")
+    plt.show()
+
     pPhi[(sY <=0)] = 2*np.pi - pPhi[(sY <= 0)]
     pPhi = pPhi.flatten()
     pR = pR.flatten()
 
     r = (np.sqrt(dec*dec+ra*ra))[0,:]
+
     phi = np.arange(nphi)*2*np.pi/(nphi-1)
+    
+    plt.plot(r, phi)
+    plt.title("r, phi")
+    plt.show()
 
     # - do interpolation
     iR = np.interp(pR,r,range(nr))
@@ -699,7 +754,9 @@ def findtau1(disk,tau,Inu,cube3,flag=0.):
     r = disk.r
     nr = disk.nr
     nphi = disk.nphi
-    phi = np.arange(nphi)*2*np.pi/(nphi-1)
+    #phi = np.arange(nphi)*2*np.pi/(nphi-1)
+    '''trying adjusting phi coordinates used to reference disk'''
+    phi = disk.phi
     z=disk.Z
 
     ztau1=np.zeros((nphi,nr))
@@ -721,6 +778,9 @@ def findtau1(disk,tau,Inu,cube3,flag=0.):
             #    ztau1[iphi,ir] = -170*disk.AU
             #if (iphi % 50 ==0) & (ir %50==0):
             #    print(tau[iphi,ir,-1],ztau1[iphi,ir]/disk.AU)
+    plt.imshow(ztau1)
+    plt.title("ztau1")
+    plt.show() 
     return ztau1
 #c18o 2-1: 4.1e-5
 #13co 2-1: 5.1e-5

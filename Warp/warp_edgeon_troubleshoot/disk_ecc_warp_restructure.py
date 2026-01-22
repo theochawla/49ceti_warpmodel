@@ -986,6 +986,7 @@ class Disk:
         S -= S[isdisk].min() #Reset the min S to 0
         #xydisk =  tr[:,:,0] <= self.Aout*(1.+self.ecc)+Smax*self.sinthet  # - tracing outline of disk on observer xy plane
         self.r = tr
+        self.phi = tphi
 
 
 
@@ -1105,10 +1106,10 @@ class Disk:
         plt.title("tT, top and bottom no sky")
         plt.show()
         '''
-        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tT[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tT[:,:,-1])
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tT[:,:,0])
+        #plt.pcolor(X_w[:,:,-1], Y_w[:,:,-1], tT[:,:,-1])
         plt.colorbar()
-        plt.title("tT, top and bottom")
+        plt.title("tT, top and bottom, disk_coord")
         plt.show()
         #print("tT shape " + str(tT.shape))
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
@@ -1128,8 +1129,8 @@ class Disk:
         
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
 
-        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tvel[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tvel[:,:,-1])
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tvel[:,:,0])
+        #plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tvel[:,:,-1])
         plt.title("tvel, top and bottom")
         plt.show()
         
@@ -1212,8 +1213,8 @@ class Disk:
         plt.colorbar()
         plt.show()
 
-        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tsig_col[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tsig_col[:,:,-1])
+        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tsig_col[:,:,0])
+        #plt.pcolor(X_w[:,:,-1], Y_w[:,:,-1], tsig_col[:,:,-1])
         plt.title("Cart tsig top & bottom")
         plt.colorbar()
         plt.show()
@@ -1278,16 +1279,16 @@ class Disk:
         # store disk
 
         '''originally, I think these parameters were X, Y, and tdiskZ?'''
-        #self.X = X_w
-        #self.Y = Y_w
-        #self.X_unwarp = X
-        #self.Y_unwarp = Y
-        self.X = X
-        self.Y = tdiskY_unwarped
-        #self.tY = tdiskY
-        #self.tY_unwarp = tdiskY_unwarped
-        #self.tZ_unwarp = tdiskZ_unwarped
-        self.Z = tdiskZ_unwarped
+        self.X = X_w
+        self.Y = Y_w
+        self.X_unwarp = X
+        self.Y_unwarp = Y
+        #self.X = X
+        #self.Y = tdiskY_unwarped
+        self.tY = tdiskY
+        self.tY_unwarp = tdiskY_unwarped
+        self.tZ_unwarp = tdiskZ_unwarped
+        self.Z = tdiskZ
         self.S = S
         #self.r = tr
         self.T = tT
