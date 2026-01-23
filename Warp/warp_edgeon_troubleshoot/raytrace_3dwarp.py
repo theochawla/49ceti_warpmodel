@@ -326,13 +326,13 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
     cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
     cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
     '''just trying this for now: maybe X and Y need to be 2d for current version of this code. trying bottom slice of disk.'''
-    X = disk.X[:,:,150]
-    Y = disk.Y[:,:,150]
+    #X = disk.X[:,:,150]
+    #Y = disk.Y[:,:,150]
     '''trying to define X & Y in terms of unwarped disk coordinates...'''
-    #R = np.linspace(0,disk.Aout*(1+disk.ecc),disk.nr) #******* not on cluster*** #
-    #phi = np.arange(disk.nphi)*2*np.pi/(disk.nphi-1)
-    #X = (np.outer(R,np.cos(phi))).transpose()
-    #Y = (np.outer(R,np.sin(phi))).transpose()
+    R = np.linspace(0,disk.Aout*(1+disk.ecc),disk.nr) #******* not on cluster*** #
+    phi = np.arange(disk.nphi)*2*np.pi/(disk.nphi-1)
+    X = (np.outer(R,np.cos(phi))).transpose()
+    Y = (np.outer(R,np.sin(phi))).transpose()
 
 
     if isgas:
@@ -403,24 +403,19 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
             if i==1:
-                plt.imshow(np.log10(cube[:,:,i]))
+                plt.imshow(cube[:,:,i])
                 plt.colorbar()
                 plt.title("cube i=1 slice (Inu)")
                 plt.show()
 
-                plt.imshow(np.log10(cube[:,:,i+5]))
+                plt.imshow(cube2[:,:,50,i])
                 plt.colorbar()
-                plt.title("cube i=6 slice (Inu)")
+                plt.title("cube2 i=1 50 slice (Inuz)")
                 plt.show()
 
-                plt.imshow(np.log10(cube2[:,:,50,i]))
+                plt.imshow(cube3[:,:,50,i])
                 plt.colorbar()
-                plt.title("cube2 i=1 0 slice (Inuz)")
-                plt.show()
-
-                plt.imshow(np.log10(cube3[:,:,50,i]))
-                plt.colorbar()
-                plt.title("cube3 i=1 0 slice (tau_dust)")
+                plt.title("cube3 i=1 50 slice (tau_dust)")
                 plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
@@ -706,15 +701,25 @@ def xy_interpol(cube,dec,ra,xnpix,imres,flipme=0):
     r = (np.sqrt(dec*dec+ra*ra))[0,:]
 
     phi = np.arange(nphi)*2*np.pi/(nphi-1)
-    
+    '''
     plt.plot(r, phi)
     plt.title("r, phi")
     plt.show()
-
+    '''
     # - do interpolation
     iR = np.interp(pR,r,range(nr))
     iPhi = np.interp(pPhi,phi,range(nphi))
+    '''
+    plt.imshow(iR)
+    plt.title("iR")
+    plt.colorbar()
+    plt.show()
 
+    plt.imshow(iPhi)
+    plt.title("iPhi")
+    plt.colorbar()
+    plt.show()
+    '''
     if flipme:
         dchans = nchans/2. + 0.5
     else:

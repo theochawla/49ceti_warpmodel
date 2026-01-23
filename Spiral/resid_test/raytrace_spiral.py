@@ -459,6 +459,26 @@ def total_model(disk,imres=0.05,distance=57.,chanmin=-2.24,nchans=15,chanstep=0.
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
+
+            plt.imshow(cube[:,:,i])
+            plt.colorbar()
+            plt.title("cube i=1 slice (Inu)")
+            plt.show()
+
+            plt.imshow(cube[:,:,i+5])
+            plt.colorbar()
+            plt.title("cube i=6 slice (Inu)")
+            plt.show()
+
+            plt.imshow(cube2[:,:,50,i])
+            plt.colorbar()
+            plt.title("cube2 i=1 50 slice (Inuz)")
+            plt.show()
+
+            plt.imshow(cube3[:,:,50,i])
+            plt.colorbar()
+            plt.title("cube3 i=1 50 slice (tau_dust)")
+            plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu

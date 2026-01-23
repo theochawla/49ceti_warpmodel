@@ -795,6 +795,16 @@ class Disk:
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        
+        plt.imshow(tvelphi[:,:,0])
+        plt.title("tvelphi")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(tvelr[:,:,0])
+        plt.colorbar()
+        plt.title("tvelr")
+        plt.show()
         '''
         plt.imshow(tvelphi[:,:,0])
         plt.colorbar()
@@ -825,6 +835,12 @@ class Disk:
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
         self.sig_col = tsig_col
+
+        plt.imshow(tsig_col[:,:,0])
+        plt.colorbar()
+        plt.title("tsig_col")
+        plt.show()
+
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 

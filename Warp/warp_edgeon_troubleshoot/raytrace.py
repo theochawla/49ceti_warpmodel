@@ -665,11 +665,11 @@ def xy_interpol(cube,dec,ra,xnpix,imres,flipme=0):
     # - do interpolation
     iR = np.interp(pR,r,range(nr))
     iPhi = np.interp(pPhi,phi,range(nphi))
-
+    '''
     plt.plot(r, phi)
     plt.title("r, phi")
     plt.show()
-
+    '''
     if flipme:
         dchans = nchans/2. + 0.5
     else:

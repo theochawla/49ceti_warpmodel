@@ -664,7 +664,7 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        #X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
 
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
@@ -792,36 +792,36 @@ class Disk:
         '''no idea if this will work but trying Kevin's zsky manipulation on Z_w'''
 
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
-            zsky_w = np.abs(Z_w/self.sinthet)
+            #zsky_w = np.abs(Z_w/self.sinthet)
             #zsky_w = Z_w/self.sinthet
             print("werid zsky_w True")
         else:
-            zsky_w = (Z_w/self.costhet)
+            #zsky_w = (Z_w/self.costhet)
             zsky = (Z/self.costhet)
             print("normal zsky_w True")
-
-        #X_w, Y_w, zsky_w = matrix_mine_rt(X, Y, zsky, warp_rt, twist_rt,0,0)
 
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
         plt.colorbar()
         plt.title("Warp, disk coordinates")
         plt.show()
-        '''
 
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], zsky_w[:,:,0])
         plt.colorbar()
         plt.title("warp zsky")
         plt.show()
+        '''
         #tdiskY = (Y_w*self.costhet - Z_w*self.sinthet)
         #tdiskZ = (Y_w*self.sinthet + Z_w*self.costhet)
         #no way this works
 
-        tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
-        tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
+        #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
+        #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
 
         tdiskY_unwarped = (-Y*self.costhet + zsky*self.sinthet)
         tdiskZ_unwarped = (-Y*self.sinthet - zsky*self.costhet)
+
+        X_w, tdiskY, tdiskZ = matrix_mine_rt(X, tdiskY_unwarped, tdiskZ_unwarped, warp_rt, twist_rt,0,0)
 
         plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
         plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
@@ -929,7 +929,7 @@ class Disk:
         #S = (self.zmax-tdiskZ)/self.costhet
         #print("zmax "  + str(self.zmax))
         #print("tdiskZmax " + str(np.max(tdiskZ)))
-        
+        '''
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
         plt.colorbar()
@@ -939,7 +939,7 @@ class Disk:
         plt.title("S top of disk")
         plt.colorbar()
         plt.show()
-        
+        '''
         '''for passing through disk face:
         I want to use shape of ellipse in [:,:,-1] plane as a mask
         x, y coordinates that fall outside of mask will pass through edge of disk'''
@@ -961,8 +961,8 @@ class Disk:
         tr = np.sqrt(X_w**2+tdiskY**2)
         tr_unwarped = np.sqrt(X**2+tdiskY_unwarped**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
-        tphi = np.arctan2(tdiskY,X)%(2*np.pi)
-        tphi_unwarped = np.arctan2(tdiskY_unwarped,X)%(2*np.pi) - np.pi/2
+        tphi = np.arctan2(tdiskY,X_w)%(2*np.pi)
+        tphi_unwarped = np.arctan2(tdiskY_unwarped,X)%(2*np.pi)
 
         '''
         plt.imshow(tdiskZ[:,:,0])
@@ -1009,11 +1009,11 @@ class Disk:
 
 
         zf_new = np.linspace(-self.zmax, self.zmax, self.nzc)
-        z_w_skymax = np.max(zsky_w)
-        zf_sky = np.linspace(-z_w_skymax, z_w_skymax, self.nzc)
+        #z_w_skymax = np.max(zsky_w)
+        #zf_sky = np.linspace(-z_w_skymax, z_w_skymax, self.nzc)
 
-        #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
-        zind = np.interp(np.abs(tdiskZ_unwarped).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        zind_unwarped = np.interp(np.abs(tdiskZ_unwarped).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #print("nzc " + str(self.nzc))
 
         #print("flattened tdiskZ first 10 " + str(tdiskZ[0:10]))
@@ -1025,18 +1025,17 @@ class Disk:
         #zind = np.interp(tdiskZ.flatten(),zf_new,range(self.nzc)) #zf,nz
 
         zind_shaped = zind.reshape(tdiskZ.shape)
-        #zind_unwarped_shaped = zind_unwarped.reshape(tdiskZ_unwarped.shape)
+        zind_unwarped_shaped = zind_unwarped.reshape(tdiskZ_unwarped.shape)
 
         plt.imshow(zind_shaped[:,:,0])
         plt.title("zind shaped")
         plt.colorbar()
         plt.show()
-        '''
+
         plt.imshow(zind_unwarped_shaped[:,:,0])
         plt.title("zind unwarped shaped")
         plt.colorbar()
         plt.show()
-        '''
         #zind = np.interp(tdiskZ.flatten(),z_l,range(self.nz)) #zf,nzc
         #zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
         #zind = np.interp(tdiskZ_nosky.flatten(),self.zf,range(self.nzc)) #zf,nzc
@@ -1047,22 +1046,22 @@ class Disk:
         
         #zind = self.zf
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
-        #$phiind_unwarped = np.interp(tphi_unwarped.flatten(),self.pf,range(self.nphi))
+        phiind_unwarped = np.interp(tphi_unwarped.flatten(),self.pf,range(self.nphi))
 
         phiind_shaped = phiind.reshape(tphi.shape)
-        #phiind_unwarped_shaped = phiind_unwarped.reshape(tphi_unwarped.shape)
+        phiind_unwarped_shaped = phiind_unwarped.reshape(tphi_unwarped.shape)
 
 
         plt.imshow(phiind_shaped[:,:,0])
         plt.title("phiind shaped")
         plt.colorbar()
         plt.show()
-        '''
+
         plt.imshow(phiind_unwarped_shaped[:,:,0])
         plt.title("phiind unwarped shaped")
         plt.colorbar()
         plt.show()
-        '''
+        
         #print("phiind max " + str(np.max(phiind)))
         #print("phiind min " + str(np.min(phiind)))
         #print("phiind len " + str(len(phiind)))
@@ -1073,13 +1072,13 @@ class Disk:
         #aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
 
         aind_shaped = aind.reshape(tr.shape)
-        #aind_unwarped_shaped = aind_unwarped.reshape(tr_unwarped.shape)
+        aind_unwarped_shaped = aind_unwarped.reshape(tr_unwarped.shape)
 
         plt.imshow(aind_shaped[:,:,0])
         plt.title("aind shaped")
         plt.colorbar()
         plt.show()
-        '''
+
         plt.imshow(aind_unwarped_shaped[:,:,0])
         plt.title("aind unwarped shaped")
         plt.colorbar()
@@ -1089,7 +1088,7 @@ class Disk:
         print("aind max " + str(np.max(aind)))
         print("aind min " + str(np.min(aind)))
         print("aind len " + str(len(aind)))
-        '''
+        
         #aind = self.af
 
         #print("index interp {t}".format(t=time.clock()-tst))
@@ -1110,7 +1109,7 @@ class Disk:
         plt.title("tT, top and bottom no sky")
         plt.show()
         '''
-        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tT[:,:,0])
+        plt.pcolor(X[:,:,0], Y[:,:,0], tT[:,:,0])
         #plt.pcolor(X_w[:,:,-1], Y_w[:,:,-1], tT[:,:,-1])
         plt.colorbar()
         plt.title("tT, top and bottom, disk_coord")
@@ -1133,7 +1132,7 @@ class Disk:
         
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
 
-        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tvel[:,:,0])
+        plt.pcolor(X[:,:,0], Y[:,:,0], tvel[:,:,0])
         #plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tvel[:,:,-1])
         plt.title("tvel, top and bottom")
         plt.show()
@@ -1217,7 +1216,7 @@ class Disk:
         plt.colorbar()
         plt.show()
 
-        plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tsig_col[:,:,0])
+        plt.pcolor(X[:,:,0], Y[:,:,0], tsig_col[:,:,0])
         #plt.pcolor(X_w[:,:,-1], Y_w[:,:,-1], tsig_col[:,:,-1])
         plt.title("Cart tsig top & bottom")
         plt.colorbar()
@@ -1283,8 +1282,8 @@ class Disk:
         # store disk
 
         '''originally, I think these parameters were X, Y, and tdiskZ?'''
-        self.X = X_w
-        self.Y = Y_w
+        self.X = X
+        self.Y = Y
         self.X_unwarp = X
         self.Y_unwarp = Y
         #self.X = X
