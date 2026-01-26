@@ -499,6 +499,7 @@ class Disk:
         ii = zcf > zq
         tempg[ii] = tatm[ii]
 
+
         aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
         phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
         zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
@@ -847,8 +848,8 @@ class Disk:
         '''
         '''converting to xy'''
 
-        #warp_rt  = w_func(self, R, type="w")
-        #twist_rt = w_func(self, R, type="pa")
+        warp_rt  = w_func(self, R, type="w")
+        twist_rt = w_func(self, R, type="pa")
 
         X, Y = pol2cart(R_mesh, phi_mesh)
 
@@ -929,7 +930,7 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        #X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
 
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
@@ -1057,11 +1058,11 @@ class Disk:
         '''no idea if this will work but trying Kevin's zsky manipulation on Z_w'''
 
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
-            zsky_w = np.abs(Z_w/self.sinthet)
+            #zsky_w = np.abs(Z_w/self.sinthet)
             #zsky_w = Z_w/self.sinthet
             print("werid zsky_w True")
         else:
-            #zsky_w = (Z_w/self.costhet)
+            zsky_w = (Z_w/self.costhet)
             zsky = (Z/self.costhet)
             print("normal zsky_w True")
 
@@ -1079,16 +1080,17 @@ class Disk:
         plt.title("warp zsky")
         plt.show()
         '''
-        #tdiskY = (Y_w*self.costhet - Z_w*self.sinthet)
-        #tdiskZ = (Y_w*self.sinthet + Z_w*self.costhet)
+        tdiskY_nosky = (-Y_w*self.costhet + Z_w*self.sinthet)
+        tdiskZ_nosky = (-Y_w*self.sinthet - Z_w*self.costhet)
         #no way this works
 
         #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
         #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
 
+
         tdiskY = (-Y*self.costhet + zsky*self.sinthet)
         tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
-        '''
+        
         plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
         plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
         plt.colorbar()
@@ -1096,7 +1098,16 @@ class Disk:
         plt.xlim(-4.5e15, 4.5e15)
         plt.ylim(-4.5e15, 4.5e15)
         plt.show()
-        '''
+
+
+        plt.pcolor(X_w[:,:,0], tdiskY_nosky[:,:,0], tdiskZ_nosky[:,:,0])
+        plt.pcolor(X_w[:,:,-1], tdiskY_nosky[:,:,-1], tdiskZ_nosky[:,:,-1])
+        plt.colorbar()
+        plt.title("Warp on sky, no zsky projection")
+        plt.xlim(-4.5e15, 4.5e15)
+        plt.ylim(-4.5e15, 4.5e15)
+        plt.show()
+        
         '''
         plt.pcolor(X[:,:,0], tdiskY_unwarped[:,:,0], tdiskZ_unwarped[:,:,0])
         plt.pcolor(X[:,:,-1], tdiskY_unwarped[:,:,-1], tdiskZ_unwarped[:,:,-1])
@@ -1228,9 +1239,11 @@ class Disk:
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         #tr = np.sqrt(X_w**2+tdiskY**2)
         tr = np.sqrt(X**2+tdiskY**2)
+        self.tr = np.sqrt(X_w**2, tdiskY_nosky**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
         #tphi = np.arctan2(tdiskY,X)%(2*np.pi)
         tphi = np.arctan2(tdiskY,X)%(2*np.pi)
+        self.tphi = np.arctan2(tdiskY_nosky, X_w)%(2*np.pi)
 
         '''
         plt.imshow(tdiskZ[:,:,0])
@@ -1555,11 +1568,13 @@ class Disk:
         '''originally, I think these parameters were X, Y, and tdiskZ?'''
         self.X = X
         self.Y = Y
+        self.X_w = X_w
         #self.X_unwarp = X
         #self.Y_unwarp = Y
         #self.X = X
         #self.Y = tdiskY_unwarped
-        self.tY = tdiskY
+        self.tY = tdiskY_nosky
+        self.tZ = tdiskZ_nosky
         #self.tY_unwarp = tdiskY_unwarped
         #self.tZ_unwarp = tdiskZ_unwarped
         self.Z = tdiskZ

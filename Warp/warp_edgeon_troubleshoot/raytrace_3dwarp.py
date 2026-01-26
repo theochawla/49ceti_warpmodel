@@ -105,9 +105,26 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #print(height.shape,disk.cs.shape,disk.Z.shape)
 
     Signu = SignuF1*np.exp(-dV**2/disk.dBV**2)/disk.dBV*(1.-np.exp(-(BBF2*nu)/disk.T))   # - absorbing cross section
+    '''trying interpolating here onto warped grid...?
+    Doing it here because it needs to include zsky dimension, so can't be interpolated 
+    directly onto 2d grid in xy interp'''
 
+    aind_w = np.interp(disk.tr.flatten(), disk.af, range(disk.nac), right=disk.nac)
+    phiind_w = np.interp(disk.tphi.flatten(), disk.pf, range(disk.nphi))
+    zind_w = np.interp(disk.tZ.flatten(),disk.zf,range(disk.nzc))
 
-    Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
+    print("Signu shape " + str(Signu.shape))
+    
+    Signu_interp = ndimage.map_coordinates(Signu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Signu.shape)
+
+    plt.pcolor(disk.X_w[:,:,0], disk.tY[:,:,0], Signu_interp[:,:,0])
+    plt.pcolor(disk.X_w[:,:,-1], disk.tY[:,:,-1], Signu_interp[:,:,-1])
+    plt.title("signu interp onsky")
+    plt.colorbar()
+    plt.show()
+
+    #Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
+    Knu = tnl*Signu_interp
     print("Knu shape " + str(Knu.shape))
 
     if includeDust and disk.rhoD is not None:
@@ -117,8 +134,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     Knu+=Knu_dust
 
     Snu = BBF1*nu**3/(np.exp((BBF2*nu)/disk.T)-1.) # - source function
+    
+    Snu_interp = ndimage.map_coordinates(Snu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Snu.shape)
+
     if (disk.i_notdisk.sum() > 0):
-        Snu[disk.i_notdisk] = 0
+        Snu_interp[disk.i_notdisk] = 0
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
 
@@ -408,6 +428,7 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
                 plt.title("cube i=1 slice (Inu)")
                 plt.show()
 
+                '''
                 plt.imshow(cube2[:,:,50,i])
                 plt.colorbar()
                 plt.title("cube2 i=1 50 slice (Inuz)")
@@ -417,6 +438,19 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
                 plt.colorbar()
                 plt.title("cube3 i=1 50 slice (tau_dust)")
                 plt.show()
+                '''
+
+                plt.pcolor(disk.X[:,:,0], disk.tY[:,:,0], cube[:,:,i])
+                plt.colorbar()
+                plt.title("cube in cart")
+                plt.show()
+
+                plt.pcolor(disk.X[:,:,0], disk.tY[:,:,0], cube2[:,:,0,i])
+                plt.colorbar()
+                plt.title("cube2 in cart")
+                plt.show()
+
+
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu

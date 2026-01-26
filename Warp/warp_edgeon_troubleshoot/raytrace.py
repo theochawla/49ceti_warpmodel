@@ -383,7 +383,7 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
                 plt.colorbar()
                 plt.title("cube i=1 slice (Inu)")
                 plt.show()
-
+                ''''
                 plt.imshow(cube2[:,:,50,i])
                 plt.colorbar()
                 plt.title("cube2 i=1 0 slice (Inuz)")
@@ -392,6 +392,16 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
                 plt.imshow(cube3[:,:,50,i])
                 plt.colorbar()
                 plt.title("cube3 i=1 0 slice (tau_dust)")
+                plt.show()
+                '''
+                plt.pcolor(disk.X, disk.tY[:,:,0], cube[:,:,i])
+                plt.colorbar()
+                plt.title("cube in cart")
+                plt.show()
+
+                plt.pcolor(disk.X, disk.tY[:,:,0], cube2[:,:,0,i])
+                plt.colorbar()
+                plt.title("cube2 in cart")
                 plt.show()
         else:
             Inu,tau_dust = dustmodel(disk,freq0)
