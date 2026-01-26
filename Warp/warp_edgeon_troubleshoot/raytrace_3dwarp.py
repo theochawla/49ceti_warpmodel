@@ -109,13 +109,50 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     Doing it here because it needs to include zsky dimension, so can't be interpolated 
     directly onto 2d grid in xy interp'''
 
-    aind_w = np.interp(disk.tr.flatten(), disk.af, range(disk.nac), right=disk.nac)
-    phiind_w = np.interp(disk.tphi.flatten(), disk.pf, range(disk.nphi))
-    zind_w = np.interp(disk.tZ.flatten(),disk.zf,range(disk.nzc))
+    plt.imshow(Signu[:,:,0])
+    plt.title("Signu")
+    plt.colorbar()
+    plt.show()
+
+    plt.pcolor(disk.X[:,:,0], disk.Y[:,:,0], Signu[:,:,0])
+    plt.title("Signu, cart")
+    plt.colorbar()
+    plt.show()
+
+    #aind_w = np.interp(disk.tr.flatten(), disk.af, range(disk.nac), right=disk.nac)
+    #phiind_w = np.interp(disk.tphi.flatten(), disk.pf, range(disk.nphi))
+    #zind_w = np.interp(disk.tZ.flatten(),disk.zf,range(disk.nzc))
+
+    xind_w = np.interp(disk.X_w.flatten(), disk.xf, range(disk.cart_grid_res))
+    yind_w = np.interp(disk.tY.flatten(), disk.tyf, range(disk.cart_grid_res))
+    zind_w = np.interp(disk.tZ.flatten(), disk.tzf, range(disk.cart_grid_res))
+
+    plt.pcolor(xind_w.reshape(disk.X_w.shape)[:,:,0], yind_w.reshape(disk.tY.shape)[:,:,0], zind_w.reshape(disk.tZ.shape)[:,:,0])
+    plt.title("xind, yind, zind=color")
+    plt.colorbar()
+    plt.show()
+
+    plt.imshow(xind_w.reshape(disk.X_w.shape)[:,:,0])
+    plt.title("xind_w[:,:,0]")
+    plt.colorbar()
+    plt.show()
+
+    plt.pcolor(disk.X_w[:,:,150], disk.tY[:,:,150], Signu[:,:,150])
+    plt.title("signu not interp in cart")
+    plt.colorbar()
+    plt.show()
+
+    print("xind_w length " + str(len(xind_w)))
 
     print("Signu shape " + str(Signu.shape))
     
-    Signu_interp = ndimage.map_coordinates(Signu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Signu.shape)
+    #Signu_interp = ndimage.map_coordinates(Signu,[[phiind_w],[aind_w], [zind_w]], order=1).reshape(Signu.shape)
+    #Signu_interp = ndimage.map_coordinates(Signu,[[xind_w],[yind_w], [zind_w]], order=1).reshape(Signu.shape)
+
+    plt.imshow(Signu_interp[:,:,0])
+    plt.colorbar()
+    plt.title("Signu_interp")
+    plt.show()
 
     plt.pcolor(disk.X_w[:,:,0], disk.tY[:,:,0], Signu_interp[:,:,0])
     plt.pcolor(disk.X_w[:,:,-1], disk.tY[:,:,-1], Signu_interp[:,:,-1])
@@ -136,8 +173,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     Snu = BBF1*nu**3/(np.exp((BBF2*nu)/disk.T)-1.) # - source function
     
     Snu_interp = ndimage.map_coordinates(Snu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Snu.shape)
-
+    S_interp = ndimage.map_coordinates(S,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(S.shape)
     if (disk.i_notdisk.sum() > 0):
+        #Snu[disk.i_notdisk] = 0
         Snu_interp[disk.i_notdisk] = 0
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
@@ -146,10 +184,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     #arg = ds*(Knu + np.roll(Knu,1,axis=2))
     #arg[:,:,0]=0.
     #tau = arg.cumsum(axis=2)
-    tau = cumtrapz(Knu,S,axis=2,initial=0)
-    arg = Knu*Snu*np.exp(-tau)
+    tau = cumtrapz(Knu,S_interp,axis=2,initial=0)
+    #tau = cumtrapz(Knu,S,axis=2,initial=0)
+    #arg = Knu*Snu*np.exp(-tau)
+    arg = Knu*Snu_interp*np.exp(-tau)
 
-    return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
+    return trapz(arg,S_interp,axis=2),tau,cumtrapz(arg,S_interp,axis=2,initial=0.)#tau
 
 def dustmodel(disk,nu):
     '''Given a disk object, calculate the radiative transfer for the dust.

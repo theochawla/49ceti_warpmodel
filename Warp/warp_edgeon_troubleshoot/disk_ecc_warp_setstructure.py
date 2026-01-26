@@ -853,6 +853,17 @@ class Disk:
 
         X, Y = pol2cart(R_mesh, phi_mesh)
 
+        cart_grid_res = 200
+        self.cart_grid_res = cart_grid_res
+
+        xmax = np.max(X)
+        xmin = np.min(X)
+        self.xf = np.linspace(xmin, xmax, cart_grid_res)
+
+        ymax = np.max(Y)
+        ymin = np.min(Y)
+        self.xf = np.linspace(xmin, xmax, cart_grid_res)
+
         print("X_0 " + str(X[0,0,0]))
         print("X_-1 " + str(X[0,-1,0]))
 
@@ -931,6 +942,8 @@ class Disk:
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
         X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+
+        
 
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
@@ -1083,6 +1096,14 @@ class Disk:
         tdiskY_nosky = (-Y_w*self.costhet + Z_w*self.sinthet)
         tdiskZ_nosky = (-Y_w*self.sinthet - Z_w*self.costhet)
         #no way this works
+
+        y_w_max = np.max(tdiskY_nosky)
+        y_w_min = np.min(tdiskY_nosky)
+        self.tyf = np.linspace(y_w_min, y_w_max, cart_grid_res)
+
+        z_w_max = np.max(tdiskZ_nosky)
+        z_w_min = np.min(tdiskZ_nosky)
+        self.tzf = np.linspace(z_w_min, z_w_max, cart_grid_res)
 
         #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
         #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
