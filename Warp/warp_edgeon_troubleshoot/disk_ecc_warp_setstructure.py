@@ -225,7 +225,7 @@ class Disk:
         #zmin = .1*Disk.AU      # - minimum z [AU]
         zmin = -self.zmax      # - minimum z [AU]
         nfc = self.nphi       # - number of unique f points
-        '''putting into linspace for now to compare to warp model'''
+        '''putting into linspace for now'''
         af = np.linspace(amin,amax,nac)
         zf = np.linspace(zmin,self.zmax,nzc)
         zf_warp = np.linspace(zmin+1,self.zmax-1,nzc-2)
@@ -282,6 +282,7 @@ class Disk:
         '''adding to Kevin's function: I want to take grid and warp it, so I need to store grid var...?'''
         self.pcf=pcf
         self.acf=acf
+ 
         #print("acf shape = "+str(acf.shape))
         self.zcf=zcf
         #self.zcf_og = zcf_og
@@ -308,34 +309,12 @@ class Disk:
         PA_obs = np.deg2rad(0)
 
         '''need cartesian system for warp rotation'''
-        #xi = acf[:,:,0] * np.cos(pcf[:,:,0])
-        #print(xi.shape)
-        #yi = acf[:,:,0] * np.sin(pcf[:,:,0])
 
         '''trying 3d input output to matrix'''
         xi, yi = pol2cart(acf, pcf)
 
         '''reshaping to play nice with rotational matrix'''
 
-        #plt.pcolor(xi, yi, zcf[:,:,0])
-        #plt.title('zcf')
-        #plt.colorbar()
-        #plt.show()
-
-        #points_i = np.moveaxis([xi, yi, zcf[:,:,0]], 0, 2)
-        #print("set structure points_i.shape" + str(points_i.shape))
-
-        '''applying warp via rotational matrix'''
-        #rotation = apply_matrix2d_d(points_i, warp_i, twist_i, inc_obs, PA_obs)
-        #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
-        #self.rotation = rotation
-        '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        
-
-        #plt.pcolor(rotation[:,:,0], rotation[:,:,1], rotation[:,:,2])
-        #plt.title("z after warp")
-        #plt.colorbar()
-        #plt.show()
         '''now to make 3d grid:'''
 
         x_w, y_w, z_w = matrix_mine(xi, yi, zcf, warp_i, twist_i, 0, 0)
@@ -345,80 +324,21 @@ class Disk:
         self.y_grid = y_w
         self.z_grid = z_w
 
-        '''keeping z grid, adding each point in zf to each slice
-        this doesn't perfectly replicate geoemetry of warp: 
-        I think we would need to apply a rotational matrix to each z slice'''
-        #z_grid = rotation[:,:,2]
-
-        #z_full_grid = z_w
-        '''translating x &y grids back to polar coordinates'''
-
-        
         '''converting back to polar coordinates'''
         r_w, p_w = cart2pol(x_w, y_w)
         #self.r_grid = r_full_grid
         #self.p_grid = p_full_grid
         p_w = p_w + np.pi 
 
-
-        '''making r & phi grid 3d along z axis'''
-
-        '''this is maybe where the plus one offset is coming from..? might need 
-        to multply not add'''
-        #r_full_grid = r_grid[:,:, np.newaxis]+np.ones(len(zf))
-        #f_full_grid = f_grid[:,:, np.newaxis]+np.ones(len(zf))
-
-        #r_full_grid = r_grid[:,:, np.newaxis]*np.ones(len(zf))
-        #f_full_grid = f_grid[:,:, np.newaxis]*np.ones(len(zf))
-        '''
-        plt.imshow(r_full_grid[:,:,0])
-        plt.title("r_grid")
-        plt.colorbar()
-        plt.savefig("warp_rgrid.jpg")
-        plt.show()
-
-        plt.imshow(p_full_grid[:,:,0])
-        plt.title("f_grid")
-        plt.colorbar()
-        plt.savefig("warp_fgrid.jpg")
-        plt.show()
-
-        plt.imshow(z_full_grid[0,:,:])
-        plt.title("z_grid 0 slice")
-        plt.colorbar()
-        plt.savefig("warp_zgrid.jpg")
-        plt.show()
-
-        plt.imshow(z_full_grid[10,:,:])
-        plt.title("z_grid 10 slice")
-        plt.colorbar()
-        plt.savefig("warp_zgrid.jpg")
-        plt.show()
-        '''
-
-        '''just going to try this; fcf right now is from -pi to pi, try adding pi to match unedited fcf'''
-
-        #acf=r_full_grid
-        #fcf=f_full_grid + np.pi
-        #fcf = f_full_grid -np.pi/3
-        '''I'm really not sure why but the fcf grid was offset, and subtracting 1 fixed it...?? Why??'''
-        #fcf = f_full_grid -1
-
-        
-        #pcf =p_full_grid
-
-        #fcf = (pcf - self.aop) % (2*np.pi)
-        #zcf=z_full_grid
-
         '''useful for plotting polar graphs in cart space'''
         self.x_polar_w, self.y_polar_w = pol2cart(r_w[:,:,0], p_w[:,:,0])
         self.x_polar, self.y_polar = pol2cart(acf[:,:,0], pcf[:,:,0])
         
         plt.pcolor(self.x_polar_w, self.y_polar_w, z_w[:,:,150])
-        plt.colorbar()
-        plt.title("cart warp, midplane")
+        plt.colorbar(label="z coordinate")
+        plt.title("warp in cartesion coordinates, midplane")
         plt.show()
-
+        '''
         plt.pcolor(self.x_polar_w, self.y_polar_w, p_w[:,:,150])
         plt.colorbar()
         plt.title("showing phi coord, midplane")
@@ -428,7 +348,7 @@ class Disk:
         plt.colorbar()
         plt.title("showing phi coord, midplane")
         plt.show()
-        
+        '''
         '''
         plt.imshow(pcf[:,:,0])
         plt.title("pcf")
@@ -444,8 +364,6 @@ class Disk:
         # bundle the grid for helper functions
         ###### add angle to grid? ######
         '''changing nzc definition'''
-        grid = {'nac':nac,'nfc':nfc,'nzc':len(zf),'rcf':acf,'amax':amax,'zcf':zcf}#'ff':ff,'af':af,
-        self.grid=grid
 
         #print("grid {t}".format(t=time.clock()-tst))
         #define temperature structure
@@ -473,7 +391,7 @@ class Disk:
         ###### add angle to grid? ######
         '''nac, nfc, nzc are resolution (int) in each dimension. rcf is 0s grid in 3d. 
         amax is max a (AU), zcf is z meshgrid'''
-        grid = {'nac':nac,'nfc':nfc,'nzc':nzc,'rcf':rcf,'amax':amax,'zcf':zcf}#'ff':ff,'af':af,
+        grid = {'nac':nac,'nfc':nfc,'nzc':nzc,'rcf':acf,'amax':amax,'zcf':zcf}#'ff':ff,'af':af,
         self.grid=grid
 
         #print("grid {t}".format(t=time.clock()-tst))
@@ -485,9 +403,7 @@ class Disk:
         delta = 1.                # shape parameter
         rcf100=rcf/(100.*Disk.AU)
         rcf100q=rcf100**self.qq
-        
-        '''# zq0 = Zq, in AU, at 150 AU (????)'''
-        '''zq should be 3d and scalled by 150 AU...???'''
+
         zq = self.zq0*Disk.AU*rcf100**1.3
         #zq = self.zq0*Disk.AU*(rcf/(150*Disk.AU))**1.1
         tmid = self.tmid0*rcf100q
@@ -495,14 +411,19 @@ class Disk:
         #tatm = self.tatm0*rcf100q
         tempg = tatm + (tmid-tatm)*np.cos((np.pi/(2*zq))*zcf)**(2.*delta)
 
-        '''ii is 3d boolean grid of z values above some critical value'''
+        '''ii is 3d boolean grid of z values above some critical value
+        does this need to change for warp?'''
         ii = zcf > zq
         tempg[ii] = tatm[ii]
+
+        z_w_max = np.max(z_w)
+        zf_w = np.linspace(-z_w_max, z_w_max, nzc)
 
 
         aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
         phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
-        zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
+        #zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
+        zind_w = np.interp(z_w.flatten(), zf_w,range(nzc), right=nzc)
 
         temp_interp = ndimage.map_coordinates(tempg,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
 
@@ -609,7 +530,9 @@ class Disk:
 
         #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
-        vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
+        
+        #vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
+        vel = np.sqrt(Disk.G*self.Mstar/(r_w*(1-self.ecc**2.)))*(np.cos(self.aop+p_w)+self.ecc*self.cosaop)
 
         '''thinking about interpolation'''
         #tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
@@ -623,9 +546,10 @@ class Disk:
         #zind_w = np.interp(z_w.flatten(), zf,range(nzc), right=nzc)
 
 
-        vel_interp = ndimage.map_coordinates(vel,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
-        self.vel = vel_interp
-
+        #vel_interp = ndimage.map_coordinates(vel,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        #self.vel = vel_interp
+        self.vel = vel
+        '''
         plt.imshow(vel[:,:,-3])
         plt.colorbar()
         plt.title("vel in disk plane (-1 slice)")
@@ -649,11 +573,13 @@ class Disk:
 
 
         '''
+        '''
         plt.imshow(self.vel[:,:,0])
         plt.title("vel")
         plt.colorbar()
         plt.savefig("nowarp_vel.jpg")
         plt.show()
+        '''
         '''
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf

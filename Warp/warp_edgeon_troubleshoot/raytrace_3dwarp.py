@@ -79,11 +79,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     # - Calculate source function and absorbing coefficient
     try:
         disk.ecc
-        print("disk.ecc is being used ")
+        #print("disk.ecc is being used ")
     except:
         #Non-eccentric models define disk.Omg
         dV = veloc + (handed*np.sin(thet)*disk.Omg*disk.X[:,:,np.newaxis]*np.ones(nz))
-        print("disk.Omg is being used")
+        #print("disk.Omg is being used")
     else:
         #Eccentric models do not have disk.Omg, but use disk.vel instead
         dV = veloc + handed*np.sin(thet)*(disk.vel)
@@ -148,7 +148,7 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     
     #Signu_interp = ndimage.map_coordinates(Signu,[[phiind_w],[aind_w], [zind_w]], order=1).reshape(Signu.shape)
     #Signu_interp = ndimage.map_coordinates(Signu,[[xind_w],[yind_w], [zind_w]], order=1).reshape(Signu.shape)
-
+    '''
     plt.imshow(Signu_interp[:,:,0])
     plt.colorbar()
     plt.title("Signu_interp")
@@ -159,9 +159,9 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     plt.title("signu interp onsky")
     plt.colorbar()
     plt.show()
-
+    '''
     #Knu = tnl*Signu #+ kap*(.01+1.)*disk.rhoG   # - absorbing coefficient
-    Knu = tnl*Signu_interp
+    Knu = tnl*Signu
     print("Knu shape " + str(Knu.shape))
 
     if includeDust and disk.rhoD is not None:
@@ -172,11 +172,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
 
     Snu = BBF1*nu**3/(np.exp((BBF2*nu)/disk.T)-1.) # - source function
     
-    Snu_interp = ndimage.map_coordinates(Snu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Snu.shape)
-    S_interp = ndimage.map_coordinates(S,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(S.shape)
+    #Snu_interp = ndimage.map_coordinates(Snu,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(Snu.shape)
+    #S_interp = ndimage.map_coordinates(S,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(S.shape)
     if (disk.i_notdisk.sum() > 0):
-        #Snu[disk.i_notdisk] = 0
-        Snu_interp[disk.i_notdisk] = 0
+        Snu[disk.i_notdisk] = 0
+        #Snu_interp[disk.i_notdisk] = 0
         Knu[disk.i_notdisk] = 0
         Knu_dust[disk.i_notdisk] = 0
 
@@ -184,12 +184,12 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     #arg = ds*(Knu + np.roll(Knu,1,axis=2))
     #arg[:,:,0]=0.
     #tau = arg.cumsum(axis=2)
-    tau = cumtrapz(Knu,S_interp,axis=2,initial=0)
-    #tau = cumtrapz(Knu,S,axis=2,initial=0)
-    #arg = Knu*Snu*np.exp(-tau)
-    arg = Knu*Snu_interp*np.exp(-tau)
+    #tau = cumtrapz(Knu,S_interp,axis=2,initial=0)
+    tau = cumtrapz(Knu,S,axis=2,initial=0)
+    arg = Knu*Snu*np.exp(-tau)
+    #arg = Knu*Snu_interp*np.exp(-tau)
 
-    return trapz(arg,S_interp,axis=2),tau,cumtrapz(arg,S_interp,axis=2,initial=0.)#tau
+    return trapz(arg,S,axis=2),tau,cumtrapz(arg,S,axis=2,initial=0.)#tau
 
 def dustmodel(disk,nu):
     '''Given a disk object, calculate the radiative transfer for the dust.
