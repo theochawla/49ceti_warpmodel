@@ -374,11 +374,11 @@ class Disk:
 
         spir0 = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
         spir_phi_test = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi + np.pi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
-        '''
+        
         plt.imshow(spir_phi_test)
         plt.title("spir_phi_test")
         plt.colorbar()
-        plt.savefig("cart_spir_surf.png")
+        #plt.savefig("cart_spir_surf.png")
         plt.show()
 
 
@@ -394,7 +394,7 @@ class Disk:
         plt.colorbar()
         plt.savefig("spiral_b4_interp_surf.png")
         plt.show()
-        '''
+        
         '''tiling surface density grid'''
         g_r_flat = np.ravel(g_r)
         g_r_tiled = np.concatenate([g_r_flat, g_r_flat, g_r_flat])
@@ -404,6 +404,7 @@ class Disk:
         #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi )]])
         '''there was an offset in tiling, so I added phi grid shift that seemed to fix it. pi/12 is arbitrary/by eye'''
         g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
+        g_phi_tiled_noshift = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi)), (g_phi_flat-(2*np.pi))])
         print("g_phi_tiled.shape " + str(g_phi_tiled.shape))
         print("tile max " + str(np.max(g_phi_flat+(2*np.pi))))
         print("tile min " + str(np.min(g_phi_flat+(2*np.pi))))
@@ -414,10 +415,17 @@ class Disk:
 
         '''interpolating tiled grid'''
         interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
+        interp_test_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), spir_tiled)
         #print("g_r " + str(g_r))
         #print("g_phi " + str(g_phi))
         plt.scatter(g_r_tiled, g_phi_tiled, c=spir_tiled, marker=".")
         plt.title("tiled")
+        plt.colorbar()
+        plt.show()
+
+
+        plt.scatter(g_r_tiled, g_phi_tiled_noshift, c=spir_tiled, marker=".")
+        plt.title("tiled, without shifting")
         plt.colorbar()
         plt.savefig("density_plotted1darray_tiled.png")
         plt.show()
@@ -443,7 +451,8 @@ class Disk:
         '''
 
         '''trying to scale perturbation of disk by surface density... I think this is what dsigma/sigma means'''
-        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0])*(siggas_unpert) + (siggas_unpert)
+        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
+        siggas_noshift = interp_test_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
         siggas_unscale = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + (siggas_unpert)
 
         #print("siggas " + str(siggas))
@@ -459,6 +468,16 @@ class Disk:
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
         plt.title("Surface Density, Face-on View")
+        plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_noshift))
+        plt.title("Surface Density, Shift removed Face-on View")
         plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
@@ -525,7 +544,8 @@ class Disk:
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
         '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
         
-        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
+        #phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
+        phi_vel = giggle.uphC(-gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
         print("phi_vel shape "+ str(phi_vel.shape))
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
@@ -534,7 +554,8 @@ class Disk:
 
         '''I think rad_vel does not be to changed; it has positive and negative components, and is
         less concerned with rotation and more concerned with movement towards/away from center'''
-        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
+        #rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
+        rad_vel = giggle.urC(-gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
@@ -543,6 +564,8 @@ class Disk:
 
         '''tiling phi and rad vel'''
 
+        #g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
+
         phi_flat_vel = np.ravel(phi_vel)
         print("phi_flat-vel length" + str(len(phi_flat_vel)))
         phi_tiled_vel = np.append(phi_flat_vel, [[phi_flat_vel],[phi_flat_vel]])
@@ -550,8 +573,10 @@ class Disk:
         rad_flat_vel = np.ravel(rad_vel)
         rad_tiled_vel = np.append(rad_flat_vel, [[rad_flat_vel],[rad_flat_vel]])
 
+
         '''interpolating tiled grid'''
-        interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)      
+        #interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
+        #interp_test_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), spir_tiled)       
         '''
         plt.scatter(g_r_tiled, g_phi_tiled, c=phi_tiled_vel)
         plt.title("phi_vel tiled")
@@ -566,6 +591,9 @@ class Disk:
         interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
         interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
 
+        interp_test_phi_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), phi_tiled_vel)
+        interp_test_rad_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), rad_tiled_vel)
+
         phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
         rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
 
@@ -574,8 +602,64 @@ class Disk:
         self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
         self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
+        plt.imshow(siggas_noshift)
+        plt.colorbar()
+        plt.title("density spiral polar")
+        plt.show()
+
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
+
+        vel_phi_noshift = interp_test_phi_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        vel_rad_noshift = interp_test_rad_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+
+        plt.imshow(vel_phi_noshift[:,:,0])
+        plt.colorbar()
+        plt.title("vel phi spiral polar")
+        plt.show()
+        
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, self.vel_phi[:,:,0])
+        plt.title("Velocity, Phi direction")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, vel_phi_noshift[:,:,0])
+        plt.title("Velocity, Phi direction no shift")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+
+
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, self.vel_rad[:,:,0])
+        plt.title("Velocity, Radial direction")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, vel_rad_noshift[:,:,0])
+        plt.title("Velocity, Radial direction no shift")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
         '''
         print("self.vel_phi min " + str(np.min(self.vel_phi)))
         print("self.vel_phi max " + str(np.max(self.vel_phi)))

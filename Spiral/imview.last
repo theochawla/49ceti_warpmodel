@@ -1,6 +1,6 @@
-raster  = 'paperdisk_m9_1sigma2.im'
+raster  = 'paperdisk_m0_1sigma1.im/'
 contour = {}
 zoom    = 1
 axes    = {}
 out     = ''
-#imview( raster='paperdisk_m9_1sigma2.im',contour={},zoom=1,axes={},out='' )
+#imview( raster='paperdisk_m0_1sigma1.im/',contour={},zoom=1,axes={},out='' )
