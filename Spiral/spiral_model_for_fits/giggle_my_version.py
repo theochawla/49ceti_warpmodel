@@ -248,7 +248,7 @@ def momentone_keplerian(grid_radius, grid_angle, ms, incl):
 
 
 
-def perturbed_sigma(grid_radius, grid_angle, p, rin, rout ,md, surf_amp, m, alpha, pos):
+def perturbed_sigma(grid_radius, grid_angle, surf_amp, m, alpha, pos):
     
     '''Spiral-perturbed surface density [msun / au^2]
     grid_radius = radial grid [au]
@@ -392,7 +392,7 @@ def urC(gx, gy, ms, md, p, m, rin, rout, alpha, off, amp):
 
 
 '''adding amplitude adjustment from perturbation'''
-def uphC(gx, gy, ms, md, p, m, chi, beta, rin, rout, alpha, off, amp):
+def uphC(gx, gy, ms, md, p, m, rin, rout, alpha, off, amp):
     
     '''2D azimuthal velocity perturbation [km/s] in polar coordinates
     gx = x grid [au]

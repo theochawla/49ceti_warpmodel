@@ -456,6 +456,9 @@ def total_model(disk,imres=0.05,distance=57.,chanmin=-2.24,nchans=15,chanstep=0.
             print("Inu shape " + str(Inu.shape))
             print("Inu max " + str(np.max(Inu)))
             cube[:,:,i] = Inu
+            plt.imshow(cube[:,:,i])
+            plt.title("cube")
+            plt.show()
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
