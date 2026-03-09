@@ -136,6 +136,11 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         #print(height.shape,disk.cs.shape,disk.Z.shape)
 
     Signu = SignuF1*np.exp(-dV**2/disk.dBV**2)/disk.dBV*(1.-np.exp(-(BBF2*nu)/disk.T))   # - absorbing cross section
+    print("signuF1 " + str(SignuF1))
+    print("disk.dBV"+ str(disk.dBV))
+    print("dV" + str(dV))
+    print("nu "+ str(nu))
+    print("T" + str(np.max(disk.T)))
     #print('disk.vel shape ' + str(disk.vel.shape))
     
     #print("Signu shape " + str(Signu.shape))
@@ -165,7 +170,10 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
     #arg[:,:,0]=0.
     #tau = arg.cumsum(axis=2)
     tau = cumtrapz(Knu,S,axis=2,initial=0)
+    print("Knu max "+ str(Knu))
+    print("tau max "+ str(np.max(tau)))
     arg = Knu*Snu*np.exp(-tau)
+    print("arg max " + str(np.max(arg)))
 
     #print("tau shape " + str(tau.shape))
     #print("tau first z slice max" + str(np.max(tau[:,:,0])))
@@ -433,7 +441,6 @@ def total_model(disk,imres=0.05,distance=57.,chanmin=-2.24,nchans=15,chanstep=0.
         print("rhoG max " + str(np.max(disk.rhoG)))
         print("rhoG shape " + str(disk.rhoG.shape))
         tnl = gl*abund*disk.rhoG*np.exp(-(El/kB)/disk.T)/parZ
-        print("tnl " + str(tnl))
         w = tnl<0
         if w.sum()>0:
             tnl[w] = 0

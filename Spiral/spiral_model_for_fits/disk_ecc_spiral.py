@@ -339,7 +339,7 @@ class Disk:
 
         '''change grid resolution here.
         x:y:res'''
-        gx, gy = np.mgrid[-((self.Aout/Disk.AU)+50):(self.Aout/Disk.AU)+50:400j,-((self.Aout/Disk.AU)+50):((self.Aout)/Disk.AU)+50:400j]
+        gx, gy = np.mgrid[-((self.Aout/Disk.AU)+50):(self.Aout/Disk.AU)+50:800j,-((self.Aout/Disk.AU)+50):((self.Aout)/Disk.AU)+50:800j]
         g_r, g_phi = cart2pol(gx, gy)
 
         '''trying a gphi shift'''
