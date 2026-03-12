@@ -91,7 +91,8 @@ def basicspeed(r, z, md, p, rin, rout, ms):
     rout = outer radius of the disc [au]
     ms = mass of the central object [msun]'''
     
-    return np.sqrt( (G*ms/r) + veldisc(r,z,md,p,rin,rout))
+    #return np.sqrt( (G*ms/r) + veldisc(r,z,md,p,rin,rout))
+    return np.sqrt(G*ms/r) 
 
 
 
@@ -112,7 +113,7 @@ def q(ms, md, p, rin, rout, r):
 
 '''adding amplitude adjustment to perturbation
 parametrizing only in terms of arb amplitude'''
-def ura(ms, md, p, m, chi, beta, rin, rout, r, amp):
+def ura(ms, md, p, m, rin, rout, r, amp):
     
     '''Module of the radial velocity perturbation [km/s]
     ms = mass of the central object [msun]
@@ -128,7 +129,7 @@ def ura(ms, md, p, m, chi, beta, rin, rout, r, amp):
     #plt.imshow((2 * m * chi * beta**(-1/2) * q(ms, md, p, rin, rout, r)**2 * omega(ms,r) * r)[:,:,0])
     #plt.savefig("ura_output.png")
     
-    return amp * 2 * m * chi * beta**(-1/2) * q(ms, md, p, rin, rout, r)**2 * omega(ms,r) * r
+    #return amp * 2 * m * chi * beta**(-1/2) * q(ms, md, p, rin, rout, r)**2 * omega(ms,r) * r
     return amp * 2 * m * q(ms, md, p, rin, rout, r)**2 * omega(ms,r) * r
     #return amp * omega(ms,r) * r
 
@@ -249,7 +250,7 @@ def momentone_keplerian(grid_radius, grid_angle, ms, incl):
 
 
 
-def perturbed_sigma(grid_radius, grid_angle, p, rin, rout ,md, surf_amp, m, alpha, pos):
+def perturbed_sigma(grid_radius, grid_angle, surf_amp,  m,alpha, pos):
     
     '''Spiral-perturbed surface density [msun / au^2]
     grid_radius = radial grid [au]
@@ -363,7 +364,7 @@ def amplitude_central_channel(grid_radius, grid_angle, ms, md, p, m, chi, beta, 
 
 
 '''adding amplitude adjustment from perturbation'''
-def urC(gx, gy, ms, md, p, m, chi, beta, rin, rout, alpha, off, amp):
+def urC(gx, gy, ms, md, p, m,rin, rout, alpha, off, amp):
     
     '''2D radial velocity perturbation [km/s] in polar coordinates
     gx = x grid [au]
@@ -388,12 +389,12 @@ def urC(gx, gy, ms, md, p, m, chi, beta, rin, rout, alpha, off, amp):
     #return - ura(ms, md, p, m, chi, beta, rin, rout, grid_radius, amp)  * np.sin(
         #m * grid_angle + m/np.tan(alpha) * -np.log(grid_radius) + off)
 
-    return ura(ms, md, p, m, chi, beta, rin, rout, grid_radius, amp)  * np.sin(
+    return ura(ms, md, p, m, rin, rout, grid_radius, amp)  * np.sin(
         m * grid_angle + m/np.tan(alpha) * -np.log(grid_radius) + off)
 
 
 '''adding amplitude adjustment from perturbation'''
-def uphC(gx, gy, ms, md, p, m, chi, beta, rin, rout, alpha, off, amp):
+def uphC(gx, gy, ms, md, p, m, rin, rout, alpha, off, amp):
     
     '''2D azimuthal velocity perturbation [km/s] in polar coordinates
     gx = x grid [au]
@@ -431,7 +432,7 @@ def uphC(gx, gy, ms, md, p, m, chi, beta, rin, rout, alpha, off, amp):
      #   ((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)] 
     #vec = np.sqrt( (G*ms/grid_radius)) * amp * beta**(-0.5) / 2 * (md/ms) * np.sin(m*grid_angle + phase + off) + rc[
         #((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)]
-    vec = np.sqrt( (G*ms/grid_radius)) * amp * np.sin(m*grid_angle + phase + off) + rc[
+    vec = np.sqrt( (G*ms/grid_radius)) * amp *  (md/ms)* (0.5) * np.sin(m*grid_angle + phase + off) + rc[
         ((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)] 
     return vec
 

@@ -22,6 +22,16 @@ from scipy.integrate import trapz
 #testing time
 import time
 
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return(rho, phi)
+
+def pol2cart(rho, phi):
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return(x, y)
+
 class Disk:
     'Common class for circumstellar disk structure'
     #Define useful constants
@@ -240,9 +250,21 @@ class Disk:
         dsdth = (acf[:,:,0]*(1-e*e)*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e))/(1+e*np.cos(fcf[:,:,0]))**2
         siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
 
+        x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
+        plt.title("Surface Density, Face-on View")
+        plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
         plt.imshow(siggas)
         plt.colorbar()
-        plt.savefig("original_siggas.png")
+        #plt.savefig("original_siggas.png")
         plt.show()
 
         print("siggas" + str(siggas))
@@ -346,6 +368,16 @@ class Disk:
         print("self.vel min " + str(np.min(self.vel)))
         print("self.vel max" + str(np.max(self.vel)))
         print("self.vel mean " + str(np.mean(self.vel)))
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, self.vel[:,:,0])
+        plt.title("Velocity")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
 
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf

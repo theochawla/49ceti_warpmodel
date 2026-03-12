@@ -82,7 +82,7 @@ class Disk:
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None, md=.35, 
-                 p=-.5, ap=10, m=1, beta=5, pos=0, surf_amp=.1, proto=False):
+                 p=1, ap=10, m=1, beta=5, pos=0, surf_amp=.1, proto=False):
         
         params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, beta, pos, surf_amp, proto]
         obs=[nr,nphi,nz,zmax]
@@ -121,7 +121,8 @@ class Disk:
         '''longarini parameters'''
         self.ms = params[7] #star mass
         self.md = params[18] #disc mass
-        self.p = params[19] #surface density
+        #self.p = params[19] #surface density
+        self.p = params[2] 
         self.ap = params[20]*np.pi/180 #pitch angle
         self.m = params[21] #azimuthal wavenumber
         self.beta = params[22] #cool
@@ -389,20 +390,20 @@ class Disk:
         plt.show()
         '''
 
-
+        
         plt.imshow(spir0[::-1,:])
         plt.title("spir0")
         plt.colorbar()
         #plt.savefig("cart_spir_surf.png")
         plt.show()
         
-        
+        '''
         plt.scatter(g_r, g_phi, c=spir0)
         plt.title("spir0, g_rvsg_phi")
         plt.colorbar()
         #plt.savefig("spiral_b4_interp_surf.png")
         plt.show()
-        
+        '''
         '''tiling surface density grid'''
         g_r_flat = np.ravel(g_r)
         g_r_tiled = np.concatenate([g_r_flat, g_r_flat, g_r_flat])
@@ -431,14 +432,15 @@ class Disk:
         plt.colorbar()
         plt.show()
         '''
-        print("spir_tiled.shape " + str(spir_tiled.shape))
-        print("spir_tiled_masked.shape " + str(spir_tiled_masked.shape))
+        #print("spir_tiled.shape " + str(spir_tiled.shape))
+        #print("spir_tiled_masked.shape " + str(spir_tiled_masked.shape))
 
         '''interpolating tiled grid'''
         interp_test = interpnd((g_r_tiled[bool_mask], g_phi_tiled[bool_mask]), spir_tiled_masked)
         #interp_test_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), spir_tiled)
         #print("g_r " + str(g_r))
         #print("g_phi " + str(g_phi))
+        '''
         plt.scatter(g_r_tiled[bool_mask], g_phi_tiled[bool_mask], c=spir_tiled_masked, marker=".")
         plt.title("tiled")
         plt.colorbar()
@@ -448,7 +450,7 @@ class Disk:
         plt.title("tiled")
         plt.colorbar()
         plt.show()
-
+        '''
         '''
         plt.scatter(g_r_tiled, g_phi_tiled_noshift, c=spir_tiled, marker=".")
         plt.title("tiled, without shifting")
@@ -494,9 +496,9 @@ class Disk:
         x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
 
         fig, ax = plt.subplots()
-        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
+        plt.pcolor(x_pol_grid, y_pol_grid, siggas)
         plt.title("Surface Density, Face-on View")
-        plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
+        plt.colorbar(label="$M_\u2609$/($au^{2}$)")
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
         fig.set_size_inches(5, 4)
@@ -569,7 +571,7 @@ class Disk:
         #vel_amp_phi = 
         
         #phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
-        phi_vel = giggle.uphC(-gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
+        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
         print("phi_vel shape "+ str(phi_vel.shape))
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
@@ -579,7 +581,8 @@ class Disk:
         '''I think rad_vel does not be to changed; it has positive and negative components, and is
         less concerned with rotation and more concerned with movement towards/away from center'''
         #rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
-        rad_vel = giggle.urC(-gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
+        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
+        rad_vel[np.abs(rad_vel)>1] = 0
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
@@ -634,11 +637,12 @@ class Disk:
 
         #vel_phi_noshift = interp_test_phi_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
         #vel_rad_noshift = interp_test_rad_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        '''
         plt.imshow(self.vel_phi[:,:,0])
         plt.colorbar()
         plt.title("vel phi spiral polar")
         plt.show()
-  
+        
         
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, self.vel_phi[:,:,0])
@@ -655,6 +659,7 @@ class Disk:
 
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, self.vel_rad[:,:,0])
+        plt.clim(-1e-60,1e-60)
         plt.title("Velocity, Radial direction")
         plt.colorbar(label="km/s")
         plt.xlabel("X, au")
@@ -662,7 +667,7 @@ class Disk:
         fig.set_size_inches(5, 4)
         #plt.savefig("siggas_pert_scaled_cart.jpg")
         plt.show()
-
+        '''
         '''
         print("self.vel_phi min " + str(np.min(self.vel_phi)))
         print("self.vel_phi max " + str(np.max(self.vel_phi)))
@@ -916,12 +921,12 @@ class Disk:
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
         self.sig_col = tsig_col
-
+        '''
         plt.imshow(tsig_col[:,:,0])
         plt.colorbar()
         plt.title("tsig_col")
         plt.show()
-
+        '''
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 
         if np.size(self.Xco)>1:
