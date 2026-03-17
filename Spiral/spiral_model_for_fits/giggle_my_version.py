@@ -106,9 +106,18 @@ def q(ms, md, p, rin, rout, r):
     rout = outer radius of the disc [au]
     r = radius [au]'''
     
-    q_ext = md / ms
+    #q_ext = md / ms
+
+    q_ext = md
+
+    #exp = q_ext * (rout/rin)**(-2-p) * (r/rin)**(2+p)
+
+    #exp[r<=rin] = q_ext * (rout/rin)**(-2-p) * (1.001)**(2+p)
+
+    #return exp
     
-    return q_ext * (rout/rin)**(-2-p) * (r/rin)**(2+p)
+    #return q_ext * (rout/rin)**(-2-p) * (r/rin)**(2+p)
+    return q_ext
 
 
 '''adding amplitude adjustment to perturbation
@@ -432,8 +441,11 @@ def uphC(gx, gy, ms, md, p, m, rin, rout, alpha, off, amp):
      #   ((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)] 
     #vec = np.sqrt( (G*ms/grid_radius)) * amp * beta**(-0.5) / 2 * (md/ms) * np.sin(m*grid_angle + phase + off) + rc[
         #((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)]
-    vec = np.sqrt( (G*ms/grid_radius)) * amp *  (md/ms)* (0.5) * np.sin(m*grid_angle + phase + off) + rc[
-        ((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)] 
+    #vec = np.sqrt( (G*ms/grid_radius)) * amp *  (md/ms)* (0.5) * np.sin(m*grid_angle + phase + off) + rc[
+        #((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)] 
+
+    vec = np.sqrt( (G*ms/grid_radius)) * amp *  md * (0.5) * np.sin(m*grid_angle + phase + off) + rc[
+        ((grid_radius - np.min(grid_radius))/(radii[1] - radii[0])).astype(int)]
     return vec
 
 

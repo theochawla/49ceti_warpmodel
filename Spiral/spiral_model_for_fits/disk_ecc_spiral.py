@@ -82,9 +82,9 @@ class Disk:
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None, md=.35, 
-                 p=1, ap=10, m=1, beta=5, pos=0, surf_amp=.1, proto=False):
+                 p=1, ap=10, m=1, pos=0, surf_amp=.1, proto=False):
         
-        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, beta, pos, surf_amp, proto]
+        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, pos, surf_amp, proto]
         obs=[nr,nphi,nz,zmax]
         #tb = time.clock()
         self.ring=ring
@@ -125,11 +125,11 @@ class Disk:
         self.p = params[2] 
         self.ap = params[20]*np.pi/180 #pitch angle
         self.m = params[21] #azimuthal wavenumber
-        self.beta = params[22] #cool
+        #self.beta = params[22] #cool
         #self.incl = incl #inclination of the disc towards the line of sight
-        self.pos = params[23] # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = params[24]
-        self.proto = params[25]
+        self.pos = params[22] # rotation of spiral (degrees), starting north, cw
+        self.surf_amp = params[23]
+        self.proto = params[24]
 
 
         self.qq = params[0]                 # - temperature index
@@ -390,12 +390,13 @@ class Disk:
         plt.show()
         '''
 
-        
+        '''
         plt.imshow(spir0[::-1,:])
         plt.title("spir0")
         plt.colorbar()
         #plt.savefig("cart_spir_surf.png")
         plt.show()
+        '''
         
         '''
         plt.scatter(g_r, g_phi, c=spir0)
@@ -407,16 +408,18 @@ class Disk:
         '''tiling surface density grid'''
         g_r_flat = np.ravel(g_r)
         g_r_tiled = np.concatenate([g_r_flat, g_r_flat, g_r_flat])
-        print("g_r_tiled.shape " + str(g_r_tiled.shape))
+        #print("g_r_tiled.shape " + str(g_r_tiled.shape))
 
         g_phi_flat = np.ravel(g_phi)
         #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi )]])
         '''there was an offset in tiling, so I added phi grid shift that seemed to fix it. pi/12 is arbitrary/by eye'''
         #g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
         g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi)), (g_phi_flat-(2*np.pi))])
+        '''
         print("g_phi_tiled.shape " + str(g_phi_tiled.shape))
         print("tile max " + str(np.max(g_phi_flat+(2*np.pi))))
         print("tile min " + str(np.min(g_phi_flat+(2*np.pi))))
+        '''
 
         bool_mask = (g_phi_tiled > -np.pi/6)*(g_phi_tiled < (2*np.pi + np.pi/6))
 
@@ -494,7 +497,7 @@ class Disk:
         plt.show()
         '''
         x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
-
+        '''
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, siggas)
         plt.title("Surface Density, Face-on View")
@@ -504,6 +507,7 @@ class Disk:
         fig.set_size_inches(5, 4)
         plt.savefig("siggas_pert_scaled_cart.jpg")
         plt.show()
+        '''
 
         '''
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_unscale))
@@ -533,7 +537,7 @@ class Disk:
 
         self.calc_hydrostatic(tempg,siggas,grid)
 
-        print("rho0 max " + str(np.max(self.rho0)))
+        #print("rho0 max " + str(np.max(self.rho0)))
 
 
         #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
@@ -572,7 +576,7 @@ class Disk:
         
         #phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
         phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
-        print("phi_vel shape "+ str(phi_vel.shape))
+        #print("phi_vel shape "+ str(phi_vel.shape))
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
         #phi_vel = phi_vel-np.mean(phi_vel)
@@ -582,7 +586,9 @@ class Disk:
         less concerned with rotation and more concerned with movement towards/away from center'''
         #rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
         rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
-        rad_vel[np.abs(rad_vel)>1] = 0
+        #rad_vel[np.abs(rad_vel)>1] = 0
+        
+        #rad_extreme_mask = rad_vel[np.abs(rad_vel)>10]
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
@@ -631,6 +637,8 @@ class Disk:
 
         self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0])[:,:,np.newaxis]*idz
         self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0])[:,:,np.newaxis]*idz 
+
+        #rad_extreme_mask = (np.abs(self.vel_rad) > 10)
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
@@ -738,6 +746,11 @@ class Disk:
                 #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
                 #else:
                 #    zice[ia,jf] = zmin
+
+        '''setting density to 0 where rad_vel is unphysically large'''
+
+        #sig_col[rad_extreme_mask] = 0
+
         self.sig_col = sig_col
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
@@ -890,7 +903,7 @@ class Disk:
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
-        
+        '''
         plt.imshow(tvelphi[:,:,0])
         plt.title("tvelphi")
         plt.colorbar()
@@ -900,6 +913,7 @@ class Disk:
         plt.colorbar()
         plt.title("tvelr")
         plt.show()
+        '''
         
         self.p_grid = ndimage.map_coordinates(self.pcf,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         '''
