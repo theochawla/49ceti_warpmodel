@@ -161,8 +161,8 @@ def matrix_mine(x, y, z, warp, twist, inc_, PA_):
     x_pa = x_t*cosPA - y_t*sinPA
     y_pa = x_t*sinPA + y_t*cosPA
     
-    y_f = y_pa*cosi - z_w*sini
-    z_f = y_pa*sini + z_w*cosi
+    y_f =  y_pa*cosi - z_w*sini
+    z_f =  y_pa*sini + z_w*cosi
 
 
     return x_pa, y_f, z_f
@@ -225,9 +225,12 @@ def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
 
     x_pa = x_t*cosPA - y_t*sinPA
     y_pa = x_t*sinPA + y_t*cosPA
+
+    '''testing to see if I need this or not'''
+    z_sky = z_w/cosi
     
-    y_f = y_pa*cosi - z_w*sini
-    z_f = y_pa*sini + z_w*cosi
+    y_f = - y_pa*cosi + z_sky*sini
+    z_f = - y_pa*sini - z_sky*cosi
 
 
     return x_pa, y_f, z_f
@@ -270,9 +273,9 @@ class Disk:
     def __init__(self,q=-0.5,McoG=0.09,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
-                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None,w_i=10, w_r0=10,w_dr=10,w_pa=10):
+                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None,w_i=0, w_r0=10,w_dr=10,w_pa=0, w_pos=0):
         #not sure if I'm doing this right, but adding some parameters here for warp
-        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund,w_i,w_r0,w_dr,w_pa]
+        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund,w_i,w_r0,w_dr,w_pa,w_pos]
         obs=[nr,nphi,nz,zmax]
         #tb = time.clock()
         self.ring=ring
@@ -644,7 +647,7 @@ class Disk:
 
         cart_grid_res = 200
         self.cart_grid_res = cart_grid_res
-
+        '''
         xmax = np.max(X)
         xmin = np.min(X)
         self.xf = np.linspace(xmin, xmax, cart_grid_res)
@@ -663,7 +666,7 @@ class Disk:
         print("Y shape " +str(Y.shape))
         print("Z shape " +str(Z.shape))
 
-
+        '''
 
         #print("Rmax & min " + str(np.max(R)) + str(np.min(R)))
         #print("phi max & min " + str(np.max(phi)) + str(np.min(phi)))
@@ -730,7 +733,7 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,self.thet,self.pos)
 
         
 
@@ -858,6 +861,7 @@ class Disk:
         '''based on rotational matrix'''
 
         '''no idea if this will work but trying Kevin's zsky manipulation on Z_w'''
+        '''
 
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             #zsky_w = np.abs(Z_w/self.sinthet)
@@ -869,7 +873,7 @@ class Disk:
             print("normal zsky_w True")
 
         #X_w, Y_w, zsky_w = matrix_mine_rt(X, Y, zsky, warp_rt, twist_rt,0,0)
-
+        '''
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
         plt.colorbar()
@@ -882,34 +886,37 @@ class Disk:
         plt.title("warp zsky")
         plt.show()
         '''
-        tdiskY_nosky = (-Y_w*self.costhet + Z_w*self.sinthet)
-        tdiskZ_nosky = (-Y_w*self.sinthet - Z_w*self.costhet)
+        #tdiskY_nosky = (-Y_w*self.costhet + Z_w*self.sinthet)
+        #tdiskZ_nosky = (-Y_w*self.sinthet - Z_w*self.costhet)
         #no way this works
 
-        y_w_max = np.max(tdiskY_nosky)
-        y_w_min = np.min(tdiskY_nosky)
-        self.tyf = np.linspace(y_w_min, y_w_max, cart_grid_res)
+        #y_w_max = np.max(tdiskY_nosky)
+        #y_w_min = np.min(tdiskY_nosky)
+        #self.tyf = np.linspace(y_w_min, y_w_max, cart_grid_res)
 
-        z_w_max = np.max(tdiskZ_nosky)
-        z_w_min = np.min(tdiskZ_nosky)
-        self.tzf = np.linspace(z_w_min, z_w_max, cart_grid_res)
+        #z_w_max = np.max(tdiskZ_nosky)
+        #z_w_min = np.min(tdiskZ_nosky)
+        #self.tzf = np.linspace(z_w_min, z_w_max, cart_grid_res)
 
         #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
         #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
 
 
-        tdiskY = (-Y*self.costhet + zsky*self.sinthet)
-        tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
+        #tdiskY = (-Y*self.costhet + zsky*self.sinthet)
+        #tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
+
+        tdiskY = Y_w
+        tdiskZ = Z_w
         
         plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
         plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
         plt.colorbar()
         plt.title("Warp on sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
+        plt.xlim(-9e15, 9e15)
+        plt.ylim(-9e15, 9e15)
         plt.show()
 
-
+        '''
         plt.pcolor(X_w[:,:,0], tdiskY_nosky[:,:,0], tdiskZ_nosky[:,:,0])
         plt.pcolor(X_w[:,:,-1], tdiskY_nosky[:,:,-1], tdiskZ_nosky[:,:,-1])
         plt.colorbar()
@@ -918,7 +925,7 @@ class Disk:
         plt.ylim(-4.5e15, 4.5e15)
         plt.show()
         
-        '''
+        
         plt.pcolor(X[:,:,0], tdiskY_unwarped[:,:,0], tdiskZ_unwarped[:,:,0])
         plt.pcolor(X[:,:,-1], tdiskY_unwarped[:,:,-1], tdiskZ_unwarped[:,:,-1])
         plt.colorbar()
@@ -1048,12 +1055,14 @@ class Disk:
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         #tr = np.sqrt(X_w**2+tdiskY**2)
-        tr = np.sqrt(X**2+tdiskY**2)
-        self.tr = np.sqrt(X_w**2, tdiskY_nosky**2)
+        tr = np.sqrt(X_w**2+tdiskY**2)
+        #self.tr = np.sqrt(X_w**2, tdiskY_nosky**2)
+        self.tr = np.sqrt(X_w**2, tdiskY**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
         #tphi = np.arctan2(tdiskY,X)%(2*np.pi)
         tphi = np.arctan2(tdiskY,X)%(2*np.pi)
-        self.tphi = np.arctan2(tdiskY_nosky, X_w)%(2*np.pi)
+        #self.tphi = np.arctan2(tdiskY_nosky, X_w)%(2*np.pi)
+        self.tphi = np.arctan2(tdiskY, X_w)%(2*np.pi)
 
         '''
         plt.imshow(tdiskZ[:,:,0])
@@ -1383,8 +1392,8 @@ class Disk:
         #self.Y_unwarp = Y
         #self.X = X
         #self.Y = tdiskY_unwarped
-        self.tY = tdiskY_nosky
-        self.tZ = tdiskZ_nosky
+        #self.tY = tdiskY_nosky
+        #self.tZ = tdiskZ_nosky
         #self.tY_unwarp = tdiskY_unwarped
         #self.tZ_unwarp = tdiskZ_unwarped
         self.Z = tdiskZ
@@ -1435,6 +1444,7 @@ class Disk:
         self.w_r0 = params[19]*Disk.AU              # - inflection radius
         self.w_dr = params[20]*Disk.AU         # - how many annuli it takes for warp transition
         self.pa = params[21]                # - position angle (how rotated the face-on disk is) of warp
+        self.pos = params[22]                # - position angle (how rotated the face-on disk is) of warp
 
 
 
