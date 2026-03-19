@@ -44,7 +44,7 @@ def pol2cart(rho, phi):
 '''
 This function applies warp and twist gradually over a range of annuli dr, centered at annulus r0
 '''
-def w_func(self, r, type):
+def w_func_disk(self, r, type):
     r0 = self.w_r0
     dr = self.w_dr
 
@@ -65,9 +65,33 @@ def w_func(self, r, type):
     dr = 1.0 if dr is None else dr
     return np.radians(a / (1.0 + np.exp(-(r0 - r) / (0.1*dr))))
 
+def w_func_sky(self, r, type):
+    r0 = self.w_r0
+    dr = self.w_dr
+
+    if type == "w":
+        a_in = self.w_i
+        a_out = 0
+        print("a_out " + str(a_out))
+        print("a_in" + str(a_in))
+
+    elif type == "pa":
+        a_in = self.pa
+        a_out = 0
+        print("a_out " + str(a_out))
+        print("a_in" + str(a_in))
+
+    r0 = 1.0 if r0 is None else r0
+    dr = 1.0 if dr is None else dr
+    return np.radians(a_out - (a_out - a_in) / (1 + np.exp((r - r0)/(0.1 * dr))))
+
 '''
-Original matrix from (Zuleta, 2024) with 2D inputs and outputs
+
 '''
+#Original matrix from (Zuleta, 2024) with 2D inputs and outputs
+
+
+
 def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
     inc_ = 0
     x = p0[:, :, 0]
@@ -96,6 +120,8 @@ def apply_matrix2d_d(p0, warp, twist, inc_, PA_):
 
     cosi = np.cos(inc_)
     sini = np.sin(inc_)
+
+    #xp_t = x*-sinPA*sint+ cosPA*cost+ 
 
     xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
     yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
@@ -127,16 +153,63 @@ def matrix_mine(x, y, z, warp, twist, inc_, PA_):
     cosi = np.cos(inc_)
     sini = np.sin(inc_)
 
+    #making sure twist occurs before warp
+
+    #x_t = x*cost + y*(-sint)
+    #y_t = x*sint + y*cost
+
+    #xp = x_t
+    #yp = y_t*cosw + z*(-sinw)
+    #zp = y_t*sinw + z*cosw
+
+    #xp = x*(-sinPA*sint*cosi + cosPA*cost)+ y*((-sinPA*cosi*cost - sint*cosPA)
+
+
     xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
     yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
     zp = y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
 
     return xp, yp, zp
 '''
+
 def matrix_mine(x, y, z, warp, twist, inc_, PA_):
 
     warp = warp[:, None, None]
     twist = twist[:, None, None]
+
+    cosPA = np.cos(PA_)
+    sinPA = np.sin(PA_)
+    
+    cosi = np.cos(inc_)
+    sini = np.sin(inc_)
+
+    '''making sure twist occurs before warp'''
+
+    cosw = np.cos(warp)
+    sinw = np.sin(warp)
+
+    cost = np.cos(twist)
+    sint = np.sin(twist)
+    
+    y_w = y*cosw - z*sinw
+    z_w = y*sinw + z*cosw
+    
+    x_t = x*cost - y_w*sint
+    y_t = x*sint + y_w*cost
+
+    x_pa = x_t*cosPA - y_t*sinPA
+    y_pa = x_t*sinPA + y_t*cosPA
+    
+    y_f = y_pa*cosi - z_w*sini
+    z_f = y_pa*sini + z_w*cosi
+
+
+    return x_pa, y_f, z_f
+
+def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
+
+    warp = warp[None, :, None]
+    twist = twist[None, :, None]
 
     cosPA = np.cos(PA_)
     sinPA = np.sin(PA_)
@@ -173,6 +246,9 @@ I tried warping the rt grid as well, and it required indexing the grids slightly
 '''
 def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
 
+    #inc_ = self.inc
+    #PA_ = self.
+
     warp = warp[None, :, None]
     #print("warp.shape" + str(warp.shape))
     twist = twist[None, :, None]
@@ -191,47 +267,20 @@ def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
     cosi = np.cos(inc_)
     sini = np.sin(inc_)
 
+    #x_t = x*cost + y*(-sint)
+    #y_t = x*sint + y*cost
+
+    #xp = x_t
+    #yp = y_t*cosw + z*(-sinw)
+    #zp = y_t*sinw + z*cosw
+
     xp = x*(-sinPA*sint*cosi + cosPA*cost) + y*((-sinPA*cosi*cost - sint*cosPA)*cosw + sinPA*sini*sinw) + z*(-(-sinPA*cosi*cost - sint*cosPA)*sinw + sinPA*sini*cosw)
     yp = x*(sinPA*cost + sint*cosPA*cosi) + y*((-sinPA*sint + cosPA*cosi*cost)*cosw - sini*sinw*cosPA) + z*(-(-sinPA*sint + cosPA*cosi*cost)*sinw - sini*cosPA*cosw)
     zp = y*(sini*cost*cosw + sinw*cosi) + z*(-sini*sinw*cost + cosi*cosw)
 
     return xp, yp, zp
+
 '''
-
-def matrix_mine_rt(x, y, z, warp, twist, inc_, PA_):
-
-    warp = warp[None, :, None]
-    twist = twist[None, :, None]
-
-    cosPA = np.cos(PA_)
-    sinPA = np.sin(PA_)
-    
-    cosi = np.cos(inc_)
-    sini = np.sin(inc_)
-
-    '''making sure twist occurs before warp'''
-
-    cosw = np.cos(warp)
-    sinw = np.sin(warp)
-
-    cost = np.cos(twist)
-    sint = np.sin(twist)
-    
-    y_w = y*cosw - z*sinw
-    z_w = y*sinw + z*cosw
-    
-    x_t = x*cost - y_w*sint
-    y_t = x*sint + y_w*cost
-
-    x_pa = x_t*cosPA - y_t*sinPA
-    y_pa = x_t*sinPA + y_t*cosPA
-    
-    y_f = y_pa*cosi - z_w*sini
-    z_f = y_pa*sini + z_w*cosi
-
-
-    return x_pa, y_f, z_f
-
 
 class Disk:
     'Common class for circumstellar disk structure'
@@ -270,9 +319,9 @@ class Disk:
     def __init__(self,q=-0.5,McoG=0.09,pp=1.,Ain=10.,Aout=1000.,Rc=150.,incl=51.5,
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
-                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None,w_i=10, w_r0=10,w_dr=10,w_pa=10):
+                 nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None,w_i=10, w_r0=10,w_dr=10,w_pa=10, w_pos=0):
         #not sure if I'm doing this right, but adding some parameters here for warp
-        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund,w_i,w_r0,w_dr,w_pa]
+        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund,w_i,w_r0,w_dr,w_pa, w_pos]
         obs=[nr,nphi,nz,zmax]
         #tb = time.clock()
         self.ring=ring
@@ -342,9 +391,9 @@ class Disk:
         '''warp code'''
         '''defining warp, taking parmas from input into Disk'''
         '''defines change in inclination'''
-        warp_i  = w_func(self, af, type="w")
+        warp_i  = w_func_disk(self, af, type="w")
         '''defines twist'''
-        twist_i = w_func(self, af, type="pa")
+        twist_i = w_func_disk(self, af, type="pa")
 
         inc_obs = np.deg2rad(self.thet)
         #PA_obs = np.deg2rad(pa)
@@ -361,6 +410,13 @@ class Disk:
         self.x_grid = x_w
         self.y_grid = y_w
         self.z_grid = z_w
+
+
+        '''testing without warp in set_structure'''
+        #x_w = xi
+        #y_w = yi
+        #z_w = zcf
+
 
         '''converting back to polar coordinates'''
         r_w, p_w = cart2pol(x_w, y_w)
@@ -542,8 +598,11 @@ class Disk:
         '''indexing cylindrical warped structure to interpolate temp, density, and vel grids on to'''
         '''expanding z dimension to account for extension from warp'''
         z_w_max = np.max(z_w)
+        #z_w_max = np.max(z_w)
         self.z_w_max = z_w_max
         zf_w = np.linspace(-z_w_max, z_w_max, nzc)
+
+        #interp_test = interpnd((g_r_tiled[bool_mask], g_phi_tiled[bool_mask]), spir_tiled_masked)
 
         aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
         phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
@@ -637,8 +696,10 @@ class Disk:
         '''
         '''converting to xy'''
 
-        warp_rt  = w_func(self, R, type="w")
-        twist_rt = w_func(self, R, type="pa")
+        warp_rt  = w_func_sky(self, R, type="w")
+        print("warp_rt " + str(warp_rt))
+        twist_rt = w_func_sky(self, R, type="pa")
+        print("twist_rt " + str(twist_rt))
 
         X, Y = pol2cart(R_mesh, phi_mesh)
 
@@ -730,7 +791,7 @@ class Disk:
         #velocity = apply_matrix2d_d(vkep_i, warp_i, twist_i, inc_obs, PA_obs)
         #self.rotation = rotation
         '''now we have warped disk, rotation is a a stack of 3 2d array with[:,:,0]=x coord, [:,:,1]=y coord, [:,;,2]=z coord'''
-        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        
 
         
 
@@ -852,7 +913,7 @@ class Disk:
         #Y_w = self.y_grid
         #Z_w = self.z_grid
 
-
+        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,self.thet,np.deg2rad(self.pos))
 
         #tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
         '''based on rotational matrix'''
@@ -870,6 +931,9 @@ class Disk:
 
         #X_w, Y_w, zsky_w = matrix_mine_rt(X, Y, zsky, warp_rt, twist_rt,0,0)
 
+        #X_w, Y_w, Z_w = matrix_mine_rt(X, Y, zsky, warp_rt, twist_rt,self.thet,np.deg2rad(self.pos))
+        
+
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], Z_w[:,:,0])
         plt.colorbar()
@@ -886,38 +950,52 @@ class Disk:
         tdiskZ_nosky = (-Y_w*self.sinthet - Z_w*self.costhet)
         #no way this works
 
-        y_w_max = np.max(tdiskY_nosky)
-        y_w_min = np.min(tdiskY_nosky)
-        self.tyf = np.linspace(y_w_min, y_w_max, cart_grid_res)
-
-        z_w_max = np.max(tdiskZ_nosky)
-        z_w_min = np.min(tdiskZ_nosky)
-        self.tzf = np.linspace(z_w_min, z_w_max, cart_grid_res)
+        
 
         #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
         #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
 
 
-        tdiskY = (-Y*self.costhet + zsky*self.sinthet)
-        tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
-        
-        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
+        #tdiskY = (-Y*self.costhet + zsky*self.sinthet)
+        #tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
+
+        #tdiskY = (-Y_w*self.costhet + zsky_w*self.sinthet)
+        #tdiskZ = (-Y_w*self.sinthet - zsky_w*self.costhet)
+        #tdiskY = Z_w
+        #tdiskZ = Y_w
+
+        tdiskY = Y_w
+        tdiskZ = zsky_w
+        #tdiskZ = zsky_w
+
+        '''switching z & y in plotting for now'''
+        '''
+        plt.pcolor(X_w[:,:,0], tdiskZ[:,:,0],tdiskY[:,:,0])
+        plt.pcolor(X_w[:,:,-1], tdiskZ[:,:,-1], tdiskY[:,:,-1])
         plt.colorbar()
         plt.title("Warp on sky")
         plt.xlim(-4.5e15, 4.5e15)
         plt.ylim(-4.5e15, 4.5e15)
         plt.show()
+        '''
 
+        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
+        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
+        plt.colorbar()
+        plt.title("Warp on sky, no zsky projection")
+        plt.xlim(-9e15, 9e15)
+        plt.ylim(-9e15, 9e15)
+        plt.show()
 
-        plt.pcolor(X_w[:,:,0], tdiskY_nosky[:,:,0], tdiskZ_nosky[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY_nosky[:,:,-1], tdiskZ_nosky[:,:,-1])
+        '''
+        plt.pcolor(X_w[:,:,0], tdiskY[:,:,0], tdisk_Z_nosky[:,:,0])
+        plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tdisk_Z_nosky[:,:,-1])
         plt.colorbar()
         plt.title("Warp on sky, no zsky projection")
         plt.xlim(-4.5e15, 4.5e15)
         plt.ylim(-4.5e15, 4.5e15)
         plt.show()
-        
+        '''
         '''
         plt.pcolor(X[:,:,0], tdiskY_unwarped[:,:,0], tdiskZ_unwarped[:,:,0])
         plt.pcolor(X[:,:,-1], tdiskY_unwarped[:,:,-1], tdiskZ_unwarped[:,:,-1])
@@ -1047,13 +1125,13 @@ class Disk:
         #tdiskY = ytop - self.sinthet*S + (Y/self.costhet).repeat(self.nz).reshape(self.nphi,self.nr,self.nz)
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         #tr = np.sqrt(X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
-        #tr = np.sqrt(X_w**2+tdiskY**2)
-        tr = np.sqrt(X**2+tdiskY**2)
-        self.tr = np.sqrt(X_w**2, tdiskY_nosky**2)
+        tr = np.sqrt(X_w**2+tdiskY**2)
+        self.tr = np.sqrt(X**2+tdiskY**2)
+        #self.tr = np.sqrt(X_w**2, tdiskY_nosky**2)
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
-        #tphi = np.arctan2(tdiskY,X)%(2*np.pi)
         tphi = np.arctan2(tdiskY,X)%(2*np.pi)
-        self.tphi = np.arctan2(tdiskY_nosky, X_w)%(2*np.pi)
+        self.tphi = np.arctan2(tdiskY,X)%(2*np.pi)
+        #self.tphi = np.arctan2(tdiskY_nosky, X_w)%(2*np.pi)
 
         '''
         plt.imshow(tdiskZ[:,:,0])
@@ -1104,7 +1182,12 @@ class Disk:
         #zf_sky = np.linspace(-z_w_skymax, z_w_skymax, self.nzc)
 
         #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        t_z = np.linspace(np.min(tdiskZ), np.max(tdiskZ), self.nzc)
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+
+        #t_p = np.linspace(np.min(tphi), np.max(tphi), self.nphi)
+
+        #t_r = np.linspace(np.min(tr), np.max(tr), self.nac)
         #print("nzc " + str(self.nzc))
 
         #print("flattened tdiskZ first 10 " + str(tdiskZ[0:10]))
@@ -1135,6 +1218,14 @@ class Disk:
         print("zind max " + str(np.max(zind)))
         print("zind min " + str(np.min(zind)))
         print("zind len " + str(len(zind)))
+
+        y_w_max = np.max(tdiskY_nosky)
+        y_w_min = np.min(tdiskY_nosky)
+        self.tyf = np.linspace(y_w_min, y_w_max, cart_grid_res)
+
+        z_w_max = np.max(tdiskZ_nosky)
+        z_w_min = np.min(tdiskZ_nosky)
+        self.tzf = np.linspace(z_w_min, z_w_max, cart_grid_res)
         
         #zind = self.zf
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
@@ -1419,6 +1510,7 @@ class Disk:
         self.Aout = params[4]*Disk.AU       # - outer edge in cm
         self.Rc = params[5]*Disk.AU         # - critical radius in cm
         self.thet = math.radians(params[6]) # - convert inclination to radians
+        self.inc = params[6]
         self.Mstar = params[7]*Disk.Msun    # - convert mass of star to g
         self.Xco = params[8]                # - CO gas fraction
         self.vturb = params[9]*Disk.kms     # - turbulence velocity
@@ -1435,6 +1527,7 @@ class Disk:
         self.w_r0 = params[19]*Disk.AU              # - inflection radius
         self.w_dr = params[20]*Disk.AU         # - how many annuli it takes for warp transition
         self.pa = params[21]                # - position angle (how rotated the face-on disk is) of warp
+        self.pos = params[22] 
 
 
 
