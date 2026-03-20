@@ -359,7 +359,8 @@ class Disk:
 
         '''now to make 3d grid:'''
 
-        x_w, y_w, z_w = matrix_mine(xi, yi, zcf, warp_i, twist_i, 0, 0)
+        x_w, y_w, z_w = matrix_mine(xi, yi, zcf, warp_i, twist_i, self.thet, self.pos)
+        #x_w, y_w, z_w = matrix_mine(xi, yi, zcf, warp_i, twist_i, 0, 0)
 
         self.x_grid = x_w
         self.y_grid = y_w
@@ -377,6 +378,8 @@ class Disk:
         
         plt.pcolor(self.x_polar_w, self.y_polar_w, z_w[:,:,150])
         plt.colorbar(label="z coordinate")
+        plt.xlim(-9e15, 9e15)
+        plt.ylim(-9e15, 9e15)
         plt.title("warp in cartesion coordinates, midplane")
         plt.show()
 
@@ -548,20 +551,55 @@ class Disk:
         self.z_w_max = z_w_max
         zf_w = np.linspace(-z_w_max, z_w_max, nzc)
 
-        aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
-        phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
+        r_w_max = np.max(r_w)
+        self.r_w_max = r_w_max
+        rf_w = np.linspace(-r_w_max, r_w_max, nac)
+
+        p_w_max = np.max(p_w)
+        self.p_w_max = p_w_max
+        pf_w = np.linspace(-p_w_max, p_w_max, self.nphi)
+
+        aind_w = np.interp(r_w.flatten(), rf_w, range(nac), right=nac)
+        phiind_w = np.interp(p_w.flatten(), pf_w, range(self.nphi))
         #zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
         zind_w = np.interp(z_w.flatten(), zf_w,range(nzc), right=nzc)
+
+        print("zpht shape " + str(zpht_up.shape))
 
         '''interpolating temp, vel, and density onto warped grid'''
         temp_interp = ndimage.map_coordinates(tempg,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
         sig_col_interp = ndimage.map_coordinates(sig_col,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
         vel_interp = ndimage.map_coordinates(vel,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        zpht_up_interp = ndimage.map_coordinates(zpht_up,[[aind_w], [phiind_w]], order=1).reshape(nac,self.nphi, nzc)
+        rho0_interp = ndimage.map_coordinates(self.rho0,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+
+        print("temp_interp shape "+ str(temp_interp.shape))
+        print("p_w shape "+ str(p_w.shape))
+
+        plt.pcolor(self.x_polar_w, self.y_polar_w, temp_interp[:,:,0])
+        plt.xlim(-9e15, 9e15)
+        plt.ylim(-9e15, 9e15)
+        plt.title("interped temp set_structure")
+        plt.colorbar()
+        plt.show()
+
+        plt.pcolor(self.x_polar, self.y_polar, temp_interp[:,:,0])
+        plt.title("interped temp set_structure (unwarped coords)")
+        plt.xlim(-9e15, 9e15)
+        plt.ylim(-9e15, 9e15)
+        plt.colorbar()
+        plt.show()
+
+        self.r_w = r_w
+        self.p_w = p_w
+        self.z_w = z_w
 
 
         self.sig_col = sig_col_interp
         self.vel = vel_interp
         self.tempg = temp_interp
+        self.zpht_up = zpht_up_interp
+        self.rho0 = rho0_interp
 
         '''
 
@@ -587,7 +625,7 @@ class Disk:
         self.nzc = nzc
         
         #self.Omg0 = Omg#velrot
-        self.zpht_up = zpht_up
+        #self.zpht_up = zpht_up
         self.zpht_low = zpht_low
         self.pcf = pcf  #only used for plotting can remove after testing
         self.rcf = rcf  #only used for plotting can remove after testing
@@ -1113,24 +1151,25 @@ class Disk:
         #zf_sky = np.linspace(-z_w_skymax, z_w_skymax, self.nzc)
 
         #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
-        zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+        #zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #print("nzc " + str(self.nzc))
 
         #print("flattened tdiskZ first 10 " + str(tdiskZ[0:10]))
         #print("flattened tdiskZ last 10 " + str(tdiskZ[-10:-1]))
 
-        print("zf first 10 " + str(self.zf[0:10]))
-        print("zf last 10 " + str(self.zf[-10:-1]))
+        #print("zf first 10 " + str(self.zf[0:10]))
+        #print("zf last 10 " + str(self.zf[-10:-1]))
         
         #zind = np.interp(tdiskZ.flatten(),zf_new,range(self.nzc)) #zf,nz
 
-        zind_shaped = zind.reshape(tdiskZ.shape)
+        #zind_shaped = zind.reshape(tdiskZ.shape)
         #zind_unwarped_shaped = zind_unwarped.reshape(tdiskZ_unwarped.shape)
-
+        '''
         plt.imshow(zind_shaped[:,:,0])
         plt.title("zind shaped")
         plt.colorbar()
         plt.show()
+        '''
         '''
         plt.imshow(zind_unwarped_shaped[:,:,0])
         plt.title("zind unwarped shaped")
@@ -1141,22 +1180,23 @@ class Disk:
         #zind = np.interp(tdiskZ.flatten(),self.zf,range(self.nzc)) #zf,nzc
         #zind = np.interp(tdiskZ_nosky.flatten(),self.zf,range(self.nzc)) #zf,nzc
         
-        print("zind max " + str(np.max(zind)))
-        print("zind min " + str(np.min(zind)))
-        print("zind len " + str(len(zind)))
+        #print("zind max " + str(np.max(zind)))
+        #print("zind min " + str(np.min(zind)))
+        #print("zind len " + str(len(zind)))
         
         #zind = self.zf
-        phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
+        #phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         #$phiind_unwarped = np.interp(tphi_unwarped.flatten(),self.pf,range(self.nphi))
 
-        phiind_shaped = phiind.reshape(tphi.shape)
+        #phiind_shaped = phiind.reshape(tphi.shape)
         #phiind_unwarped_shaped = phiind_unwarped.reshape(tphi_unwarped.shape)
 
-
+        '''
         plt.imshow(phiind_shaped[:,:,0])
         plt.title("phiind shaped")
         plt.colorbar()
         plt.show()
+        '''
         '''
         plt.imshow(phiind_unwarped_shaped[:,:,0])
         plt.title("phiind unwarped shaped")
@@ -1168,17 +1208,17 @@ class Disk:
         #print("phiind len " + str(len(phiind)))
     
         #phiind = self.pf
-        aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        #aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
         #aind_unwarped = np.interp((tr_unwarped.flatten()*(1+self.ecc*np.cos(tphi_unwarped.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
         #aind = np.interp(tr.flatten(),self.af,range(self.nac),right=self.nac)
 
-        aind_shaped = aind.reshape(tr.shape)
+        #aind_shaped = aind.reshape(tr.shape)
         #aind_unwarped_shaped = aind_unwarped.reshape(tr_unwarped.shape)
 
-        plt.imshow(aind_shaped[:,:,0])
-        plt.title("aind shaped")
-        plt.colorbar()
-        plt.show()
+        #plt.imshow(aind_shaped[:,:,0])
+        #plt.title("aind shaped")
+        #plt.colorbar()
+        #plt.show()
         '''
         plt.imshow(aind_unwarped_shaped[:,:,0])
         plt.title("aind unwarped shaped")
@@ -1200,7 +1240,23 @@ class Disk:
         #tT = ndimage.map_coordinates(self.tempg,[[phiind],[aind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
         #tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(tdiskZ.shape)
         '''trying calculating t grids with unwarped coordinates, using warped coordinates to reference them'''
-        tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+        #tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
+
+        temp_interp = interpnd((self.r_w.flatten(), self.p_w.flatten(), self.z_w.flatten()), self.tempg.flatten())
+        sig_col_interp = interpnd((self.r_w.flatten(), self.p_w.flatten(), self.z_w.flatten()), self.sig_col.flatten())
+        vel_interp = interpnd((self.r_w.flatten(), self.p_w.flatten(), self.z_w.flatten()), self.vel.flatten())
+        zpht_interp = interpnd((self.r_w.flatten(), self.p_w.flatten()), self.zpht_up.flatten())  # Note: zpht is 2D, so only r_w and p_w
+        rho0_interp = interpnd((self.r_w.flatten(), self.p_w.flatten(), self.z_w.flatten()), self.rho0.flatten())
+
+
+        tT = temp_interp((tr.flatten(), tphi.flatten(), tdiskZ.flatten())).reshape(tr.shape)
+        tvel = vel_interp((tr.flatten(), tphi.flatten(), tdiskZ.flatten())).reshape(tr.shape)
+        tsig_col = sig_col_interp((tr.flatten(), tphi.flatten(), tdiskZ.flatten())).reshape(tr.shape)
+        zpht_up = zpht_interp((tr.flatten(), tphi.flatten())).reshape(tr.shape)  # zpht is 2D, so reshape to match
+        rho0 = rho0_interp((tr.flatten(), tphi.flatten(), tdiskZ.flatten())).reshape(tr.shape)
+
+        # ...existing code...
+
 
         '''
         
@@ -1233,7 +1289,7 @@ class Disk:
         plt.colorbar()
         plt.show()
         
-        tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
+        #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
         '''
         plt.pcolor(X_w[:,:,0], Y_w[:,:,0], tvel[:,:,0])
         #plt.pcolor(X_w[:,:,-1], tdiskY[:,:,-1], tvel[:,:,-1])
@@ -1286,14 +1342,14 @@ class Disk:
         '''
 
         #tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
-        tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        #tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         #tsig_col = ndimage.map_coordinates(self.sig_col,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(tdiskZ.shape)
 
         #zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
-        zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
+        #zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         #zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         #zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
-        zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        #zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz)
         tT[notdisk] = 0
         self.sig_col = tsig_col
 
@@ -1358,7 +1414,8 @@ class Disk:
             #trhoG[zap] = 1e-8*trhoG[zap]
 
         #trhoH2 = Disk.H2tog/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind_unwarped],[phiind_unwarped],[zind_unwarped]],order=1).reshape(self.nphi,self.nr,self.nz)
-        trhoH2 = Disk.H2tog/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        #trhoH2 = Disk.H2tog/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
+        trhoH2 = Disk.H2tog/Disk.m0*rho0
         trhoG = trhoH2*self.Xmol
         trhoH2[notdisk] = 0
         trhoG[notdisk] = 0
