@@ -148,6 +148,7 @@ def dustmodel(disk,nu):
     #arg[:,:,0]=0.
     #tau = arg.cumsum(axis=2)
     tau = cumtrapz(Knu_dust,S,axis=2,initial=0.)
+    print("tau "+ str(tau))
     arg = Knu_dust*Snu*np.exp(-tau)
     arg[:,:,0] = 0.
 
@@ -305,9 +306,13 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
     #tchans = chans.astype('|S6') # - convert channel names to string
 
     # extract disk structure from Disk object
-    cube=np.zeros((disk.nphi,disk.nr,nchans))
-    cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
-    cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
+    #cube=np.zeros((disk.nphi,disk.nr,nchans))
+    #cube2=np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau
+    #cube3 = np.zeros((disk.nphi,disk.nr,disk.nz,nchans)) #tau_dust
+    # extract disk structure from Disk object
+    cube=np.zeros((disk.nphi,disk.nac,nchans))
+    cube2=np.zeros((disk.nphi,disk.nac,disk.nzc,nchans)) #tau
+    cube3 = np.zeros((disk.nphi,disk.nac,disk.nzc,nchans)) #tau_dust
     '''just trying this for now: maybe X and Y need to be 2d for current version of this code. trying bottom slice of disk.'''
     #X = disk.X
     #Y = disk.Y
@@ -377,6 +382,11 @@ def total_model(disk,imres=0.05,distance=122.,chanmin=-2.24,nchans=15,chanstep=0
             Inu,Inuz,tau_dust = gasmodel(disk,params,obs,moldat,tnl,wind,includeDust=includeDust)
         #Inu_dust,tau_dust = dustmodel(disk,freq0)
             cube[:,:,i] = Inu
+
+            plt.imshow(Inu)
+            plt.title("Inu")
+            plt.colorbar()
+            plt.show()
         #print('Finished channel %i / %i' % (i+1,nchans))
             cube2[:,:,:,i] = Inuz
             cube3[:,:,:,i] = tau_dust
