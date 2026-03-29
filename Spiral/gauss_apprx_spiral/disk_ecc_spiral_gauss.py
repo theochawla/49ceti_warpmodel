@@ -1118,6 +1118,7 @@ class Disk:
 
 
     def calc_hydrostatic(self,tempg,siggas,grid):
+        
         nac = grid['nac']
         nfc = grid['nfc']
         nzc = grid['nzc']
@@ -1125,38 +1126,43 @@ class Disk:
         zcf = grid['zcf']
         dz = (zcf - np.roll(zcf,1))#,axis=2))
 
+        print("tempg shape "+ str(tempg.shape))
+        print("zcf shape "+ str(zcf.shape))
+
         #compute rho structure
         rho0 = np.zeros((nac,nfc,nzc))
         sigint = siggas
+
+        print("sigint shape "+str(sigint.shape))
 
         #compute gravo-thermal constant
         grvc = Disk.G*self.Mstar*Disk.m0/Disk.kB
 
         #t1 = time.clock()
         #differential equation for vertical density profile
-        dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
-        dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
-        dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        #dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
+        #dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
+        #dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
 
         #numerical integration to get vertical density profile
-        foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
-        foo[:,:,0] = np.zeros((nac,nfc))
-        lnp = foo.cumsum(axis=2)
+        #foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
+        #foo[:,:,0] = np.zeros((nac,nfc))
+        #lnp = foo.cumsum(axis=2)
 
         #normalize the density profile (note: this is just half the sigma value!)
-        rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        #rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 
         #print('Doing hydrostatic equilibrium')
         #t1 = time.clock()
-        #for ia in range(nac):
-        #    for jf in range(nfc):
+        for ia in range(nac):
+            for iz in range(nzc):
         #
         #        #extract the T(z) profile at a given radius
-        #        T = tempg[ia,jf]
+                T = tempg[ia,:,iz]
         #
-        #        z=zcf[ia,jf]
+                z=zcf[ia,:,iz]
         #        #differential equation for vertical density profile
         #        dlnT = (np.log(T)-np.roll(np.log(T),1))/dz[ia,jf]
         #        dlnp = -1*grvc*z/(T*(rcf[ia,jf]**2.+z**2.)**1.5)-dlnT
@@ -1174,6 +1180,9 @@ class Disk:
         #        #if ir == 200:
         #        #    plt.plot(z/Disk.AU,dlnT)
         #        #    plt.plot(z/Disk.AU,dlnp)
+                hr = np.sqrt(2*T[0]*rcf[ia,:,iz]**3./grvc)
+                dens = sigint[ia,:]/(np.sqrt(np.pi)*hr)*np.exp(-(z/hr)**2.)
+                rho0[ia,:,iz] = dens
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 

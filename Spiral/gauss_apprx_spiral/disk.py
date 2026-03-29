@@ -54,21 +54,21 @@ class Disk:
     Hnuctog = 0.706*mu                # - H nuclei abundance fraction (H nuclei:gas)
     sc      = 1.59e21                 # - Av --> H column density (C. Qi 08,11)
     H2tog   = 0.8                     # - H2 abundance fraction (H2:gas)
-    Tco     = 19.                     # - freeze out
+    Tco     = 0                       # - freeze out
     sigphot = 0.79*sc                 # - photo-dissociation column
 
     #def __init__(self,params=[-0.5,0.09,1.,10.,1000.,150.,51.5,2.3,1e-4,0.01,33.9,19.,69.3,
     #             [.79,1000],[10.,1000],-1],obs=[180,131,300,170],rtg=True,vcs=True,
     #             exp_temp=False,line='co',ring=None,include_selfgrav=False):
     def __init__(self,q=-0.5,McoG=0.09,pp=1.,Rin=1.,Rout=1000,Rc=150.,incl=51.5,
-                 Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19,Tatm0=69.3,sigbound=[.79,1000],
+                 Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19,Tatm0=69.3,sigbound=[1e-3,float('inf')],
                  Rabund=[10,1000],handed=-1,vtalpha=0,vtsig=0,
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,
-                 exp_temp=False,line='co',ring=None,include_selfgrav=False):
+                 exp_temp=False,line='co',ring=None,include_selfgrav=False, h0=1):
 
         ### Changed the init function so that it is easier to specify a subset of the parameters
         ### while keeping the rest as defaults.
-        params = [q,McoG,pp,Rin,Rout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,sigbound,Rabund,handed,vtalpha,vtsig]
+        params = [q,McoG,pp,Rin,Rout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,sigbound,Rabund,handed,vtalpha,vtsig,h0]
         obs = [nr,nphi,nz,zmax]
         self.ring=ring
         self.set_obs(obs)   # set the observational parameters
@@ -111,6 +111,9 @@ class Disk:
         self.vvtr = (self.vtalpha != 0) #Boolean describing whether there is a radial dependency
         self.vvtz = (self.vtsig != 0) #Boolean describing whether there is a height dependency
         self.vvt = self.vvtr | self.vvtz # Boolean describing whether there is any spatial dependency
+        
+        '''adding scale height in for MCMC chain'''
+        self.h0 = params[18]
 
         self.costhet = np.cos(self.thet)  # - cos(i)
         self.sinthet = np.sin(self.thet)  # - sin(i)
@@ -397,18 +400,12 @@ class Disk:
         yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         tT = ndimage.map_coordinates(self.tempg,[[xind],[yind]],order=1).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
         Omg = ndimage.map_coordinates(self.Omg0,[[xind],[yind]],order=1).reshape(self.nphi,self.nr,self.nz) #Omg
-        tsig_col = ndimage.map_coordinates(self.sig_col,[[xind],[yind]],order=1).reshape(self.nphi,self.nr,self.nz)###
+        tsig_col = ndimage.map_coordinates(self.sig_col,[[xind],[yind]],order=2).reshape(self.nphi,self.nr,self.nz)
         vt = ndimage.map_coordinates(self.vtm,[[xind],[yind]],order=1).reshape(self.nphi,self.nr,self.nz) #AD
 
         tT[notdisk]=2.73
         self.r = tr
-        #print('Negative column densities, before interpolation: ',(self.sig_col<0).sum())
         self.sig_col = tsig_col
-        #print('Negative column densities, after interpolation: ',(self.sig_col<0).sum())
-        self.sig_col[self.sig_col<0] = 0
-
-        #print('Negative temperatures before interpolation: ',(self.tempg<0).sum())
-        #print('Negative temperatures, after interpolation: ',(tT<0).sum())
 
         #Set molecular abundance
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
@@ -427,9 +424,6 @@ class Disk:
         trhoG = trhoH2*self.Xmol
         #trhoG[notdisk] = 0
         self.rhoH2 = trhoH2
-
-        #print('Negative densities before interpolation: ',(self.rho0<0).sum())
-        #print('Negative densities, after interpolation: ',(trhoH2<0).sum())
 
         self.add_dust_ring(self.Rin,self.Rout,0.,0.,initialize=True) #initialize dust density to 0
 
@@ -528,45 +522,16 @@ class Disk:
             add_mol = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU)
         if add_mol.sum()>0:
             self.Xmol[add_mol]+=abund*(self.r[add_mol]/(Rin*Disk.AU))**(alpha)
-        
-        ## New method, using sigmoids to soften the boundaries.
-        ### This seems like a better idea, since it softens the abundance on either side of the boundary, but it doesn't actually solve the problem I want it to solve. Commenting out for now (KMF, July 2025)
-        #xvar_sig=(self.sig_col*Disk.Hnuctog/(Disk.m0*Disk.sc)-np.max([Sig0,1e-30])/10)/(np.max([Sig0,1e-30])/10)
-        #fabund_sig = 1*(1+1e8*np.exp(-xvar_sig))**(-1.)
-        #xvar_Rout = (self.r-Rout*Disk.AU)/(Rout*Disk.AU)
-        #fabund_Rout = (1-np.tanh(xvar_Rout*100.))/2.#1*(1+1e8*np.exp(-xvar_Rout))**(-1.)
-        #xvar_Rin = (self.r-Rin*Disk.AU)/(Rin*Disk.AU)
-        #fabund_Rin = (1+np.tanh(xvar_Rin*.01))/2.#1*(1+1e8*np.exp(-xvar_Rin))**(-1.)
-
-        #self.Xmol *= fabund_sig*fabund_Rout*fabund_Rin
-
-        #plt.figure()
-        #plt.subplot(211)
-        #plt.loglog(xvar_sig.flatten()[::100],self.Xmol.flatten()[::100],'.k')
-        #plt.axhline(abund)
-        #plt.xlabel('Column density')
-        #plt.ylabel('Abundance modification')
-        #plt.subplot(212)
-        #plt.loglog(self.r.flatten()[::100]/Disk.AU,self.Xmol.flatten()[::100],'.k')
-        #plt.axhline(abund)
-        #plt.xlabel('Radius (au)')
-        #plt.ylabel('Abundance modification')
-        #plt.subplot(313)
-        #plt.plot(self.r.flatten()[::100]/Disk.AU,fabund_Rin.flatten()[::100],'.k')
-        #plt.xlabel('Radius (au)')
-        #plt.ylabel('Abundance modification')        
-        
         #add soft boundaries
-        edge1 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rout*Disk.AU) #Outer edge of the disk
+        edge1 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r>Rout*Disk.AU)
         if edge1.sum()>0:
-            self.Xmol[edge1] += abund*(self.r[edge1]/(Rin*Disk.AU))**(alpha)*np.exp(-(self.r[edge1]/(Rout*Disk.AU))**16) #16
-        edge2 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r<Rin*Disk.AU) #Inner edge of the disk
+            self.Xmol[edge1] += abund*(self.r[edge1]/(Rin*Disk.AU))**(alpha)*np.exp(-(self.r[edge1]/(Rout*Disk.AU))**16)
+        edge2 = (self.sig_col*Disk.Hnuctog/Disk.m0>Sig0*Disk.sc) & (self.sig_col*Disk.Hnuctog/Disk.m0<Sig1*Disk.sc) & (self.r<Rin*Disk.AU)
         if edge2.sum()>0:
             self.Xmol[edge2] += abund*(self.r[edge2]/(Rin*Disk.AU))**(alpha)*(1-np.exp(-(self.r[edge2]/(Rin*Disk.AU))**20.))
-        edge3 = (self.sig_col*Disk.Hnuctog/Disk.m0<Sig0*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU) # Top of the disk
+        edge3 = (self.sig_col*Disk.Hnuctog/Disk.m0<Sig0*Disk.sc) & (self.r>Rin*Disk.AU) & (self.r<Rout*Disk.AU)
         if edge3.sum()>0:
             self.Xmol[edge3] += abund*(self.r[edge3]/(Rin*Disk.AU))**(alpha)*(1-np.exp(-((self.sig_col[edge3]*Disk.Hnuctog/Disk.m0)/(Sig0*Disk.sc))**8.))
-        
         zap = (self.Xmol<0)
         if zap.sum()>0:
             self.Xmol[zap]=1e-18
@@ -586,33 +551,31 @@ class Disk:
 
         #print('Doing hydrostatic equilibrium')
         for ir in range(nrc):
-            #compute gravo-thermal constant
+#            #compute gravo-thermal constant
             grvc = Disk.G*self.Mstar*Disk.m0/Disk.kB
-
-            #extract the T(z) profile at a given radius
+#
+#            #extract the T(z) profile at a given radius
             T = tempg[ir]
-
-            print("tempg shape "+ str(tempg.shape))
-            print("T shape "+ str(T.shape))
-
-            #differential equation for vertical density profile
+#
+#            #differential equation for vertical density profile
             z = zcf[ir]
-            dz = (z - np.roll(z,1))
-            dlnT = (np.log(T)-np.roll(np.log(T),1))/dz
-            dlnp = -1*grvc*z/(T*(rf[ir]**2.+z**2.)**1.5)-dlnT
-            dlnp[0] = -1*grvc*z[0]/(T[0]*(rf[ir]**2.+z[0]**2.)**1.5)
-
-            #numerical integration to get vertical density profile
-            foo = dz*(dlnp+np.roll(dlnp,1))/2.
-            foo[0] = 0.
-            lnp = foo.cumsum()
-
-            #normalize the density profile (note: this is just half the sigma value!)
-            dens = 0.5*sigint[ir]*np.exp(lnp)/np.trapz(np.exp(lnp),z)
+#            dz = (z - np.roll(z,1))
+#            dlnT = (np.log(T)-np.roll(np.log(T),1))/dz
+#            dlnp = -1*grvc*z/(T*(rf[ir]**2.+z**2.)**1.5)-dlnT
+#            dlnp[0] = -1*grvc*z[0]/(T[0]*(rf[ir]**2.+z[0]**2.)**1.5)
+#
+#            #numerical integration to get vertical density profile
+#            foo = dz*(dlnp+np.roll(dlnp,1))/2.
+#            foo[0] = 0.
+#            lnp = foo.cumsum()
+#
+#            #normalize the density profile (note: this is just half the sigma value!)
+#            dens = 0.5*sigint[ir]*np.exp(lnp)/np.trapz(np.exp(lnp),z)
 
             #gaussian profile
-            #hr = np.sqrt(2*T[0]*rf[ir]**3./grvc)
-            #dens = sigint[ir]/(np.sqrt(np.pi)*hr)*np.exp(-(z/hr)**2.)
+            #hr = np.sqrt(2*T[0]*rf[ir]**3./grvc)*self.h0
+            hr = np.sqrt(2*T[0]*rf[ir]**3./grvc)*self.h0
+            dens = sigint[ir]/(np.sqrt(np.pi)*hr)*np.exp(-(z/hr)**2.)
 
             rho0[ir,:] = dens
 
@@ -664,8 +627,7 @@ class Disk:
         plt.rc('axes',lw=2)
         cs2 = plt.contour(self.r[0,:,:]/Disk.AU,self.Z[0,:,:]/Disk.AU,np.log10((self.rhoG/self.Xmol)[0,:,:]),np.arange(0,11,0.1))
         #cs2 = plt.contour(self.r[0,:,:]/Disk.AU,self.Z[0,:,:]/Disk.AU,np.log10((self.rhoG)[0,:,:]),np.arange(-4,7,0.1))
-        #cs3 = plt.contour(self.r[0,:,:]/Disk.AU,self.Z[0,:,:]/Disk.AU,np.log10(self.sig_col[0,:,:]),(-2,-1),linestyles=':',linewidths=3,colors='k')
-        cs3 = plt.contour(self.r[0,:,:]/Disk.AU,self.Z[0,:,:]/Disk.AU,np.log10(self.sig_col[0,:,:]*Disk.Hnuctog/Disk.m0),(np.log10(0.*Disk.sc),np.log10(1e-6*Disk.sc),np.log10(1e-5*Disk.sc),np.log10(1e-4*Disk.sc),np.log10(1e-3*Disk.sc),np.log10(1e-2*Disk.sc),np.log10(.1*Disk.sc)),linestyles=':',linewidths=3,colors='k')
+        cs3 = plt.contour(self.r[0,:,:]/Disk.AU,self.Z[0,:,:]/Disk.AU,np.log10(self.sig_col[0,:,:]),(-2,-1),linestyles=':',linewidths=3,colors='k')
         ax = plt.gca()
         for tick in ax.xaxis.get_major_ticks():
             tick.label1.set_fontsize(14)
