@@ -498,7 +498,7 @@ class Disk:
         plt.show()
         '''
         x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
-        '''
+        
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, siggas)
         plt.title("Surface Density, Face-on View")
@@ -506,9 +506,9 @@ class Disk:
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
         fig.set_size_inches(5, 4)
-        plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.savefig("surface_density.jpg")
         plt.show()
-        '''
+        
 
         '''
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_unscale))
