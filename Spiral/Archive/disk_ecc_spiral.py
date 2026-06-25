@@ -8,12 +8,6 @@
 # import disk
 # x = disk.Disk()
 
-'''updates from original code:
-
-simplifying amplitude parameters in giggle
-improving efficiency by not interpolating whole tiled grid
-making sure velocity/surface density grid is correctly flipped'''
-
 # For testing purposes use the second method. Then I can use reload(disk) after updating the code
 import math
 #from mol_dat import mol_dat
@@ -82,9 +76,9 @@ class Disk:
                  Mstar=2.3,Xco=1e-4,vturb=0.01,Zq0=33.9,Tmid0=19.,Tatm0=69.3,
                  handed=-1,ecc=0.,aop=0.,sigbound=[.79,1000],Rabund=[10,800],
                  nr=180,nphi=131,nz=300,zmax=170,rtg=True,vcs=True,line='co',ring=None, md=.35, 
-                 p=1, ap=10, m=1, pos=0, surf_amp=.1, proto=False, h0=1):
+                 p=-.5, ap=10, m=1, beta=5, pos=0, vel_amp=1, surf_amp=1, proto=False):
         
-        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, pos, surf_amp, proto, h0]
+        params=[q,McoG,pp,Ain,Aout,Rc,incl,Mstar,Xco,vturb,Zq0,Tmid0,Tatm0,handed,ecc,aop,sigbound,Rabund, md, p, ap, m, beta, pos, vel_amp, surf_amp, proto]
         obs=[nr,nphi,nz,zmax]
         #tb = time.clock()
         self.ring=ring
@@ -121,17 +115,15 @@ class Disk:
         '''longarini parameters'''
         self.ms = params[7] #star mass
         self.md = params[18] #disc mass
-        #self.p = params[19] #surface density
-        self.p = params[2] 
+        self.p = params[19] #surface density
         self.ap = params[20]*np.pi/180 #pitch angle
         self.m = params[21] #azimuthal wavenumber
-        #self.beta = params[22] #cool
+        self.beta = params[22] #cool
         #self.incl = incl #inclination of the disc towards the line of sight
-        self.pos = params[22] # rotation of spiral (degrees), starting north, cw
-        self.surf_amp = params[23]
-        self.proto = params[24]
-
-        self.h0 = params[25]
+        self.pos = params[23] # rotation of spiral (degrees), starting north, cw
+        self.vel_amp = params[24]
+        self.surf_amp = params[25]
+        self.proto = params[26]
 
 
         self.qq = params[0]                 # - temperature index
@@ -346,9 +338,7 @@ class Disk:
         g_r, g_phi = cart2pol(gx, gy)
 
         '''trying a gphi shift'''
-        #g_phi = g_phi + np.pi
-
-        g_phi = g_phi
+        g_phi = g_phi + np.pi
 
         print("g_phi max" + str(np.max(g_phi)))
         print("g_phi min" + str(np.min(g_phi)))
@@ -382,81 +372,58 @@ class Disk:
         #print(str(grid_angle.shape)+"grid_angle shape")
         #print(str(gr.shape)+"gr shape")
 
-        spir0 = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi, self.surf_amp, self.m, self.ap, self.pos)
-        #spir_phi_test = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi + np.pi, self.p, self.Ain, self.Aout, self.md, self.surf_amp, self.m, self.ap,0)
-        '''
+        spir0 = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
+        spir_phi_test = self.surf_amp * giggle.perturbed_sigma(g_r, g_phi + np.pi, self.p, self.Ain, self.Aout, self.md, self.beta, self.m, self.ap,0)
+        
         plt.imshow(spir_phi_test)
         plt.title("spir_phi_test")
         plt.colorbar()
         #plt.savefig("cart_spir_surf.png")
         plt.show()
-        '''
 
-        '''
-        plt.imshow(spir0[::-1,:])
+
+        plt.imshow(spir0)
         plt.title("spir0")
         plt.colorbar()
-        #plt.savefig("cart_spir_surf.png")
+        plt.savefig("cart_spir_surf.png")
         plt.show()
-        '''
         
-        '''
+        
         plt.scatter(g_r, g_phi, c=spir0)
         plt.title("spir0, g_rvsg_phi")
         plt.colorbar()
-        #plt.savefig("spiral_b4_interp_surf.png")
+        plt.savefig("spiral_b4_interp_surf.png")
         plt.show()
-        '''
+        
         '''tiling surface density grid'''
         g_r_flat = np.ravel(g_r)
         g_r_tiled = np.concatenate([g_r_flat, g_r_flat, g_r_flat])
-        #print("g_r_tiled.shape " + str(g_r_tiled.shape))
+        print("g_r_tiled.shape " + str(g_r_tiled.shape))
 
         g_phi_flat = np.ravel(g_phi)
         #g_phi_tiled = np.append(g_phi_flat, [[g_phi_flat+(2*np.pi)], [g_phi_flat-(2*np.pi )]])
         '''there was an offset in tiling, so I added phi grid shift that seemed to fix it. pi/12 is arbitrary/by eye'''
-        #g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
-        g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi)), (g_phi_flat-(2*np.pi))])
-        '''
+        g_phi_tiled = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi+ np.pi/12)), (g_phi_flat-(2*np.pi+ np.pi/12))])
+        g_phi_tiled_noshift = np.concatenate([g_phi_flat, (g_phi_flat+(2*np.pi)), (g_phi_flat-(2*np.pi))])
         print("g_phi_tiled.shape " + str(g_phi_tiled.shape))
         print("tile max " + str(np.max(g_phi_flat+(2*np.pi))))
         print("tile min " + str(np.min(g_phi_flat+(2*np.pi))))
-        '''
 
-        bool_mask = (g_phi_tiled > -np.pi/6)*(g_phi_tiled < (2*np.pi + np.pi/6))
-
-        #print("bool_mask " + str(bool_mask[0:50]))
-
-        '''vel & surf density perts were mirror images: flipped surface amp in x axis'''
-        spir_flat = np.ravel(spir0[::-1,:])
+        spir_flat = np.ravel(spir0)
         spir_tiled = np.concatenate([spir_flat, spir_flat,spir_flat])
-        spir_tiled_masked = spir_tiled[bool_mask]
-        '''
-        plt.imshow(spir_tiled_masked)
-        plt.title("spir_tiled_masked")
-        plt.colorbar()
-        plt.show()
-        '''
-        #print("spir_tiled.shape " + str(spir_tiled.shape))
-        #print("spir_tiled_masked.shape " + str(spir_tiled_masked.shape))
+        print("spir_tiled.shape " + str(spir_tiled.shape))
 
         '''interpolating tiled grid'''
-        interp_test = interpnd((g_r_tiled[bool_mask], g_phi_tiled[bool_mask]), spir_tiled_masked)
-        #interp_test_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), spir_tiled)
+        interp_test = interpnd((g_r_tiled, g_phi_tiled), spir_tiled)
+        interp_test_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), spir_tiled)
         #print("g_r " + str(g_r))
         #print("g_phi " + str(g_phi))
-        '''
-        plt.scatter(g_r_tiled[bool_mask], g_phi_tiled[bool_mask], c=spir_tiled_masked, marker=".")
-        plt.title("tiled")
-        plt.colorbar()
-        plt.show()
-
         plt.scatter(g_r_tiled, g_phi_tiled, c=spir_tiled, marker=".")
         plt.title("tiled")
         plt.colorbar()
         plt.show()
-        '''
-        '''
+
+
         plt.scatter(g_r_tiled, g_phi_tiled_noshift, c=spir_tiled, marker=".")
         plt.title("tiled, without shifting")
         plt.colorbar()
@@ -464,7 +431,6 @@ class Disk:
         plt.show()
         #print("acf [:,:,0] " + str(acf[:,:,0]))
         #print("pcf[:,:,0]-np.pi " + str(pcf[:,:,0]-np.pi))
-        '''
 
         
 
@@ -485,10 +451,9 @@ class Disk:
         '''
 
         '''trying to scale perturbation of disk by surface density... I think this is what dsigma/sigma means'''
-        #siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
-        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0])*(siggas_unpert) + (siggas_unpert)
-        #siggas_noshift = interp_test_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
-        #siggas_unscale = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + (siggas_unpert)
+        siggas = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
+        siggas_noshift = interp_test_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
+        siggas_unscale = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + (siggas_unpert)
 
         #print("siggas " + str(siggas))
         '''
@@ -499,18 +464,26 @@ class Disk:
         plt.show()
         '''
         x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
-        '''
+
         fig, ax = plt.subplots()
-        plt.pcolor(x_pol_grid, y_pol_grid, siggas)
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
         plt.title("Surface Density, Face-on View")
-        plt.colorbar(label="$M_\u2609$/($au^{2}$)")
+        plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
         fig.set_size_inches(5, 4)
         plt.savefig("siggas_pert_scaled_cart.jpg")
         plt.show()
-        '''
 
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_noshift))
+        plt.title("Surface Density, Shift removed Face-on View")
+        plt.colorbar(label="log($M_\u2609$/($au^{2}$))")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
         '''
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_unscale))
         plt.title("siggas cart pert unscaled")
@@ -526,20 +499,18 @@ class Disk:
         #print(spir0.shape)
         #spir1 = giggle.perturbed_sigma(g_r, grid_angle, p, 1, 100, md, beta, m, ap,30)
         #spir2 = giggle.perturbed_sigma(g_r, grid_angle, p, 1, 100, md, beta, m, ap,90)
-        '''
+
         ## Add an extra ring
         if self.ring is not None:
             w = np.abs(rcf-self.Rring)<self.Wring/2.
             if w.sum()>0:
                 tempg[w] = tempg[w]*(rcdf[w]/(150*Disk.AU))**(self.sig_enhance-self.qq)/((rcf[w].max())/(150.*Disk.AU))**(-self.qq+self.sig_enhance)
 
-        '''
+        
         
         
 
         self.calc_hydrostatic(tempg,siggas,grid)
-
-        #print("rho0 max " + str(np.max(self.rho0)))
 
 
         #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
@@ -565,20 +536,17 @@ class Disk:
         '''
         '''the amplitude of the surface density perturbation needs to be very small to avoid negative
         surface density values... but the velocity one needs to be larger to be visible. Arbitratily leaving beta=5 for now'''
-        #beta = 5 #cool
+        beta = 5 #cool
 
         #self.vel = giggle.momentone(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0, 0)
         '''defining spiral velocity fields'''
         
         #self.vel_phi = giggle.uph(rcf, pcf, ms, md, p, m, 1, beta, amin, amax, ap, 0)[:,:,np.newaxis]*idz
         '''units of giggle vel field are km/s, converting to cm/s to match Kevin's grid'''
-
-        #vel_amp_rad = 
-        #vel_amp_phi = 
         
         #phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
-        phi_vel = giggle.uphC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
-        #print("phi_vel shape "+ str(phi_vel.shape))
+        phi_vel = giggle.uphC(-gx, gy, self.ms, self.md, self.p, self.m, 1, beta, amin, amax, self.ap, 0, self.vel_amp)
+        print("phi_vel shape "+ str(phi_vel.shape))
         '''trying shifting center of line to middle of data...? I think there is a better
         way to do this, but just to try...'''
         #phi_vel = phi_vel-np.mean(phi_vel)
@@ -587,10 +555,7 @@ class Disk:
         '''I think rad_vel does not be to changed; it has positive and negative components, and is
         less concerned with rotation and more concerned with movement towards/away from center'''
         #rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
-        rad_vel = giggle.urC(gx, gy, self.ms, self.md, self.p, self.m, amin, amax, self.ap, self.pos, self.surf_amp)
-        #rad_vel[np.abs(rad_vel)>1] = 0
-        
-        #rad_extreme_mask = rad_vel[np.abs(rad_vel)>10]
+        rad_vel = giggle.urC(-gx, gy, self.ms, self.md, self.p, self.m, 1, self.beta, amin, amax, self.ap, 0, self.vel_amp)
         #print("self.vel_rad shape " + str(self.vel_rad.shape))
 
         '''maybe there's a simpler way to do this... but since there are extra NaNs at the corners
@@ -623,40 +588,49 @@ class Disk:
         print("phi_vel max " + str(np.max(phi_flat_vel)))
         print("phi_vel mean " + str(np.mean(phi_flat_vel)))
         '''
-        interp_test_phi = interpnd((g_r_tiled[bool_mask], g_phi_tiled[bool_mask]), phi_tiled_vel[bool_mask])
-        interp_test_rad = interpnd((g_r_tiled[bool_mask], g_phi_tiled[bool_mask]), rad_tiled_vel[bool_mask])
+        interp_test_phi = interpnd((g_r_tiled, g_phi_tiled), phi_tiled_vel)
+        interp_test_rad = interpnd((g_r_tiled, g_phi_tiled), rad_tiled_vel)
 
-        #interp_test_phi_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), phi_tiled_vel)
-        #interp_test_rad_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), rad_tiled_vel)
+        interp_test_phi_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), phi_tiled_vel)
+        interp_test_rad_noshift = interpnd((g_r_tiled, g_phi_tiled_noshift), rad_tiled_vel)
 
         phi_2d = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
         rad_2d = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)
 
         '''storing in self.vel, converting to cm/s'''
 
-        #self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
-        #self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz 
+        self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
 
-        self.vel_phi = interp_test_phi(acf[:,:,0]/Disk.AU, fcf[:,:,0])[:,:,np.newaxis]*idz
-        self.vel_rad = interp_test_rad(acf[:,:,0]/Disk.AU, fcf[:,:,0])[:,:,np.newaxis]*idz 
-
-        #rad_extreme_mask = (np.abs(self.vel_rad) > 10)
+        plt.imshow(siggas_noshift)
+        plt.colorbar()
+        plt.title("density spiral polar")
+        plt.show()
 
         self.vel_phi[np.isnan(self.vel_phi)] = 0
         self.vel_rad[np.isnan(self.vel_rad)] = 0
 
-        #vel_phi_noshift = interp_test_phi_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
-        #vel_rad_noshift = interp_test_rad_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
-        '''
-        plt.imshow(self.vel_phi[:,:,0])
+        vel_phi_noshift = interp_test_phi_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+        vel_rad_noshift = interp_test_rad_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)[:,:,np.newaxis]*idz
+
+        plt.imshow(vel_phi_noshift[:,:,0])
         plt.colorbar()
         plt.title("vel phi spiral polar")
         plt.show()
         
-        
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, self.vel_phi[:,:,0])
         plt.title("Velocity, Phi direction")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, vel_phi_noshift[:,:,0])
+        plt.title("Velocity, Phi direction no shift")
         plt.colorbar(label="km/s")
         plt.xlabel("X, au")
         plt.ylabel("Y, au")
@@ -669,7 +643,6 @@ class Disk:
 
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, self.vel_rad[:,:,0])
-        plt.clim(-1e-60,1e-60)
         plt.title("Velocity, Radial direction")
         plt.colorbar(label="km/s")
         plt.xlabel("X, au")
@@ -677,7 +650,16 @@ class Disk:
         fig.set_size_inches(5, 4)
         #plt.savefig("siggas_pert_scaled_cart.jpg")
         plt.show()
-        '''
+
+        fig, ax = plt.subplots()
+        plt.pcolor(x_pol_grid, y_pol_grid, vel_rad_noshift[:,:,0])
+        plt.title("Velocity, Radial direction no shift")
+        plt.colorbar(label="km/s")
+        plt.xlabel("X, au")
+        plt.ylabel("Y, au")
+        fig.set_size_inches(5, 4)
+        #plt.savefig("siggas_pert_scaled_cart.jpg")
+        plt.show()
         '''
         print("self.vel_phi min " + str(np.min(self.vel_phi)))
         print("self.vel_phi max " + str(np.max(self.vel_phi)))
@@ -748,11 +730,6 @@ class Disk:
                 #    zice[ia,jf] = np.max(zcf[ia,jf,foo])
                 #else:
                 #    zice[ia,jf] = zmin
-
-        '''setting density to 0 where rad_vel is unphysically large'''
-
-        #sig_col[rad_extreme_mask] = 0
-
         self.sig_col = sig_col
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
@@ -883,7 +860,6 @@ class Disk:
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
         
-        print("tempg max "+ str(np.max(self.tempg)))
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         
@@ -905,7 +881,7 @@ class Disk:
         tvelphi = ndimage.map_coordinates(self.vel_phi,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         tvelr = ndimage.map_coordinates(self.vel_rad,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)*Disk.kms
         #tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
-        '''
+        
         plt.imshow(tvelphi[:,:,0])
         plt.title("tvelphi")
         plt.colorbar()
@@ -915,7 +891,6 @@ class Disk:
         plt.colorbar()
         plt.title("tvelr")
         plt.show()
-        '''
         
         self.p_grid = ndimage.map_coordinates(self.pcf,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
         '''
@@ -937,12 +912,12 @@ class Disk:
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
         self.sig_col = tsig_col
-        '''
+
         plt.imshow(tsig_col[:,:,0])
         plt.colorbar()
         plt.title("tsig_col")
         plt.show()
-        '''
+
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 
         if np.size(self.Xco)>1:
@@ -1120,7 +1095,6 @@ class Disk:
 
 
     def calc_hydrostatic(self,tempg,siggas,grid):
-        
         nac = grid['nac']
         nfc = grid['nfc']
         nzc = grid['nzc']
@@ -1128,43 +1102,38 @@ class Disk:
         zcf = grid['zcf']
         dz = (zcf - np.roll(zcf,1))#,axis=2))
 
-        print("tempg shape "+ str(tempg.shape))
-        print("zcf shape "+ str(zcf.shape))
-
         #compute rho structure
         rho0 = np.zeros((nac,nfc,nzc))
         sigint = siggas
-
-        print("sigint shape "+str(sigint.shape))
 
         #compute gravo-thermal constant
         grvc = Disk.G*self.Mstar*Disk.m0/Disk.kB
 
         #t1 = time.clock()
         #differential equation for vertical density profile
-        #dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
-        #dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
-        #dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
+        dlnT = (np.log(tempg)-np.roll(np.log(tempg),1,axis=2))/dz
+        dlnp = -1.*grvc*zcf/(tempg*(rcf**2+zcf**2)**1.5)-dlnT
+        dlnp[:,:,0] = -1.*grvc*zcf[:,:,0]/(tempg[:,:,0]*(rcf[:,:,0]**2.+zcf[:,:,0]**2.)**1.5)
 
         #numerical integration to get vertical density profile
-        #foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
-        #foo[:,:,0] = np.zeros((nac,nfc))
-        #lnp = foo.cumsum(axis=2)
+        foo = dz*(dlnp+np.roll(dlnp,1,axis=2))/2.
+        foo[:,:,0] = np.zeros((nac,nfc))
+        lnp = foo.cumsum(axis=2)
 
         #normalize the density profile (note: this is just half the sigma value!)
-        #rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 
         #print('Doing hydrostatic equilibrium')
         #t1 = time.clock()
-        for ia in range(nac):
-            for iz in range(nzc):
+        #for ia in range(nac):
+        #    for jf in range(nfc):
         #
         #        #extract the T(z) profile at a given radius
-                T = tempg[ia,:,iz]
+        #        T = tempg[ia,jf]
         #
-                z=zcf[ia,:,iz]
+        #        z=zcf[ia,jf]
         #        #differential equation for vertical density profile
         #        dlnT = (np.log(T)-np.roll(np.log(T),1))/dz[ia,jf]
         #        dlnp = -1*grvc*z/(T*(rcf[ia,jf]**2.+z**2.)**1.5)-dlnT
@@ -1182,14 +1151,10 @@ class Disk:
         #        #if ir == 200:
         #        #    plt.plot(z/Disk.AU,dlnT)
         #        #    plt.plot(z/Disk.AU,dlnp)
-                hr = np.sqrt(2*T[0]*rcf[ia,:,iz]**3./grvc)*self.h0
-                dens = sigint[ia,:]/(np.sqrt(np.pi)*hr)*np.exp(-(z/hr)**2.)
-                rho0[ia,:,iz] = dens
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 
         self.rho0=rho0
-        print(np.max(rho0))
         #print(Disk.G,self.Mstar,Disk.m0,Disk.kB)
         if 0:
             print('plotting')

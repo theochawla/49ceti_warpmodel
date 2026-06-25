@@ -1,6 +1,0 @@
-raster  = 'spiral_moment0_test.im'
-contour = {}
-zoom    = 1
-axes    = {}
-out     = ''
-#imview( raster='spiral_moment0_test.im',contour={},zoom=1,axes={},out='' )
