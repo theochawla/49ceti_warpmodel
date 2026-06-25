@@ -491,6 +491,8 @@ class Disk:
         #siggas_noshift = interp_test_noshift(acf[:,:,0]/Disk.AU, fcf[:,:,0]-np.pi)*(siggas_unpert) + (siggas_unpert)
         #siggas_unscale = interp_test(acf[:,:,0]/Disk.AU, fcf[:,:,0]) + (siggas_unpert)
 
+        
+
         #print("siggas " + str(siggas))
         '''
         plt.imshow(siggas)
@@ -499,8 +501,14 @@ class Disk:
         plt.savefig("after_interp_surf.png")
         plt.show()
         '''
-        x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
+        plt.rcParams["font.size"] = 16
         
+        x_pol_grid, y_pol_grid = pol2cart(acf[:,:,0]/Disk.AU, fcf[:,:,0])
+
+        self.surf = np.log10(siggas)
+        self.x_grid = x_pol_grid
+        self.y_grid = y_pol_grid
+        '''
         fig, ax = plt.subplots()
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas))
         plt.title("Surface Density, Face-on View")
@@ -510,9 +518,9 @@ class Disk:
         fig.set_size_inches(5, 4)
         plt.savefig("amp_effect/surf_a{}_pos{}.jpg".format(self.ap, self.pos), dpi=300)
         plt.show()
-        
+        '''
 
-        print("I am working")
+        #print("I am working")
 
         '''
         plt.pcolor(x_pol_grid, y_pol_grid, np.log10(siggas_unscale))
