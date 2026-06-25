@@ -592,6 +592,9 @@ class Disk:
         #yind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
         #indices in structure arrays of coordinates in transform grid`
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf,range(self.nzc)) #zf,nzc
+
+        #print("self.zf" + str(self.zf))
+        #phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
         '''
@@ -635,13 +638,83 @@ class Disk:
         zpht_up = ndimage.map_coordinates(self.zpht_up,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
-        '''
+
+        plt.imshow(aind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
+        plt.colorbar()
+        plt.title("aind imshow")
+        plt.show()
+
+        plt.imshow(zind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
+        plt.colorbar()
+        plt.title("zind imshow")
+        plt.show()
+
+        plt.imshow(phiind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
+        plt.colorbar()
+        plt.title("phiind imshow")
+        plt.show()
+        
+        plt.imshow(self.tempg[:,:,0])
+        plt.colorbar()
+        plt.title("tempg imshow before map coordinates, bottom of disk")
+        plt.show()
+
+        plt.imshow(self.tempg[:,:,-1])
+        plt.colorbar()
+        plt.title("tempg imshow before map coordinates, top of disk")
+        plt.show()
+
+        plt.imshow(self.vel[:,:,0])
+        plt.colorbar()
+        plt.title("tempg imshow before map coordinates, bottom of disk")
+        plt.show()
+
+        plt.imshow(self.vel[:,:,-1])
+        plt.colorbar()
+        plt.title("tempg imshow before map coordinates, top of disk")
+        plt.show()
+
+        plt.imshow(self.rho0[:,:,0])
+        plt.colorbar()
+        plt.title("rho0 imshow before map coordinates,bottom of disk")
+        plt.show()
+
+        plt.imshow(self.rho0[:,:,-1])
+        plt.colorbar()
+        plt.title("rho0 imshow before map coordinates, top of disk")
+        plt.show()
+
+        plt.imshow(self.rho0[:,:,100])
+        plt.colorbar()
+        plt.title("rho0 imshow before map coordinates, mid disk")
+        plt.show()
+        
+        plt.imshow(self.zpht_up)
+        plt.colorbar()
+        plt.title("zpht_up imshow before map coordinates")
+        plt.show()
+
         plt.imshow(tsig_col[:,:,0])
         plt.title("tsig_col")
         plt.colorbar()
-        plt.savefig("nowarp_tsig_col.jpg")
+        #plt.savefig("nowarp_tsig_col.jpg")
         plt.show()
-        '''
+
+        plt.pcolor(X, tdiskY[:,:,-1], tvel[:,:,-1])
+        plt.title("tvel, top and bottom")
+        plt.colorbar()
+        plt.show()
+        
+        plt.imshow(tvel[:,:,0])
+        plt.title("tvel bottom of disk")
+        plt.colorbar()
+        plt.show()
+
+        plt.imshow(tvel[:,:,-1])
+        plt.title("tvel top of disk")
+        plt.colorbar()
+        plt.show()
+        
         self.sig_col = tsig_col
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
@@ -827,6 +900,12 @@ class Disk:
 
         #normalize the density profile (note: this is just half the sigma value!)
         rho0 = 0.5*((sigint/np.trapz(np.exp(lnp),zcf,axis=2))[:,:,np.newaxis]*np.ones(nzc))*np.exp(lnp)
+        
+        plt.imshow(rho0[:,:,0])
+        plt.title("rho0 at def")
+        plt.colorbar()
+        plt.show()
+        
         #t2=time.clock()
         #print("hydrostatic loop took {t} seconds".format(t=(t2-t1)))
 

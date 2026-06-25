@@ -1,0 +1,53 @@
+Notes on running warped disk models.
+
+p=[-0.3,2.,0.,70.,4.,1.,0.,200.,0.,44.,135.,135.] #q,Rc,vturb,Tatm0,incl_in,Rin_in,vsys,Rin_out,Gap,incl_out,PA_in,PA_out
+params=[p[0],0.09,1.,1.,1000.,10**(p[1]),p[4],2.3,1e-4,p[2],70.,19.,p[3],[.79,1000],[p[5],p[7]],-1]
+x=Disk(params)
+params2=[p[0],0.09,1.,1.,1000.,10**(p[1]),p[9],2.3,1e-4,p[2],70.,19.,p[3],[.79,1000],[p[7]+p[8],1000.],-1]
+y = Disk(params2)
+x.set_line('co32')
+x.add_mol_ring(params[14][0],params[14][1],.79,3.,params[8],just_frozen=True)
+y.set_line('co32')
+y.add_mol_ring(params2[14][0],params2[14][1],.79,3.,params[8],just_frozen=True)
+
+Rtrans = (p[7]+p[8])*x.AU
+innerindex = x.r > Rtrans
+x.rhoG[innerindex] = y.rhoG[innerindex]
+x.T[innerindex] = y.T[innerindex]
+x.Omg[innerindex] = y.Omg[innerindex]
+x.Xmol[innerindex] = y.Xmol[innerindex]
+x.dBV[innerindex] = y.dBV[innerindex]
+x.i_notdisk[innerindex] = y.i_notdisk[innerindex]
+x.cs[innerindex] = y.cs[innerindex]
+x.thet2=y.thet
+
+
+total_model(x,imres=.05,distance=110.,offs=[0.,0.],PA=p[10],PAdos=p[11],vsys=p[6],chanstep=.16,chanmin=-1.12)
+
+
+settattr(x,'inin',innerindex)
+
+comdensityG = x.rhoG
+comtemperature = x.T
+comvelocity = x.Omg
+comXmol = x.Xmol
+comdBV = x.dBV
+comi_notdisk = x.i_notdisk
+comcs = x.cs
+
+comdensityG[x.inin] = y.rhoG[x.inin]
+comtemperature[x.inin] = y.T[x.inin]
+comvelocity[x.inin] = y.Omg[x.inin]
+comXmol[x.inin] = y.Xmol[x.inin]
+comdBV[x.inin] = y.dBV[x.inin]
+comi_notdisk[x.inin] = y.i_notdisk[x.inin]
+comcs[x.inin] = y.cs[x.inin]
+
+setattr(x,'rhoG',comdensityG)
+setattr(x,'T',comtemperature)
+setattr(x,'Omg',comvelocity)
+setattr(x,'Xmol',comXmol)
+setattr(x,'dBV',comdBV)
+setattr(x,'i_notdisk',comi_notdisk)
+setattr(x,'cs',comcs)
+setattr(x,'thet2',y.thet)
