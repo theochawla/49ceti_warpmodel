@@ -465,6 +465,8 @@ class Disk:
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
 
+        print('self.vel shape '+str(self.vel.shape))
+
         plt.imshow(self.vel[:,:,0])
         plt.title("vel warp with pi shift")
         plt.colorbar()
@@ -653,39 +655,13 @@ class Disk:
 
     def set_rt_grid(self):
 
-
-        
-        #tst=time.clock()
-        ### Start of Radiative Transfer portion of the code...
-        # Define and initialize cylindrical grid
-        #Smin = 1*Disk.AU                 # offset from zero to log scale
-        #if self.thet > np.arctan(self.Aout/self.zmax):
-        #    Smax = 2*self.Aout/self.sinthet
-        #else:
-        #    Smax = 2.*self.zmax/self.costhet       # los distance through disk
-        #Smid = Smax/2.                    # halfway along los
-        #ytop = Smax*self.sinthet/2.       # y origin offset for observer xy center
-        #sky coordinates
-        #R = np.logspace(np.log10(self.Ain*(1-self.ecc)),np.log10(self.Aout*(1+self.ecc)),self.nr)
+        '''making 1d arrays at rt grid resolution'''
         R = np.linspace(0,self.Aout*(1+self.ecc),self.nr) #******* not on cluster*** #
-        print("nr " + str(self.nr))
-        print("nphi " + str(self.nphi))
-        '''do i need the -1 or did I add that... I could put in aop here, but 
-        I'm going to rely on twist_i to define rotation.'''
-        phi = np.arange(self.nphi)*2*np.pi/(len(R))
-
-        #phi = np.arange(self.nphi)*2*np.pi/(self.nphi-1)
+        phi = np.arange(self.nphi)*2*np.pi/(len(self.nphi))
+        z_l = self.zf
 
 
         '''warp code'''
-        #inc=0
-        #pa=0
-
-        #r_grid = self.acf
-        #f_grid = self.pcf
-        #z_grid = self.zcf
-
-        #r_i = acf[:,0,0]  #1d array of radius values
 
         '''defining warp, taking parmas from input into Disk'''
         '''defines change in inclination'''
@@ -693,18 +669,12 @@ class Disk:
         '''defines twist'''
         twist_i = w_func(self, R, type="pa")
 
-        '''may actually have to also interpolate x and y warp grids onto these ones...'''
-        #X = (np.outer(R,np.cos(phi)))
-        #Y = (np.outer(R,np.sin(phi)))
-        #X = (np.outer(R,np.cos(phi))).transpose()
-        #Y = (np.outer(R,np.sin(phi))).transpose()
-        #Z = np.zeros(X.shape)
-        x_l, y_l = pol2cart(R,phi)
-        z_l = self.zf
 
-        '''need 3d inputs, so I'm using meshgrid'''
+        '''meshgridding into 3d arrays'''
+        r, phi, Z = np.meshgrid(R, phi, z_l)
 
-        X,Y,Z = np.meshgrid(x_l, y_l, z_l)
+        '''getting cartesian version'''
+        X,Y,Z = pol2cart(r, phi)
 
 
         inc_obs = np.deg2rad(0)
