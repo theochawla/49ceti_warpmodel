@@ -79,7 +79,8 @@ def gasmodel(disk,params,obs,moldat,tnl,wind=False,includeDust=False):
         dV = veloc + (handed*np.sin(thet)*disk.Omg*disk.X[:,:,np.newaxis]*np.ones(nz))
     else:
         #Eccentric models do not have disk.Omg, but use disk.vel instead
-        dV = veloc + handed*np.sin(thet)*(disk.vel)
+        #dV = veloc + handed*np.sin(thet)*(disk.vel)
+        dV = veloc + handed*(disk.vel)
 
 
     if wind:
