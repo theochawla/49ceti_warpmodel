@@ -42,10 +42,12 @@ Defining some helpful functions for applying warp & coordinate switching
 straightforward coordinate switching but i did steal it from here;
 https://stackoverflow.com/questions/20924085/python-conversion-between-coordinates'''
 
-def plot(x, y, z, title, label=None):
+def plot(x, y, z, title, label=None, ylim=None):
     plt.pcolor(x, y, z, cmap="RdBu_r")
     plt.title(title)
     plt.colorbar(label=label)
+    if ylim is not None:
+        plt.ylim(ylim)
     plt.show()
 
 def cart2pol(x, y):
@@ -309,11 +311,11 @@ class Disk:
 
         '''now, global az rotation of the disk:'''
         rot = np.radians(self.rot)
-        trotx = x_w*np.cos(self.rot)-y_w*np.sin(self.rot) 
-        troty = x_w*np.sin(self.rot)+y_w*np.cos(self.rot) 
+        trotx = x_w*np.cos(rot)-y_w*np.sin(rot) 
+        troty = x_w*np.sin(rot)+y_w*np.cos(rot) 
         
-        rotvx = vx_w*np.cos(self.rot)-vy_w*np.sin(self.rot) 
-        rotvy = vx_w*np.sin(self.rot)+vy_w*np.cos(self.rot)
+        rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
+        rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
 
         self.vx_w = rotvx
         self.vy_w = rotvy
@@ -321,6 +323,7 @@ class Disk:
 
         plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (m/s) ?")
         plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (m/s) ?")
+        plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (m/s) ?")
 
         self.x_grid = x_w
         self.y_grid = y_w
@@ -551,12 +554,24 @@ class Disk:
 
         warp_rt  = w_func(self, R, type="w")
         twist_rt = w_func(self, R, type="pa")
+
+
         '''leaving X & Y here as sky coordinates, but since right now they are the same
         dimension as disk coordinates, I am going to use them as the basis for the warp'''
         X, Y = pol2cart(R_mesh, phi_mesh)
 
+
         '''applying warp'''
-        #X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+
+        plot(X_w[:,:,150], Y_w[:,:,150], Z_w[:,:,150], "Warped grid", label="z [AU]")
+
+        rot = np.radians(self.rot)
+        X_rot = X_w*np.cos(rot)-Y_w*np.sin(rot) 
+        Y_rot = X_w*np.sin(rot)+Y_w*np.cos(rot)
+
+        plot(X_rot[:,:,150], Y_rot[:,:,150], Z_w[:,:,150], "Warp before incl", label="z cm", ylim=[-np.max(X), np.max(X)])
+ 
 
         nac = 500#256             # - number of unique a ring
         #nzc = int(5*nac)#nac*5           # - number of unique z points
@@ -568,46 +583,29 @@ class Disk:
             print("weird zsky_w True")
         else:
             #zsky_w = (Z_w/self.costhet)
-            zsky = (Z/self.costhet)
+            zsky_w = Z_w
+            #zsky = (Z/self.costhet)
+            zsky = Z
             print("normal zsky_w True")
 
 
         '''I create a warped and unwarped grid here
         for something to compare against '''
 
-        #tdiskY_w = (-Y_w*self.costhet + zsky_w*self.sinthet)
-        #tdiskZ_w = (-Y_w*self.sinthet - zsky_w*self.costhet)
+        tdiskY_w = (Y_rot*self.costhet + zsky_w*self.sinthet)
+        tdiskZ_w = (Y_rot*self.sinthet - zsky_w*self.costhet)
 
-        tdiskY = (-Y*self.costhet + zsky*self.sinthet)
-        tdiskZ = (-Y*self.sinthet - zsky*self.costhet)
+        tdiskY = (Y*self.costhet + zsky*self.sinthet)
+        tdiskZ = (Y*self.sinthet - zsky*self.costhet)
 
-        tvy = (-self.vy_w*self.costhet +self.vz_w*self.sinthet)
-        tvz = (-self.vy_w*self.sinthet -self.vz_w*self.costhet)
+        tvy = (self.vy_w*self.costhet + self.vz_w*self.sinthet)
+        tvz = (self.vy_w*self.sinthet - self.vz_w*self.costhet)
 
         #tvy_rot = (rotvy*np.cos(inc) - vwz*np.sin(inc)) 
         #tvz_rot = (rotvy*np.sin(inc) + vwz*np.cos(inc)) 
-        
-        '''
-        plt.pcolor(X_w[:,:,0], tdiskY_w[:,:,0], tdiskZ_w[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY_w[:,:,-1], tdiskZ_w[:,:,-1])
-        plt.colorbar(label=("Zsky coordiante (cm?)"))
-        plt.title("Warp on sky")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.show()
 
-        plt.pcolor(X[:,:,0], tdiskY[:,:,0], tdiskZ[:,:,0])
-        plt.pcolor(X[:,:,-1], tdiskY[:,:,-1], tdiskZ[:,:,-1])
-        plt.colorbar(label=("Zsky coordiante (cm?)"))
-        plt.title("Disk on sky, no warp")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.show()
-        '''
+        plot(X_rot[:,:,150], tdiskY_w[:,:,150], tdiskZ_w[:,:,150], "Warp on sky", label="z [AU]", ylim=[-np.max(X), np.max(X)])
+        
 
         '''I have not modified S'''
         if (self.thet<np.pi/2) & (self.thet>0):
@@ -669,82 +667,9 @@ class Disk:
 
         self.sig_col = tsig_col
 
-        '''
-        plt.pcolor(X_w[:,:,0], tdiskY_w[:,:,0], tvel_w[:,:,0])
-        plt.pcolor(X_w[:,:,150], tdiskY_w[:,:,150], tvel_w[:,:,150])
-        plt.pcolor(X_w[:,:,-1], tdiskY_w[:,:,-1], tvel_w[:,:,-1])
-        plt.title("Warped velocity in sky plane")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="los velocity (cm/s?)")
-        plt.show()
+        plot(X[:,:,150], tdiskY[:,:,150], tvel[:,:,150], "Velocity on sky, unwarped coords", label="cm/s", ylim=[-np.max(X), np.max(X)])
+        plot(X_rot[:,:,150], tdiskY_w[:,:,150], tvel[:,:,150], "Velocity on sky, warped coords", label="cm/s", ylim=[-np.max(X), np.max(X)])
 
-        plt.pcolor(X_w[:,:,0], tdiskY_w[:,:,0], tvel[:,:,0])
-        plt.pcolor(X_w[:,:,150], tdiskY_w[:,:,150], tvel[:,:,150])
-        plt.pcolor(X_w[:,:,-1], tdiskY_w[:,:,-1], tvel[:,:,-1])
-        plt.title("Warped velocity in sky plane, referenced with unwarped coordinates")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="los velocity (cm/s?)")
-        plt.show()
-        
-        
-        plt.pcolor(X[:,:,0], tdiskY[:,:,0], tvel[:,:,0])
-        plt.pcolor(X[:,:,-1], tdiskY[:,:,-1], tvel[:,:,-1])
-        plt.title("No warp, velocity in sky plane")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="los velocity (cm/s?)")
-        plt.show()
-        
-        plt.pcolor(X_w[:,:,0], tdiskY_w[:,:,0], zpht_up_w[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY_w[:,:,-1], zpht_up_w[:,:,-1])
-        plt.title("Warped zphtup in sky plane")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="zpht (?)")
-        plt.show()
-        '''
-        
-        plt.pcolor(X[:,:,0], tdiskY[:,:,0], zpht_up[:,:,0])
-        plt.pcolor(X[:,:,-1], tdiskY[:,:,-1], zpht_up[:,:,-1])
-        plt.title("No warp zphtup in sky plane")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="zpht (?)")
-        plt.show()
-
-        '''
-        plt.pcolor(X_w[:,:,0], tdiskY_w[:,:,0], tT_w[:,:,0])
-        plt.pcolor(X_w[:,:,-1], tdiskY_w[:,:,-1], tT_w[:,:,-1])
-        plt.title("Warped temp in sky plane")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="temp (K)")
-        plt.show()
-        '''
-        
-        plt.pcolor(X[:,:,0], tdiskY[:,:,0], tT[:,:,0])
-        plt.pcolor(X[:,:,-1], tdiskY[:,:,-1], tT[:,:,-1])
-        plt.title("No warp, temp in sky plane")
-        plt.xlabel("X")
-        plt.ylabel("Y_sky")
-        plt.xlim(-4.5e15, 4.5e15)
-        plt.ylim(-4.5e15, 4.5e15)
-        plt.colorbar(label="temp (K)")
-        plt.show()
-
-        
 
         self.add_mol_ring(self.Rabund[0]/Disk.AU,self.Rabund[1]/Disk.AU,self.sigbound[0]/Disk.sc,self.sigbound[1]/Disk.sc,self.Xco,initialize=True)
 
@@ -796,24 +721,6 @@ class Disk:
         self.T = tT
 
         self.vel = tvel
-
-        #print("zap {t}".format(t=time.clock()-tst))
-        #temperature and turbulence broadening
-        #moved this to the set_line method
-        #tdBV = np.sqrt(2.*Disk.kB/(Disk.Da*Disk.mCO)*tT+self.vturb**2)
-        #tdBV = np.sqrt((1+(self.vturb/Disk.kms)**2.)*(2.*Disk.kB/(Disk.Da*Disk.mCO)*tT)) #vturb proportional to cs
-
-
-        if 1:
-            print('plotting')
-            plt.figure(1)
-            plt.subplot(211)
-            plt.pcolor(np.log10(tr[0,:,:]),tdiskZ[0,:,:],np.log10(trhoG[0,:,:]))
-            plt.colorbar()
-            #plt.subplot(212)
-            #plt.pcolor(self.rf[:,0,np.newaxis]*np.ones(256*5),(self.zf[:,np.newaxis]*np.ones(256)).T,np.log10(self.rho0[:,0,:])) #need to expand rf and zf to same dimensions as tempg
-            #plt.colorbar()
-            plt.show()
 
         # store disk
 
