@@ -22,6 +22,30 @@ from scipy.integrate import trapz
 #testing time
 import time
 
+def imshow(x, title, label=None):
+    plt.imshow(x, cmap="RdBu_r")
+    plt.title(title)
+    plt.colorbar(label=label)
+    plt.show()
+
+def plot(x, y, z, title, label=None, ylim=None):
+    plt.pcolor(x, y, z, cmap="RdBu_r")
+    plt.title(title)
+    plt.colorbar(label=label)
+    if ylim is not None:
+        plt.ylim(ylim)
+    plt.show()
+
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return(rho, phi)
+
+def pol2cart(rho, phi):
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return(x, y)
+
 class Disk:
     'Common class for circumstellar disk structure'
     #Define useful constants
@@ -162,7 +186,6 @@ class Disk:
         plt.imshow(fcf[:,:,0])
         plt.title("fcf")
         plt.colorbar()
-        plt.savefig("warp_fcf.jpg")
         plt.show()
         '''
         #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
@@ -170,13 +193,13 @@ class Disk:
         plt.imshow(zcf[0,:,:])
         plt.title("zcf")
         plt.colorbar()
-        plt.savefig("original_zcf.jpg")
+
         plt.show()
 
         plt.imshow(zcf[10,:,:])
         plt.title("zcf p=10 index slice")
         plt.colorbar()
-        plt.savefig("original_zcf.jpg")
+
         plt.show()
         '''
         '''should be 0 grid in shape of radius, phi, z above midplane'''
@@ -258,7 +281,7 @@ class Disk:
         plt.imshow(siggas)
         plt.title("siggas")
         plt.colorbar()
-        plt.savefig("nowarp_siggas.jpg")
+
         plt.show()
         '''
 
@@ -309,15 +332,20 @@ class Disk:
 
         #https://pdfs.semanticscholar.org/75d1/c8533025d0a7c42d64a7fef87b0d96aba47e.pdf
         #Lovis & Fischer 2010, Exoplanets edited by S. Seager (eq 11 assuming m2>>m1)
+        self.vel_before_cos = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
-
-        '''
-        plt.imshow(self.vel[:,:,0])
-        plt.title("vel")
+        
+        
+        plt.imshow(self.vel_before_cos[:,:,0])
+        plt.title("before cosine vel")
         plt.colorbar()
-        plt.savefig("nowarp_vel.jpg")
         plt.show()
-        '''
+
+        plt.imshow(self.vel[:,:,0])
+        plt.title("after cosine vel")
+        plt.colorbar()
+        plt.show()
+        
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))
@@ -498,9 +526,12 @@ class Disk:
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<np.abs(self.thet))] = -((self.Aout*(1+self.ecc)-tdiskY[(theta_crit<np.abs(self.thet))])/self.sinthet)
 
-        print("zmax "  + str(self.zmax))
-        print("tdiskZmax " + str(np.max(tdiskZ)))
-        
+        imshow(S[:,:,0], title="S bottom of disk")
+        imshow(S[:,:,-1], title="S top of disk")
+
+        #print("zmax "  + str(self.zmax))
+        #print("tdiskZmax " + str(np.max(tdiskZ)))
+        '''
         plt.imshow(S[:,:,0])
         plt.title("S bottom of disk")
         plt.colorbar()
@@ -510,7 +541,7 @@ class Disk:
         plt.title("S top of disk")
         plt.colorbar()
         plt.show()
-        '''
+        
         plt.imshow(tdiskZ[:,:,0])
         plt.title("tdiskZ imshow")
         plt.colorbar()
@@ -529,11 +560,19 @@ class Disk:
         tr = np.sqrt(X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz)**2+tdiskY**2)
         tphi = np.arctan2(tdiskY,X.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
 
+        #imshow(tdiskY[:,:,0], title="tdiskY grid", label="tdiskY")
+        #imshow(X, title="X grid", label="X")
+        #imshow(tphi[:,:,0], title="phi warped grid", label="phi [rad]")
+
+        #print("tdiskY:"+ str(tdiskY))
+        #print("X:"+ str(X))
+        
+
         '''
         plt.imshow(tphi[:,:,0])
         plt.title("tphi")
         plt.colorbar()
-        plt.savefig("nowarp_tphi.jpg")
+
         plt.show()
         '''
         ###### should be real outline? requiring a loop over f or just Aout(1+ecc)######
@@ -610,6 +649,10 @@ class Disk:
         print("phiind min " + str(np.min(phiind)))
         print("phiind len " + str(len(phiind)))
         '''
+
+        #imshow(aind.reshape(tr.shape)[:,:,0], title="a index warped grid", label="a index")
+        #imshow(phiind.reshape(tr.shape)[:,:,0], title="phi index warped grid", label="phi index")
+        #imshow(zind.reshape(tr.shape)[:,:,0], title="z index warped grid", label="z index")
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
@@ -617,19 +660,8 @@ class Disk:
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
-        '''
-        plt.imshow(tT[:,:,0])
-        plt.title("tT")
-        plt.colorbar()
-        plt.savefig("nowarp_tT.jpg")
-        plt.show()
+        plot(X, tdiskY[:,:,0], tvel[:,:,0],title="cartesian vel")
 
-        plt.imshow(tvel[:,:,0])
-        plt.title("tvel")
-        plt.colorbar()
-        plt.savefig("nowarp_tvel.jpg")
-        plt.show()
-        '''
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #trhoH2 = trhoG/self.Xmol #** not on cluster**
@@ -639,81 +671,7 @@ class Disk:
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
 
-        plt.imshow(aind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
-        plt.colorbar()
-        plt.title("aind imshow")
-        plt.show()
-
-        plt.imshow(zind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
-        plt.colorbar()
-        plt.title("zind imshow")
-        plt.show()
-
-        plt.imshow(phiind.reshape(self.nphi,self.nr,self.nz)[:,:,0])
-        plt.colorbar()
-        plt.title("phiind imshow")
-        plt.show()
-        
-        plt.imshow(self.tempg[:,:,0])
-        plt.colorbar()
-        plt.title("tempg imshow before map coordinates, bottom of disk")
-        plt.show()
-
-        plt.imshow(self.tempg[:,:,-1])
-        plt.colorbar()
-        plt.title("tempg imshow before map coordinates, top of disk")
-        plt.show()
-
-        plt.imshow(self.vel[:,:,0])
-        plt.colorbar()
-        plt.title("tempg imshow before map coordinates, bottom of disk")
-        plt.show()
-
-        plt.imshow(self.vel[:,:,-1])
-        plt.colorbar()
-        plt.title("tempg imshow before map coordinates, top of disk")
-        plt.show()
-
-        plt.imshow(self.rho0[:,:,0])
-        plt.colorbar()
-        plt.title("rho0 imshow before map coordinates,bottom of disk")
-        plt.show()
-
-        plt.imshow(self.rho0[:,:,-1])
-        plt.colorbar()
-        plt.title("rho0 imshow before map coordinates, top of disk")
-        plt.show()
-
-        plt.imshow(self.rho0[:,:,100])
-        plt.colorbar()
-        plt.title("rho0 imshow before map coordinates, mid disk")
-        plt.show()
-        
-        plt.imshow(self.zpht_up)
-        plt.colorbar()
-        plt.title("zpht_up imshow before map coordinates")
-        plt.show()
-
-        plt.imshow(tsig_col[:,:,0])
-        plt.title("tsig_col")
-        plt.colorbar()
-        #plt.savefig("nowarp_tsig_col.jpg")
-        plt.show()
-
-        plt.pcolor(X, tdiskY[:,:,-1], tvel[:,:,-1])
-        plt.title("tvel, top and bottom")
-        plt.colorbar()
-        plt.show()
-        
-        plt.imshow(tvel[:,:,0])
-        plt.title("tvel bottom of disk")
-        plt.colorbar()
-        plt.show()
-
-        plt.imshow(tvel[:,:,-1])
-        plt.title("tvel top of disk")
-        plt.colorbar()
-        plt.show()
+        plot(X, tdiskY[:,:,0], tsig_col[:,:,0],title="cartesian sig col")
         
         self.sig_col = tsig_col
 
@@ -784,6 +742,13 @@ class Disk:
         self.rhoG = trhoG
         #self.Omg = Omg#Omgy #need to combine omgx,y,z
         self.vel = tvel
+
+        plt.imshow(self.vel[:,:,0])
+        plt.title("tvel")
+        plt.colorbar()
+
+        plt.show()
+
         self.i_notdisk = notdisk
         #self.i_xydisk = xydisk
         #self.rhoH2 = trhoH2 #*** not on cluster ***
