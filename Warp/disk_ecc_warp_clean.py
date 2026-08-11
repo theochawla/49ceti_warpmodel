@@ -305,15 +305,12 @@ class Disk:
         xi, yi = pol2cart(acf, pcf)
         x_w, y_w, z_w = matrix_mine(xi, yi, zcf, warp_i, twist_i, 0, 0)
 
+
+
         '''calculating velocity structure at the same time as the positional warp'''
         #vel_phi = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
+        
         vel_phi = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))
-
-        plt.imshow(vel_phi[:,:,0])
-        plt.title("tvel")
-        plt.colorbar()
-        plt.savefig("nowarp_vel.jpg")
-        plt.show()
         
         vx = -vel_phi*np.sin(pcf)
         vy = vel_phi*np.cos(pcf)
@@ -329,14 +326,24 @@ class Disk:
         rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
         rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
 
-        self.vx_w = rotvx
-        self.vy_w = rotvy
-        self.vz_w = vz_w
+        plot(trotx[:,:,0], troty[:,:,0], vz_w[:,:,0], "uninclined z velocity after az rotation", label="z vel (cm/s)")
 
-        plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (cm/s)")
-        plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
-        plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
+        #self.vx_w = rotvx
+        #self.vy_w = rotvy
+        #self.vz_w = vz_w
+        
+        '''calculating velocity structure after global inclination'''
+        tvy_rot = (rotvy*np.cos(self.thet) - vz_w*np.sin(self.thet)) 
+        tvz_rot = (rotvy*np.sin(self.thet) + vz_w*np.cos(self.thet)) 
+        self.vz_w = tvz_rot
 
+        ty_w = (troty*np.cos(self.thet) - z_w*np.sin(self.thet))
+        tz_w = (troty*np.sin(self.thet) + z_w*np.cos(self.thet)) 
+
+        #plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (cm/s)")
+        #plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
+        #plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
+        
         self.x_grid = x_w
         self.y_grid = y_w
         self.z_grid = z_w
@@ -479,23 +486,37 @@ class Disk:
         zf_w = np.linspace(-z_w_max, z_w_max, nzc)
         self.zf_w = zf_w
 
+        pcf_shift = (pcf - rot) % (2*np.pi)
+
         aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
+        aind = np.interp(rcf.flatten(), af, range(nac), right=nac)
         phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
+        phiind_shift = np.interp(pcf_shift.flatten(), pf, range(self.nphi))
+        #phiind = np.interp(pcf.flatten(), pf, range(self.nphi))
         #zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
         zind_w = np.interp(z_w.flatten(), zf_w,range(nzc), right=nzc)
+        zind = np.interp(zcf.flatten(), zf, range(nzc), right=nzc)
 
+        imshow(self.vz_w[:,:,0], title="natural velocity grid", label="vel [cm/s]")
 
+        plot(self.x_polar, self.y_polar, self.vz_w[:,:,0], "vel, before spatial incl", label="vel [cm/s]")
+        plot(trotx[:,:,0], ty_w[:,:,0], tz_w[:,:,0], "warped positions, inclined", label="z [cm]", ylim=[-np.max(trotx), np.max(trotx)])
+        plot(trotx[:,:,0], ty_w[:,:,0], self.vz_w[:,:,0], "vel, referenced with warped grid inclined", label="vel [cm/s]", ylim=[-np.max(trotx), np.max(trotx)])
 
         '''interpolating temp, vel, and density onto warped grid'''
+
         temp_interp = ndimage.map_coordinates(tempg,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
         sig_col_interp = ndimage.map_coordinates(sig_col,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        vel_interp = ndimage.map_coordinates(self.vz_w,[[aind], [phiind_shift], [zind]], order=1).reshape(nac,self.nphi, nzc)
 
         #plot(trotx[:,:,0], troty[:,:,0], temp_interp[:,:,150], "temp interp", label="temp [K]")
         #plot(trotx[:,:,0], troty[:,:,0], sig_col_interp[:,:,150], "sig col interp", label="sig col [cm^-2]")
 
         self.sig_col = sig_col_interp
-        #self.vel = vel_interp
+        self.vel = vel_interp
         self.tempg = temp_interp
+
+        plot(self.x_polar, self.y_polar, vel_interp[:,:,0], "vel interp, before spatial incl", label="vel [cm/s]")
 
         '''
         szpht = zpht
@@ -585,7 +606,39 @@ class Disk:
         '''applying warp'''
         X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
 
+        '''calculating velocity directly here instead of interpolating from set_structure'''
+
+        vel_phi = np.sqrt(Disk.G*self.Mstar/(R_mesh*(1-self.ecc**2.)))
         
+        plt.imshow(vel_phi[:,:,0])
+        plt.title("tvel")
+        plt.colorbar()
+        plt.savefig("nowarp_vel.jpg")
+        plt.show()
+        
+        vx = -vel_phi*np.sin(phi_mesh)
+        vy = vel_phi*np.cos(phi_mesh)
+        vz = np.zeros(phi_mesh.shape)
+
+        vx_w, vy_w, vz_w = matrix_mine_rt(vx, vy, vz, warp_rt, twist_rt, 0, 0)
+
+        '''now, global az rotation of the disk:'''
+        rot = np.radians(self.rot)
+        trotx = X_w*np.cos(rot)-Y_w*np.sin(rot) 
+        troty = X_w*np.sin(rot)+Y_w*np.cos(rot) 
+        
+        rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
+        rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
+
+        self.vx_w = rotvx
+        self.vy_w = rotvy
+        self.vz_w = vz_w
+
+
+        plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (cm/s)")
+        plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
+        plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
+
 
         #plot(X_w[:,:,150], Y_w[:,:,150], Z_w[:,:,150], "Warped grid", label="z [AU]")
 
@@ -628,15 +681,11 @@ class Disk:
         tdiskY_rot = (Y_nonw_rot*self.costhet - zsky*self.sinthet)
         tdiskZ_rot = (Y_nonw_rot*self.sinthet + zsky*self.costhet)
 
-        tvy = (self.vy_w*self.costhet - self.vz_w*self.sinthet)
-        tvz = (self.vy_w*self.sinthet + self.vz_w*self.costhet)
+        #tvy = (self.vy_w*self.costhet - self.vz_w*self.sinthet)
+        #tvz = (self.vy_w*self.sinthet + self.vz_w*self.costhet)
 
-        
+        #tvel = tvz
 
-        plt.imshow(tvz[:,:,0])
-        plt.title("tvz")
-        plt.colorbar()
-        plt.show()
 
         #tvy_rot = (rotvy*np.cos(inc) - vwz*np.sin(inc)) 
         #tvz_rot = (rotvy*np.sin(inc) + vwz*np.cos(inc)) 
@@ -722,12 +771,14 @@ class Disk:
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
         #tT_w = ndimage.map_coordinates(self.tempg,[[aind_w],[phiind_w],[zind_w]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
 
-        tvel = ndimage.map_coordinates(tvz,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
+        tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
         #tvel = ndimage.map_coordinates(tvz,[[aind],[phiind_shift],[zind]],order=1,).reshape(self.nphi,self.nr,self.nz)
         #tvel_w = ndimage.map_coordinates(tvz,[[aind_w],[phiind_w],[zind_w]],order=1,).reshape(self.nphi,self.nr,self.nz)
         #tvel_rot = ndimage.map_coordinates(tvz,[[aind_rot],[phiind_rot],[zind_rot]],order=1,).reshape(self.nphi,self.nr,self.nz)
-        plot(X[:,:,150], tdiskY[:,:,150], tvel[:,:,150], "warped velocities", label="vel (cm/s)", ylim=[-np.max(X), np.max(X)])
+        #plot(X[:,:,150], tdiskY[:,:,150], tvel[:,:,150], "warped velocities", label="vel (cm/s)", ylim=[-np.max(X), np.max(X)])
         #tvel = tvel_w
+
+        plot(X[:,:,150], tdiskY[:,:,150], tvel[:,:,150], title="final velocity structure", label="z vel (cm/s)", ylim=[-np.max(X), np.max(X)])
         
         #plot(X_w[:,:,0], tdiskY_w[:,:,0], tvel_w[:,:,0], title="cartesian vel")
 
