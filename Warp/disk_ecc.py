@@ -182,27 +182,11 @@ class Disk:
         #zcf = (np.outer(ida,idf))[:,:,np.newaxis]*zf
         #pcf = (np.outer(ida,pf))[:,:,np.newaxis]*idz
         fcf = (pcf - self.aop) % (2*np.pi)
-        '''
-        plt.imshow(fcf[:,:,0])
-        plt.title("fcf")
-        plt.colorbar()
-        plt.show()
-        '''
-        #acf = (np.outer(af,idf))[:,:,np.newaxis]*idz
-        '''
-        plt.imshow(zcf[0,:,:])
-        plt.title("zcf")
-        plt.colorbar()
 
-        plt.show()
 
-        plt.imshow(zcf[10,:,:])
-        plt.title("zcf p=10 index slice")
-        plt.colorbar()
+        '''adding to make plots to compare with warp model'''
+        xi, yi = pol2cart(acf, pcf)
 
-        plt.show()
-        '''
-        '''should be 0 grid in shape of radius, phi, z above midplane'''
         rcf=rf[:,:,np.newaxis]*idz
         #print(str(rcf.shape))
         #print("coords init {t}".format(t=time.clock()-tst))
@@ -277,13 +261,7 @@ class Disk:
         siggas = ((siggas_r*np.sqrt(1.-e*e))/(2*np.pi*acf[:,:,0]*np.sqrt(1+2*e*np.cos(fcf[:,:,0])+e*e)))*dsdth
 
         #print("siggas shape: "+ str(siggas.shape))
-        '''
-        plt.imshow(siggas)
-        plt.title("siggas")
-        plt.colorbar()
 
-        plt.show()
-        '''
 
         ## Add an extra ring
         if self.ring is not None:
@@ -335,17 +313,8 @@ class Disk:
         self.vel_before_cos = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))
         self.vel = np.sqrt(Disk.G*self.Mstar/(acf*(1-self.ecc**2.)))*(np.cos(self.aop+fcf)+self.ecc*self.cosaop)
         
-        
-        plt.imshow(self.vel_before_cos[:,:,0])
-        plt.title("before cosine vel")
-        plt.colorbar()
-        plt.show()
 
-        plt.imshow(self.vel[:,:,0])
-        plt.title("after cosine vel")
-        plt.colorbar()
-        plt.show()
-        
+
         ###### Major change: vel is linear not angular ######
         #Omk = np.sqrt(Disk.G*self.Mstar/acf**3.)#/rcf
         #velrot = np.zeros((3,nac,nfc,nzc))
@@ -404,6 +373,9 @@ class Disk:
         self.sig_col = sig_col
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
+
+        plot(xi[:,:,0], yi[:,:,0], sig_col[:,:,0], "Column Density at z=0", label="Column Density [g/cm^2]")
+        plot(xi[:,:,0], yi[:,:,0], tempg[:,:,0], "Temperature at z=0", label="Temperature [K]")
 
         '''
 
@@ -480,8 +452,10 @@ class Disk:
 
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
+            #high inclination
             zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
         else:
+            #low inclination
             zsky_max = 2*(self.zmax/self.costhet)
 
         '''this looks like the reflection...??'''
@@ -493,22 +467,15 @@ class Disk:
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
 
-        plt.imshow(tdiskY[:,:,0])
-        plt.title("tdiskY[:,:,0]")
+        imshow(tdiskY[:,:,0], title="tdiskY[:,:,0]", label="tdiskY")
+        imshow(tdiskY[:,:,-1], title="tdiskY[:,:,-1]", label="tdiskY ")
 
-        plt.imshow(tdiskY[:,:,-1])
-        plt.title("tdiskY[:,:,-1]")
+        imshow(tdiskZ[:,:,0], title="tdiskZ[:,:,0]", label="tdiskZ")
+        imshow(tdiskZ[:,:,-1], title="tdiskZ[:,:,-1]", label="tdiskZ")
 
-        plt.imshow(tdiskZ[:,:,0])
-        plt.title("tdiskZ[:,:,0]")
+        plot(X, Y, tdiskZ[:,:,0], "tdiskZ referenced by X and Y", label="tdiskZ")
+        plot(X, tdiskY[:,:,0], tdiskZ[:,:,0], "tdiskY referenced by X and tdiskY", label="tdiskY")
 
-        plt.imshow(tdiskZ[:,:,-1])
-        plt.title("tdiskZ[:,:,-1]")
-
-        del_tdiskY = tdiskY[0,0,-1]-tdiskY[0,0,0]
-        del_tdiskY2 = tdiskY[10,10,-1]-tdiskY[10,10,0]
-        print("on sky thickness " + str(del_tdiskY))
-        print("on sky thickness 2 " + str(del_tdiskY2))
         if (self.thet<np.pi/2) & (self.thet>0):
 
             '''what is this theta_crit value...?'''

@@ -326,7 +326,7 @@ class Disk:
         rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
         rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
 
-        plot(trotx[:,:,0], troty[:,:,0], vz_w[:,:,0], "uninclined z velocity after az rotation", label="z vel (cm/s)")
+        #plot(trotx[:,:,0], troty[:,:,0], vz_w[:,:,0], "uninclined z velocity after az rotation", label="z vel (cm/s)")
 
         #self.vx_w = rotvx
         #self.vy_w = rotvy
@@ -344,12 +344,13 @@ class Disk:
         #plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
         #plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
         
-        self.x_grid = x_w
-        self.y_grid = y_w
+        self.x_grid = trotx
+        self.y_grid = troty
         self.z_grid = z_w
 
         '''converting back to polar coordinates'''
         r_w, p_w = cart2pol(trotx, troty)
+        #r_w, p_w = cart2pol(x_w, y_w)
         #p_w = p_w + np.pi 
 
         '''useful for plotting polar graphs in cart space'''
@@ -487,30 +488,39 @@ class Disk:
         self.zf_w = zf_w
 
         pcf_shift = (pcf - rot) % (2*np.pi)
+        p_w_shift = (p_w + rot) % (2*np.pi)
 
         aind_w = np.interp(r_w.flatten(), af, range(nac), right=nac)
         aind = np.interp(rcf.flatten(), af, range(nac), right=nac)
-        phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
+        #phiind_w = np.interp(p_w.flatten(), pf, range(self.nphi))
+        phiind_w_shift = np.interp(p_w_shift.flatten(), pf, range(self.nphi))
         phiind_shift = np.interp(pcf_shift.flatten(), pf, range(self.nphi))
         #phiind = np.interp(pcf.flatten(), pf, range(self.nphi))
         #zind_w = np.interp(z_w.flatten(), zf[:-150],range(nzc-150), right=nzc-150)
         zind_w = np.interp(z_w.flatten(), zf_w,range(nzc), right=nzc)
         zind = np.interp(zcf.flatten(), zf, range(nzc), right=nzc)
 
-        imshow(self.vz_w[:,:,0], title="natural velocity grid", label="vel [cm/s]")
+        #imshow(self.vz_w[:,:,0], title="natural velocity grid", label="vel [cm/s]")
 
-        plot(self.x_polar, self.y_polar, self.vz_w[:,:,0], "vel, before spatial incl", label="vel [cm/s]")
-        plot(trotx[:,:,0], ty_w[:,:,0], tz_w[:,:,0], "warped positions, inclined", label="z [cm]", ylim=[-np.max(trotx), np.max(trotx)])
-        plot(trotx[:,:,0], ty_w[:,:,0], self.vz_w[:,:,0], "vel, referenced with warped grid inclined", label="vel [cm/s]", ylim=[-np.max(trotx), np.max(trotx)])
+        #plot(self.x_polar, self.y_polar, self.vz_w[:,:,0], "vel, before spatial incl", label="vel [cm/s]")
+        #plot(trotx[:,:,0], ty_w[:,:,0], tz_w[:,:,0], "warped positions, inclined", label="z [cm]", ylim=[-np.max(trotx), np.max(trotx)])
+        #plot(trotx[:,:,0], ty_w[:,:,0], self.vz_w[:,:,0], "vel, referenced with warped grid inclined", label="vel [cm/s]", ylim=[-np.max(trotx), np.max(trotx)])
 
-        '''interpolating temp, vel, and density onto warped grid'''
+        '''interpolating temp, vel, and density onto warped grid
+        vel is calculated directly on warped grid, so needs to be interpolated back to natural grid for RT calculations
+        temp & sig_col are calculated on unwarped grid, so need to be interpolated onto warped grid for RT calculations
+        '''
 
-        temp_interp = ndimage.map_coordinates(tempg,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
-        sig_col_interp = ndimage.map_coordinates(sig_col,[[aind_w], [phiind_w], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        temp_interp = ndimage.map_coordinates(tempg,[[aind_w], [phiind_w_shift], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        sig_col_interp = ndimage.map_coordinates(sig_col,[[aind_w], [phiind_w_shift], [zind_w]], order=1).reshape(nac,self.nphi, nzc)
+        #temp_interp = ndimage.map_coordinates(tempg,[[aind], [phiind_shift], [zind]], order=1).reshape(nac,self.nphi, nzc)
+        #sig_col_interp = ndimage.map_coordinates(sig_col,[[aind], [phiind_shift], [zind]], order=1).reshape(nac,self.nphi, nzc)
         vel_interp = ndimage.map_coordinates(self.vz_w,[[aind], [phiind_shift], [zind]], order=1).reshape(nac,self.nphi, nzc)
 
-        #plot(trotx[:,:,0], troty[:,:,0], temp_interp[:,:,150], "temp interp", label="temp [K]")
-        #plot(trotx[:,:,0], troty[:,:,0], sig_col_interp[:,:,150], "sig col interp", label="sig col [cm^-2]")
+        #plot(trotx[:,:,0], troty[:,:,0], temp_interp[:,:,150], "temp interp, rotated grid", label="temp [K]")
+        #plot(trotx[:,:,0], troty[:,:,0], sig_col_interp[:,:,150], "sig col interp, rotated grid", label="sig col [cm^-2]")
+        plot(self.x_polar, self.y_polar, temp_interp[:,:,0], "temp interp, unwarped uninclined coords", label="temp [K]")
+        plot(self.x_polar, self.y_polar, sig_col_interp[:,:,0], "sig col interp, unwarped uninclined coords", label="sig col [cm^-2]")
 
         self.sig_col = sig_col_interp
         self.vel = vel_interp
@@ -576,7 +586,8 @@ class Disk:
         #z_l = self.zf
         #z_l = np.arange(self.nz)/self.nz*(-self.zmax)+s/2.
 
-        z_l = np.linspace(self.zmax,-self.zmax,self.nz)
+        #z_l = np.linspace(self.zmax,-self.zmax,self.nz)
+        z_l = np.linspace(self.z_w_max,-self.z_w_max,self.nz)
         #print("nz " + str(self.nz))
 
 
@@ -591,64 +602,61 @@ class Disk:
         warp_rt  = w_func(self, R, type="w")
         twist_rt = w_func(self, R, type="pa")
 
-        print("warp_rt " + str(np.rad2deg(warp_rt)))
 
-        total_inc = warp_rt + self.thet
-
-        print("total_inc " + str(np.rad2deg(total_inc)))
+        #total_inc = warp_rt + self.thet
 
 
         '''leaving X & Y here as sky coordinates, but since right now they are the same
         dimension as disk coordinates, I am going to use them as the basis for the warp'''
-        X, Y = pol2cart(R_mesh, phi_mesh)
+        Xw, Yw = pol2cart(R_mesh, phi_mesh)
+
+        X = (np.outer(R,np.cos(phi))).transpose()
+        Y = (np.outer(R,np.sin(phi))).transpose()
 
 
-        '''applying warp'''
-        X_w, Y_w, Z_w = matrix_mine_rt(X, Y, Z, warp_rt, twist_rt,0,0)
+        '''applying warp
+        necessary for S'''
+
+        X_w, Y_w, Z_w = matrix_mine_rt(Xw, Yw, Z, warp_rt, twist_rt,0,0)
 
         '''calculating velocity directly here instead of interpolating from set_structure'''
 
-        vel_phi = np.sqrt(Disk.G*self.Mstar/(R_mesh*(1-self.ecc**2.)))
-        
-        plt.imshow(vel_phi[:,:,0])
-        plt.title("tvel")
-        plt.colorbar()
-        plt.savefig("nowarp_vel.jpg")
-        plt.show()
-        
-        vx = -vel_phi*np.sin(phi_mesh)
-        vy = vel_phi*np.cos(phi_mesh)
-        vz = np.zeros(phi_mesh.shape)
+        #vel_phi = np.sqrt(Disk.G*self.Mstar/(R_mesh*(1-self.ecc**2.)))
 
-        vx_w, vy_w, vz_w = matrix_mine_rt(vx, vy, vz, warp_rt, twist_rt, 0, 0)
+        
+        #vx = -vel_phi*np.sin(phi_mesh)
+        #vy = vel_phi*np.cos(phi_mesh)
+        #vz = np.zeros(phi_mesh.shape)
+
+        #vx_w, vy_w, vz_w = matrix_mine_rt(vx, vy, vz, warp_rt, twist_rt, 0, 0)
 
         '''now, global az rotation of the disk:'''
         rot = np.radians(self.rot)
-        trotx = X_w*np.cos(rot)-Y_w*np.sin(rot) 
-        troty = X_w*np.sin(rot)+Y_w*np.cos(rot) 
+        #trotx = X_w*np.cos(rot)-Y_w*np.sin(rot) 
+        #troty = X_w*np.sin(rot)+Y_w*np.cos(rot) 
         
-        rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
-        rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
+        #rotvx = vx_w*np.cos(rot)-vy_w*np.sin(rot) 
+        #rotvy = vx_w*np.sin(rot)+vy_w*np.cos(rot)
 
-        self.vx_w = rotvx
-        self.vy_w = rotvy
-        self.vz_w = vz_w
+        #self.vx_w = rotvx
+        #self.vy_w = rotvy
+        #self.vz_w = vz_w
 
 
-        plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (cm/s)")
-        plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
-        plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
+        #plot(trotx[:,:,150], troty[:,:,150], rotvx[:,:,150], "x velocity", label="x vel (cm/s)")
+        #plot(trotx[:,:,150], troty[:,:,150], rotvy[:,:,150], "y velocity", label="y vel (cm/s)")
+        #plot(trotx[:,:,150], troty[:,:,150], vz_w[:,:,150], "z velocity", label="z vel (cm/s)")
 
 
         #plot(X_w[:,:,150], Y_w[:,:,150], Z_w[:,:,150], "Warped grid", label="z [AU]")
 
         rot = np.radians(self.rot)
 
-        X_nonw_rot = X*np.cos(rot)-Y*np.sin(rot)
-        Y_nonw_rot = X*np.sin(rot)+Y*np.cos(rot)
+        #X_nonw_rot = X*np.cos(rot)-Y*np.sin(rot)
+        #Y_nonw_rot = X*np.sin(rot)+Y*np.cos(rot)
 
-        X_rot = X_w*np.cos(rot)-Y_w*np.sin(rot) 
-        Y_rot = X_w*np.sin(rot)+Y_w*np.cos(rot)
+        #X_rot = X_w*np.cos(rot)-Y_w*np.sin(rot) 
+        #Y_rot = X_w*np.sin(rot)+Y_w*np.cos(rot)
 
         #plot(X_rot[:,:,150], Y_rot[:,:,150], Z_w[:,:,150], "Warp before incl", label="z cm", ylim=[-np.max(X), np.max(X)])
  
@@ -659,12 +667,13 @@ class Disk:
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
             #zsky_w = np.abs(Z_w/self.sinthet)
             #zsky_w = Z_w/self.sinthet
-            '''I haven't figured out the extremely edge-on case yet'''
+            zsky_max = np.abs(2*self.Aout*(1+self.ecc)/self.sinthet)
             print("weird zsky_w True")
         else:
-            zsky_w = (Z_w/self.costhet)
+            #zsky_w = (Z_w/self.costhet)
             #zsky_w = Z_w
-            zsky = (Z/self.costhet)
+            #zsky = (Z/self.costhet)
+            zsky_max = 2*(self.z_w_max/self.costhet)
             #zsky = Z
             print("normal zsky_w True")
 
@@ -672,14 +681,22 @@ class Disk:
         '''I create a warped and unwarped grid here
         for something to compare against '''
 
-        tdiskY_w = (Y_rot*self.costhet - zsky_w*self.sinthet)
-        tdiskZ_w = (Y_rot*self.sinthet + zsky_w*self.costhet)
+        zsky = np.arange(self.nz)/self.nz*(-zsky_max)+zsky_max/2.
 
-        tdiskY = (Y*self.costhet - zsky*self.sinthet)
-        tdiskZ = (Y*self.sinthet + zsky*self.costhet)
+        tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
+        tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
 
-        tdiskY_rot = (Y_nonw_rot*self.costhet - zsky*self.sinthet)
-        tdiskZ_rot = (Y_nonw_rot*self.sinthet + zsky*self.costhet)
+        #tdiskY_w = (Y_rot*self.costhet - zsky_w*self.sinthet)
+        #tdiskZ_w = (Y_rot*self.sinthet + zsky_w*self.costhet)
+
+        #tdiskY = (Y*self.costhet - zsky*self.sinthet)
+        #tdiskZ = (Y*self.sinthet + zsky*self.costhet)
+
+        #tdiskY = (Y*self.costhet - zsky_w*self.sinthet)
+        #tdiskZ = (Y*self.sinthet + zsky_w*self.costhet)
+
+        #tdiskY_rot = (Y_nonw_rot*self.costhet - zsky*self.sinthet)
+        #tdiskZ_rot = (Y_nonw_rot*self.sinthet + zsky*self.costhet)
 
         #tvy = (self.vy_w*self.costhet - self.vz_w*self.sinthet)
         #tvz = (self.vy_w*self.sinthet + self.vz_w*self.costhet)
@@ -690,9 +707,9 @@ class Disk:
         #tvy_rot = (rotvy*np.cos(inc) - vwz*np.sin(inc)) 
         #tvz_rot = (rotvy*np.sin(inc) + vwz*np.cos(inc)) 
 
-        plot(X_rot[:,:,150], tdiskY_w[:,:,150], tdiskZ_w[:,:,150], "Warp on sky", label="z [AU]", ylim=[-np.max(X), np.max(X)])
+        #plot(X_rot[:,:,150], tdiskY_w[:,:,150], tdiskZ_w[:,:,150], "Warp on sky", label="z [AU]", ylim=[-np.max(X), np.max(X)])
         
-        total_inc_full_grid = total_inc[np.newaxis, :, np.newaxis]*np.ones((self.nphi, self.nr, self.nz))
+        #total_inc_full_grid = total_inc[np.newaxis, :, np.newaxis]*np.ones((self.nphi, self.nr, self.nz))
 
         '''I have not modified S'''
         if (self.thet<np.pi/2) & (self.thet>0):
@@ -723,8 +740,8 @@ class Disk:
         #tphi = np.arctan2(tdiskY,X_w.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))%(2*np.pi)
         #tphi = np.arctan2(tdiskY,X)%(2*np.pi)
         tphi = np.arctan2(tdiskY,X)%(2*np.pi)
-        tphi_shift = (tphi - rot)%(2*np.pi)
-        tphi_rot = np.arctan2(tdiskY_rot,X_nonw_rot)%(2*np.pi)
+        #tphi_shift = (tphi - rot)%(2*np.pi)
+        #tphi_rot = np.arctan2(tdiskY_rot,X_nonw_rot)%(2*np.pi)
         #tphi_w = np.arctan2(tdiskY_w,X_rot)%(2*np.pi)
 
         #imshow(tdiskY_w[:,:,0], title="Y warped grid", label="Y")
@@ -732,14 +749,14 @@ class Disk:
         #imshow(np.arctan2(tdiskY_w[:,:,0],X_rot[:,:,0]), title="single slice phi warped grid")
         #tphi_w = np.arctan2(X_w,tdiskY_w)%(2*np.pi)
 
-        print("tdiskY_w[:,:,0]:"+ str(tdiskY_w[:,:,0]))
-        print("X_rot[:,:,0]:"+ str(X_rot[:,:,0]))
+        #print("tdiskY_w[:,:,0]:"+ str(tdiskY_w[:,:,0]))
+        #print("X_rot[:,:,0]:"+ str(X_rot[:,:,0]))
 
-        tr_w, phi_w = cart2pol(X_rot, tdiskY_w)
+        #tr_w, phi_w = cart2pol(X_rot, tdiskY_w)
 
-        tr_rot, phi_rot = cart2pol(X_nonw_rot, tdiskY_rot)
+        #tr_rot, phi_rot = cart2pol(X_nonw_rot, tdiskY_rot)
 
-        tphi_w = (phi_w)%(2*np.pi)
+        #tphi_w = (phi_w)%(2*np.pi)
 
         #imshow(tphi_w[:,:,0], title="phi warped grid", label="phi [rad]")
 
@@ -753,15 +770,15 @@ class Disk:
 
         zind = np.interp(np.abs(tdiskZ).flatten(),self.zf_w,range(self.nzc)) #zf,nzc
         #zind_rot = np.interp(np.abs(tdiskZ_rot).flatten(),self.zf_w,range(self.nzc))
-        zind_w = np.interp(np.abs(tdiskZ_w).flatten(),self.zf_w,range(self.nzc))
+        #zind_w = np.interp(np.abs(tdiskZ_w).flatten(),self.zf_w,range(self.nzc))
         
         phiind = np.interp(tphi.flatten(),self.pf,range(self.nphi))
         #phiind_shift = np.interp(tphi_shift.flatten(),self.pf,range(self.nphi))
         #phiind_rot = np.interp(tphi_rot.flatten(),self.pf,range(self.nphi))
-        phiind_w = np.interp(tphi_w.flatten(),self.pf,range(self.nphi))
+        #phiind_w = np.interp(tphi_w.flatten(),self.pf,range(self.nphi))
 
         aind = np.interp((tr.flatten()*(1+self.ecc*np.cos(tphi.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
-        aind_w = np.interp((tr_w.flatten()*(1+self.ecc*np.cos(tphi_w.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
+        #aind_w = np.interp((tr_w.flatten()*(1+self.ecc*np.cos(tphi_w.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
         #aind_rot = np.interp((tr_rot.flatten()*(1+self.ecc*np.cos(phi_rot.flatten()-self.aop)))/(1.-self.ecc**2),self.af,range(self.nac),right=self.nac)
 
         #imshow(aind_w.reshape(self.nphi,self.nac, self.nzc)[:,:,0], title="a index warped grid", label="a index")
