@@ -28,8 +28,10 @@ def imshow(x, title, label=None):
     plt.colorbar(label=label)
     plt.show()
 
-def plot(x, y, z, title, label=None, ylim=None):
+def plot(x, y, z, title, label=None, ylim=None, z2=None):
     plt.pcolor(x, y, z, cmap="RdBu_r")
+    if z2 is not None:
+            plt.pcolor(x, y, z2, cmap="RdBu_r")
     plt.title(title)
     plt.colorbar(label=label)
     if ylim is not None:
@@ -374,8 +376,8 @@ class Disk:
         #szpht = zpht
         #print("Zpht {t} seconds".format(t=(time.clock()-tst)))
 
-        plot(xi[:,:,0], yi[:,:,0], sig_col[:,:,0], "Column Density at z=0", label="Column Density [g/cm^2]")
-        plot(xi[:,:,0], yi[:,:,0], tempg[:,:,0], "Temperature at z=0", label="Temperature [K]")
+        #plot(xi[:,:,0], yi[:,:,0], sig_col[:,:,0], "Column Density at z=0", label="Column Density [g/cm^2]")
+        #plot(xi[:,:,0], yi[:,:,0], tempg[:,:,0], "Temperature at z=0", label="Temperature [K]")
 
         '''
 
@@ -437,18 +439,14 @@ class Disk:
         X = (np.outer(R,np.cos(phi))).transpose()
         Y = (np.outer(R,np.sin(phi))).transpose()
 
-        plt.plot(X, Y)
-        plt.title("X by Y")
-        plt.xlabel("X")
-        plt.ylabel("Y")
 
-        print("X shape " + str(X.shape))
+        #print("X shape " + str(X.shape))
 
-        print("X_0 " + str(X[0,0]))
-        print("X_-1 " + str(X[0,-1]))
+        #print("X_0 " + str(X[0,0]))
+        #print("X_-1 " + str(X[0,-1]))
 
-        print("Y_0 " + str(Y[0,0]))
-        print("Y_-1 " + str(Y[0,-1]))
+        #print("Y_0 " + str(Y[0,0]))
+        #print("Y_-1 " + str(Y[0,-1]))
 
         #Use a rotation matrix to transform between radiative transfer grid and physical structure grid
         if np.abs(self.thet) > np.arctan(self.Aout*(1+self.ecc)/self.zmax):
@@ -467,14 +465,14 @@ class Disk:
         tdiskZ = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.sinthet+zsky*self.costhet
         tdiskY = (Y.repeat(self.nz).reshape(self.nphi,self.nr,self.nz))*self.costhet-zsky*self.sinthet
 
-        imshow(tdiskY[:,:,0], title="tdiskY[:,:,0]", label="tdiskY")
-        imshow(tdiskY[:,:,-1], title="tdiskY[:,:,-1]", label="tdiskY ")
+        #imshow(tdiskY[:,:,0], title="tdiskY[:,:,0]", label="tdiskY")
+        #imshow(tdiskY[:,:,-1], title="tdiskY[:,:,-1]", label="tdiskY ")
 
-        imshow(tdiskZ[:,:,0], title="tdiskZ[:,:,0]", label="tdiskZ")
-        imshow(tdiskZ[:,:,-1], title="tdiskZ[:,:,-1]", label="tdiskZ")
+        #imshow(tdiskZ[:,:,0], title="tdiskZ[:,:,0]", label="tdiskZ")
+        #imshow(tdiskZ[:,:,-1], title="tdiskZ[:,:,-1]", label="tdiskZ")
 
-        plot(X, Y, tdiskZ[:,:,0], "tdiskZ referenced by X and Y", label="tdiskZ")
-        plot(X, tdiskY[:,:,0], tdiskZ[:,:,0], "tdiskY referenced by X and tdiskY", label="tdiskY")
+        #plot(X, Y, tdiskZ[:,:,0], "tdiskZ referenced by X and Y", label="tdiskZ")
+        #plot(X, tdiskY[:,:,0], tdiskZ[:,:,0], "tdiskY referenced by X and tdiskY", label="tdiskY")
 
         if (self.thet<np.pi/2) & (self.thet>0):
 
@@ -493,8 +491,11 @@ class Disk:
             S = (self.zmax-tdiskZ)/self.costhet
             S[(theta_crit<np.abs(self.thet))] = -((self.Aout*(1+self.ecc)-tdiskY[(theta_crit<np.abs(self.thet))])/self.sinthet)
 
-        imshow(S[:,:,0], title="S bottom of disk")
-        imshow(S[:,:,-1], title="S top of disk")
+        #imshow(S[:,:,0], title="S bottom of disk")
+        #imshow(S[:,:,-1], title="S top of disk")
+
+        plot(X, Y, S[:,:,0], "S referenced by X and Y [:,:,0]", label="S")
+        plot(X, Y, S[:,:,-1], "S referenced by X and Y [:,:,-1]", label="S")
 
         #print("zmax "  + str(self.zmax))
         #print("tdiskZmax " + str(np.max(tdiskZ)))
@@ -623,11 +624,19 @@ class Disk:
         #print("index interp {t}".format(t=time.clock()-tst))
         ###### fixed T,Omg,rhoG still need to work on zpht ######
         tT = ndimage.map_coordinates(self.tempg,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #interpolate onto coordinates xind,yind #tempg
+        imshow(tT[:,:,0], title="tT z_sky=0", label="Temperature [K]")
+        imshow(tT[:,:,-1], title="tT z_sky=max", label="Temperature [K]")
+        #plot(X, tdiskY[:,:,0], tT[:,:,0],title="cartesian temp, X, tdiskY [:,:,0]", ylim=(-np.max(X), np.max(X)))
+        #plot(X, tdiskY[:,:,-1], tT[:,:,-1],title="cartesian temp, X, tdiskY, [:,:,-1]", ylim=(-np.max(X), np.max(X)))
+        plot(X, Y, tT[:,:,0],title="cartesian temp, X, Y [:,:,0]")
+        plot(X, Y, tT[:,:,-1],title="cartesian temp, X, Y [:,:,-1]")
+        plot(X, Y, tT[:,:,150], title="cartesian temp, X, Y [:,:,150]")
+
         #Omgx = ndimage.map_coordinates(self.Omg0[0],[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgs
         #Omg = ndimage.map_coordinates(self.Omg0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz) #Omgy
         tvel = ndimage.map_coordinates(self.vel,[[aind],[phiind],[zind]],order=1).reshape(self.nphi,self.nr,self.nz)
 
-        plot(X, tdiskY[:,:,0], tvel[:,:,0],title="cartesian vel")
+        #plot(X, tdiskY[:,:,0], tvel[:,:,0],title="cartesian vel")
 
         #Omgz = np.zeros(np.shape(Omgy))
         #trhoG = Disk.H2tog*self.Xmol/Disk.m0*ndimage.map_coordinates(self.rho0,[[aind],[phiind],[zind]],order=1,cval=1e-18).reshape(self.nphi,self.nr,self.nz)
@@ -638,7 +647,7 @@ class Disk:
         zpht_low = ndimage.map_coordinates(self.zpht_low,[[aind],[phiind]],order=1).reshape(self.nphi,self.nr,self.nz) #tr,rf,zpht
         tT[notdisk] = 0
 
-        plot(X, tdiskY[:,:,0], tsig_col[:,:,0],title="cartesian sig col")
+        #plot(X, tdiskY[:,:,0], tsig_col[:,:,0],title="cartesian sig col")
         
         self.sig_col = tsig_col
 
